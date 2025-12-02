@@ -6,10 +6,12 @@ User type includes individual and business.
 ## Features And Todos
 
 1. User Onboarding
+
 User Type: Individual - KYC
 - [ ] User registration (NIN/Bank verification)
 - [ ] KYC compliance (photo ID, address verification, etc.)
 - [ ] OTP and email/mobile verification
+
 User Type: Business - KYB
 - [ ] Documents upload
 
