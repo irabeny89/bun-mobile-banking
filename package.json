@@ -9,7 +9,8 @@
     "@elysiajs/cors": "^1.4.0",
     "@elysiajs/openapi": "^1.4.11",
     "@elysiajs/server-timing": "^1.4.0",
-    "elysia": "latest"
+    "elysia": "latest",
+    "elysia-healthcheck": "^1.0.0"
   },
   "devDependencies": {
     "bun-types": "latest"
