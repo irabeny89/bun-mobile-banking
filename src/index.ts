@@ -1,4 +1,5 @@
 import cors from "@elysiajs/cors";
+import jwt, { type JWTOption } from "@elysiajs/jwt";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
@@ -6,7 +7,7 @@ import { healthcheckPlugin } from "elysia-healthcheck";
 import { elysiaXSS } from "elysia-xss";
 import logixlysia, { type Options } from "logixlysia";
 import pkg from "../package.json";
-import { IS_PROD_ENV } from "./config";
+import { IS_PROD_ENV, SECRET_1 } from "./config";
 
 const logOption: Options = {
 	config: {
@@ -33,6 +34,10 @@ const logOption: Options = {
 			"🦊 {now} {level} {duration} {method} {pathname} {status} {message} {ip}",
 	},
 };
+const jwtOption: JWTOption<"jwt", undefined> = {
+	name: "jwt",
+	secret: SECRET_1,
+};
 const app = new Elysia()
 	.use(logixlysia(logOption))
 	.use(cors())
@@ -40,6 +45,7 @@ const app = new Elysia()
 	.use(serverTiming())
 	.use(healthcheckPlugin())
 	.use(elysiaXSS({}))
+	.use(jwt(jwtOption))
 	.get("/", () => "Hello Elysia")
 	.listen(3000);
 
