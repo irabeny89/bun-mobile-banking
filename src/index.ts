@@ -15,6 +15,12 @@ const logOption: Options = {
 			translateTime: "yyyy-mm-dd HH:MM:ss.SSS",
 		},
 		logFilePath: IS_PROD_ENV ? "./logs/app.log" : undefined,
+		logRotation: {
+			maxSize: "10m",
+			interval: "1d",
+			maxFiles: "7d",
+			compress: true,
+		},
 		logFilter: IS_PROD_ENV
 			? {
 					level: ["ERROR", "WARNING", "INFO"],
