@@ -4,6 +4,7 @@ import jwt, { type JWTOption } from "@elysiajs/jwt";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
+import { background } from "elysia-background";
 import { healthcheckPlugin } from "elysia-healthcheck";
 import { elysiaXSS } from "elysia-xss";
 import logixlysia, { type Options } from "logixlysia";
@@ -47,6 +48,7 @@ const app = new Elysia()
 	.use(healthcheckPlugin())
 	.use(elysiaXSS({}))
 	.use(jwt(jwtOption))
+	.use(background())
 	.get("/", () => "Hello Elysia")
 	.listen(3000);
 
