@@ -1,8 +1,10 @@
+import { createFilename } from "@/utils";
+
 if (Bun.argv.length === 3) {
-  const folder = Bun.env.MIG_FOLDER ?? "src/migrations";
   const timestamp = Date.now();
-  const suffix = Bun.argv[2].trim().replace(/\s/g, () => "-");
-  const filename = `${timestamp}-${suffix}.sql`;
+  const suffix = Bun.argv[2];
+  const filename = `${timestamp}-${createFilename(suffix)}.sql`;
+  const folder = Bun.env.MIG_FOLDER ?? "src/migrations";
   const filePath = `${folder}/${filename}`;
   Bun.write(`${filePath}`, "");
   console.log(`file created: ${filePath}`);
