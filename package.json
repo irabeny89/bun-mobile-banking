@@ -3,7 +3,9 @@
   "version": "1.0.50",
   "scripts": {
     "email": "email dev --dir src/emails",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "maildev": "podman run -p 1080:1080 -p 1025:1025 maildev/maildev",
+    "mig-file": "bun scripts/create-migration-file.ts"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.0",
@@ -23,6 +25,7 @@
   },
   "devDependencies": {
     "@react-email/preview-server": "5.0.5",
+    "@types/nodemailer": "^7.0.4",
     "bun-types": "latest",
     "react-email": "^5.0.5"
   },
