@@ -1,9 +1,15 @@
-import { createFilename } from "@/utils";
+/// Creates SQL migration file with name like: [timestamp]-[suffix]
+/// Usage: bun scripts/create-migration-file.ts user-table
+/// OR
+/// Usage: bun mig8:new user-table
+
+import { WORD_SEPARATOR } from "@/config";
+import { renameFile } from "@/utils/migration-filename";
 
 if (Bun.argv.length === 3) {
   const timestamp = Date.now();
   const suffix = Bun.argv[2];
-  const filename = `${timestamp}-${createFilename(suffix)}.sql`;
+  const filename = `${timestamp}${WORD_SEPARATOR}${renameFile(suffix)}`;
   const folder = Bun.env.MIG_FOLDER ?? "src/migrations";
   const filePath = `${folder}/${filename}`;
   Bun.write(`${filePath}`, "");
