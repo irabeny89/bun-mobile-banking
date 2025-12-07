@@ -3,6 +3,13 @@ import { t } from "elysia";
 import { UserModel } from "../user/model";
 
 export namespace AuthModel {
+    export const tokenPayloadSchema = t.Pick(UserModel.userSchema, [
+        "id",
+        "userType",
+        "email"
+    ])
+    export type TokenPayloadT = typeof tokenPayloadSchema.static;
+
     export const tokenSchema = t.Object({
         accessToken: t.String(),
         refreshToken: t.String(),
