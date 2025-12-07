@@ -64,12 +64,12 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | **GET** | `/me` | Get current user's profile details. |
-| **PUT** | `/me` | Update profile information. |
+| **POST** | `/update/photo-url` | Update photo ID URL. |
 | **POST** | `/kyc` | Submit KYC documents (Photo ID, Address). |
 | **GET** | `/kyc/status` | Check current KYC verification status. |
 | **POST** | `/pin/set` | Set transaction PIN. |
 | **POST** | `/pin/change` | Change transaction PIN. |
-| **POST** | `/security/2fa` | Enable/Disable 2FA. |
+| **POST** | `/security/mfa` | Enable/Disable MFA. |
 
 ### 3. Account Management
 **Base URL**: `/api/v1/accounts`
