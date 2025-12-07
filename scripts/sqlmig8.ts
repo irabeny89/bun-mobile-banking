@@ -1,7 +1,12 @@
-import { ascendSort } from "@/utils/migration-file";
-import { sql } from "bun";
+import db from "@/utils/db";
+import { ascendSortByTimestamp } from "@/utils/migration-file";
 
+const sql = db();
 const MIGRATION_TABLE = "mig8";
+/**
+ * Logs a message to the console with migration context.
+ * @param message The message to log.
+ */
 const log = (message: unknown) => {
   console.log(`${MIGRATION_TABLE}|INFO:: ${message}`);
 };
@@ -27,7 +32,7 @@ if (Bun.argv.length > 2 && Bun.argv[2] === "--dir") {
   const { readdir } = await import("node:fs/promises");
   const files = await readdir(folder);
   // sort files by their prefixed number eg 1-create-user-table.sql
-  files.sort(ascendSort);
+  files.sort(ascendSortByTimestamp);
   // execute each file
   let count = 0;
   for (const filename of files) {
