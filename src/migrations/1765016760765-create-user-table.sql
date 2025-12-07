@@ -34,3 +34,5 @@ CREATE TRIGGER users_set_updated_at
 BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION set_update_timestamp();
+
+CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
