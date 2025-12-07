@@ -1,4 +1,4 @@
-import { ascendSort } from "@/utils/migration-filename";
+import { ascendSort } from "@/utils/migration-file";
 import { sql } from "bun";
 
 const MIGRATION_TABLE = "mig8";

@@ -1,4 +1,4 @@
-import { renameFile } from "@/utils/migration-filename";
+import { renameFile } from "@/utils/migration-file";
 import { describe, expect, it } from "bun:test";
 
 describe("renameFilename", () => {

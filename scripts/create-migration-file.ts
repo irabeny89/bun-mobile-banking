@@ -4,7 +4,7 @@
 /// Usage: bun mig8:new user-table
 
 import { WORD_SEPARATOR } from "@/config";
-import { renameFile } from "@/utils/migration-filename";
+import { renameFile } from "@/utils/migration-file";
 
 if (Bun.argv.length === 3) {
   const timestamp = Date.now();
