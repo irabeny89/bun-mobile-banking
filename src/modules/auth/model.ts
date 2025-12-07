@@ -1,6 +1,6 @@
 import { errorSchemaFactory, successSchemaFactory } from "@/utils/response";
 import { t } from "elysia";
-import { UserModel } from "../model";
+import { UserModel } from "../user/model";
 
 export namespace AuthModel {
     export const tokenSchema = t.Object({
