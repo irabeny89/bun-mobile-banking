@@ -66,6 +66,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **GET** | `/me` | Get current user's profile details. |
 | **POST** | `/update/photo-url` | Update photo ID URL. |
 | **POST** | `/kyc` | Submit KYC documents (Photo ID, Address). |
+| **POST** | `/kyb` | Submit KYB documents (Address Proof). |
 | **GET** | `/kyc/status` | Check current KYC verification status. |
 | **POST** | `/pin/set` | Set transaction PIN. |
 | **POST** | `/pin/change` | Change transaction PIN. |

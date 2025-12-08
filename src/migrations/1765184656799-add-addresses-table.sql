@@ -10,3 +10,18 @@ CREATE TABLE IF NOT EXISTS addresses (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE OR REPLACE FUNCTION set_update_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER addresses_set_updated_at
+BEFORE UPDATE ON addresses
+FOR EACH ROW
+EXECUTE FUNCTION set_update_timestamp();
+
+CREATE INDEX IF NOT EXISTS idx_addresses_created_at ON addresses(created_at);
