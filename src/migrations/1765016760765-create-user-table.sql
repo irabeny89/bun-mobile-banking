@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS users (
   phone VARCHAR(20) UNIQUE,
   dob DATE,
   gender VARCHAR(2),
-  address_id UUID REFERENCES addresses(id),
   bvn VARCHAR(11) UNIQUE,
   nin VARCHAR(11) UNIQUE,
   govt_id VARCHAR(128) UNIQUE,

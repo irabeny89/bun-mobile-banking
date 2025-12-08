@@ -37,7 +37,6 @@ export namespace UserModel {
     })),
     dob: t.Optional(t.Date()),
     gender: t.Optional(genderSchema),
-    addressId: t.Optional(t.String({ format: "uuid" })),
     bvn: t.Optional(t.String({ pattern: "^[0-9]{11}$" })),
     nin: t.Optional(t.String({ pattern: "^[0-9]{11}$" })),
     govtId: t.Optional(t.String({ pattern: "^[a-zA-Z0-9]{1,128}$" })),
