@@ -12,6 +12,8 @@ declare module "bun" {
     POSTGRES_HOSTNAME: string;
     POSTGRES_PORT: string;
     POSTGRES_URL: string;
-    
+    VALKEY_HOSTNAME: string;
+    VALKEY_PORT: string;
+    VALKEY_URL: string;
   }
 }
