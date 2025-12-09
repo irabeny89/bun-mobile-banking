@@ -1,6 +1,6 @@
 /**
  * Generates numeric OTP(one-time password) string.
- * @param length number of digits to generate
+ * @param length number of digits to generate. default is 6
  * @returns numeric OTP string
  */
 export async function genOTP(digits: number = 6): Promise<string> {
