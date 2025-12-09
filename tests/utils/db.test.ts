@@ -6,5 +6,6 @@ describe("db", () => {
     const sql = db();
     const connection = await sql.connect();
     expect(connection).toBeDefined();
+    sql.close();
   });
 });
