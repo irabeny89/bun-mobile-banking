@@ -4,7 +4,7 @@ import { describe, expect, it } from "bun:test";
 describe("cache", () => {
   it("should be connected", async () => {
     const cache = cacheSingleton();
-    const connection = await cache.connect();
-    expect(connection).toBeDefined();
+    await cache.connect();
+    expect(cache.connected).toBe(true);
   });
 });
