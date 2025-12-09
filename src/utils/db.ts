@@ -8,15 +8,7 @@ let db: Bun.SQL | null = null;
  */
 export default function dbSingleton(url: string = POSTGRES_URL) {
     if (!db) {
-        db = new Bun.SQL({
-            url,
-            onconnect: () => {
-                console.log("Connected to PostgreSQL");
-            },
-            onclose: () => {
-                console.log("PostgreSQL connection closed");
-            },
-        });
+        db = new Bun.SQL({ url });
     }
     return db;
 }
