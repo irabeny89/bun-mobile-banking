@@ -22,5 +22,16 @@ export const errorHandler = new Elysia({ name: "error-handler" })
       };
       return errRes;
     }
+    else {
+      const { message } = error as any;
+      const errRes: ErrorResponse = {
+        status: "error",
+        error: {
+          code: String(code),
+          message,
+        },
+      };
+      return errRes;
+    }
   })
   .as("global");
