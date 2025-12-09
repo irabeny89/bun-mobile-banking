@@ -1,6 +1,6 @@
 {
   "name": "fluxus-mobile-banking",
-  "version": "1.0.50",
+  "version": "1.0.0",
   "description": "Mobile banking app for individuals and businesses.",
   "scripts": {
     "email": "email dev --dir src/emails",
