@@ -8,7 +8,10 @@
     "maildev": "podman run -p 1080:1080 -p 1025:1025 maildev/maildev",
     "mig8:new": "bun scripts/create-migration-file.ts",
     "mig8:file": "bun scripts/sqlmig8.ts",
-    "mig8:dir": "bun scripts/sqlmig8.ts --dir"
+    "mig8:dir": "bun scripts/sqlmig8.ts --dir",
+    "pod:app": "./scripts/app-pod.sh",
+    "kube:play": "./scripts/kube-play.sh",
+    "kube:gen": "./scripts/pod-kube.sh"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.0",
@@ -17,8 +20,8 @@
     "@elysiajs/openapi": "^1.4.11",
     "@elysiajs/server-timing": "^1.4.0",
     "@react-email/components": "^1.0.1",
+    "bullmq": "^5.65.1",
     "elysia": "latest",
-    "elysia-background": "^1.0.1",
     "elysia-healthcheck": "^1.0.0",
     "elysia-xss": "^1.0.3",
     "logixlysia": "^5.3.0",
