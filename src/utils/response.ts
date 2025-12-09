@@ -15,17 +15,17 @@ export function successSchemaFactory<T extends TProperties & TSchema>(
 ) {
   return type === "paging data"
     ? t.Object({
-        status: t.Literal("success"),
-        data: t.Array(dataSchema),
-        pagination: t.Object({
-          cursor: t.String(),
-          hasMore: t.Boolean(),
-        }),
-      })
+      status: t.Literal("success"),
+      data: t.Array(dataSchema),
+      pagination: t.Object({
+        cursor: t.String(),
+        hasMore: t.Boolean(),
+      }),
+    })
     : t.Object({
-        status: t.Literal("success"),
-        data: dataSchema,
-      });
+      status: t.Literal("success"),
+      data: dataSchema,
+    });
 }
 /**
  * Factory function to generate HTTP error schema.
@@ -35,7 +35,7 @@ export function errorSchemaFactory() {
   return t.Object({
     status: t.Literal("error"),
     error: t.Object({
-      code: t.String(),
+      code: t.Optional(t.String()),
       message: t.String(),
       details: t.Optional(
         t.Array(
