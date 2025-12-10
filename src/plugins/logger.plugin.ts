@@ -20,16 +20,15 @@ export const logger = new Elysia({ name: "logger" })
         },
         logFilter: IS_PROD_ENV
           ? {
-              level: ["ERROR", "WARNING", "INFO"],
-              status: [500, 404],
-              method: "GET",
-            }
+            level: ["ERROR", "WARNING", "INFO"],
+            status: [500, 404],
+            method: "GET",
+          }
           : undefined,
         pino: {
           level: "debug",
           prettyPrint: true,
           redact: ["password", "token"],
-          base: { service: pkg.name },
         },
         ip: true,
         customLogFormat:
@@ -37,4 +36,3 @@ export const logger = new Elysia({ name: "logger" })
       },
     })
   )
-  .as("global");
