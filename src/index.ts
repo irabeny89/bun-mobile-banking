@@ -7,7 +7,6 @@ import pkg from "../package.json";
 import { trim } from "./plugins/trim.plugin";
 import { errorHandler } from "./plugins/onerror.plugin";
 import { compression } from "./plugins/compress.plugin";
-import { logger } from "./plugins/logger.plugin";
 import { auth } from "./modules/auth";
 import { systemStatus } from "./plugins/system-status.plugin";
 import { individualUser } from "./modules/Individual_user";
@@ -22,7 +21,6 @@ const app = new Elysia({
   .use(errorHandler)
   .use(systemStatus)
   .use(trim)
-  .use(logger)
   .use(cors())
   .use(openapi())
   .use(serverTiming())
