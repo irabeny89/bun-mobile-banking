@@ -2,6 +2,7 @@ import Elysia from "elysia";
 import pkg from "../../package.json";
 import { IS_PROD_ENV } from "../config";
 import dbSingleton from "@/utils/db";
+import dbStatuses from "@/utils/db-status";
 import cacheSingleton from "@/utils/cache";
 
 /**
@@ -10,15 +11,9 @@ import cacheSingleton from "@/utils/cache";
  */
 export const systemStatus = new Elysia({ name: "system-status" })
     .onStart(async ({ server }) => {
-        const db = dbSingleton();
-        const dbStatus = await db`SELECT 1`
-            .then(() => "✅ connected")
-            .catch(() => "❌ disconnected")
-        const cache = cacheSingleton();
-        const cacheStatus = await cache.connect()
-            .then(() => "✅ connected")
-            .catch(() => "❌ disconnected")
-
+        const db = dbSingleton()
+        const cache = cacheSingleton()
+        const { dbStatus, cacheStatus } = await dbStatuses(db, cache)
         console.log(`🦊 ${pkg.name} v${pkg.version} server running 🚀`);
         console.log(`🛠️  Environment: ${IS_PROD_ENV ? "production" : "development"}`);
         console.log(`💾 Database status: ${dbStatus}`)
