@@ -7,8 +7,7 @@ export const errorHandler = new Elysia({ name: "error-handler" })
   .use(logger)
   .onError(({ code, error, store }) => {
     const logger = pinoLogger(store)
-    logger.trace("error handler")
-    logger.error(error, "error")
+    logger.error(error, "errorHandler:: error captured")
     const errorSchema = errorSchemaFactory();
     type ErrorResponse = typeof errorSchema.static;
     if (code === "VALIDATION") {
@@ -26,7 +25,8 @@ export const errorHandler = new Elysia({ name: "error-handler" })
           }),
         },
       };
-      return errRes;
+      logger.info("errorHandler:: validation error transformed to ErrorResponse")
+      return errRes
     }
     else {
       const { message } = error as any;
@@ -37,6 +37,7 @@ export const errorHandler = new Elysia({ name: "error-handler" })
           message,
         },
       };
-      return errRes;
+      logger.info("errorHandler:: error transformed to ErrorResponse")
+      return errRes
     }
-  });
+  }).as("global");
