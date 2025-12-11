@@ -20,7 +20,7 @@ export const compression = new Elysia()
 			: (responseValue?.toString() ?? "empty");
 
 		const compressed = Bun.gzipSync(encoder.encode(text));
-		logger.info("compression:: returning compressed response");
+		logger.info("compression:: returned compressed response");
 		set.headers["Content-Encoding"] = "gzip";
 		return new Response(compressed, {
 			headers: {
