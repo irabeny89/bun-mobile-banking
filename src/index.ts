@@ -4,13 +4,12 @@ import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
 import { elysiaXSS } from "elysia-xss";
 import pkg from "../package.json";
-import { trim } from "./plugins/trim.plugin";
 import { errorHandler } from "./plugins/onerror.plugin";
-import { compression } from "./plugins/compress.plugin";
 import { auth } from "./modules/auth";
 import { systemStatus } from "./plugins/system-status.plugin";
 import { individualUser } from "./modules/Individual_user";
 import { healthcheck } from "./plugins/heathcheck.plugin";
+import { cacheReq } from "./cache-req";
 
 const app = new Elysia({
   name: pkg.name,
@@ -20,12 +19,11 @@ const app = new Elysia({
 })
   .use(errorHandler)
   .use(systemStatus)
-  .use(trim)
   .use(cors())
   .use(openapi())
   .use(serverTiming())
   .use(elysiaXSS({}))
-  .use(compression)
+  .use(cacheReq)
   .use(healthcheck)
   .get("/", () => `Hello from ${pkg.name}.\n${pkg.description}`)
   .group("/api/v1", (app) => app.use(auth).use(individualUser))

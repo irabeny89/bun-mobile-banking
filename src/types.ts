@@ -15,5 +15,11 @@ declare module "bun" {
     VALKEY_HOSTNAME: string;
     VALKEY_PORT: string;
     VALKEY_URL: string;
+    EMAIL_FROM: string;
   }
+}
+
+export enum CACHE_GET_VALUE {
+  Set = "set",
+  Hit = "hit"
 }
