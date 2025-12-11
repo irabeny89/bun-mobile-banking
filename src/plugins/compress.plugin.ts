@@ -1,21 +1,30 @@
 import { Elysia } from "elysia";
+import pinoLogger from "@/utils/pino-logger";
 
 const encoder = new TextEncoder();
 
-export const compression = new Elysia().mapResponse(({ responseValue, set }) => {
-	const isJson = typeof responseValue === "object";
+export const compression = new Elysia()
+	.mapResponse({ as: "scoped" }, ({ responseValue, set, store }) => {
+		const logger = pinoLogger(store)
 
-	const text = isJson
-		? JSON.stringify(responseValue)
-		: (responseValue?.toString() ?? "");
+		const isJson = typeof responseValue === "object";
 
-	set.headers["Content-Encoding"] = "gzip";
+		logger.debug({
+			dataType: typeof responseValue,
+			isJson,
+			responseValue,
+		}, "compression:: response value");
 
-	return new Response(Bun.gzipSync(encoder.encode(text)), {
-		headers: {
-			"Content-Type": `${
-				isJson ? "application/json" : "text/plain"
-			}; charset=utf-8`,
-		},
-	});
-}).as("global");
+		const text = isJson
+			? JSON.stringify(responseValue)
+			: (responseValue?.toString() ?? "empty");
+
+		const compressed = Bun.gzipSync(encoder.encode(text));
+		logger.info("compression:: returning compressed response");
+		set.headers["Content-Encoding"] = "gzip";
+		return new Response(compressed, {
+			headers: {
+				"Content-Type": `${isJson ? "application/json" : "text/plain"}; charset=utf-8`,
+			},
+		});
+	}).as("global");

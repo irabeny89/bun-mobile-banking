@@ -11,6 +11,7 @@ import { individualUser } from "./modules/Individual_user";
 import { healthcheck } from "./plugins/heathcheck.plugin";
 import { cacheReq } from "./cache-req";
 import { logger } from "./plugins/logger.plugin";
+import { compression } from "./plugins/compress.plugin";
 
 const app = new Elysia({
   name: pkg.name,
@@ -26,6 +27,7 @@ const app = new Elysia({
   .use(elysiaXSS({}))
   .use(logger)
   .use(cacheReq)
+  .use(compression)
   .use(healthcheck)
   .get("/", () => `Hello from ${pkg.name}.\n${pkg.description}`)
   .group("/api/v1", (app) => app.use(auth).use(individualUser))
