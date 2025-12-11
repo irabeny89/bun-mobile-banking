@@ -3,18 +3,11 @@ import cacheSingleton from "./utils/cache";
 import { CACHE_GET } from "./config";
 import { CACHE_GET_VALUE } from "./types";
 import pinoLogger from "./utils/pino-logger";
-import { logger } from "./plugins/logger.plugin";
 
 export const cacheReq = new Elysia({ name: "cache-request" })
-    .use(logger)
     .state("cacheHit", false)
     .decorate("cache", cacheSingleton())
-    .resolve(({ store }) => {
-        const logger = pinoLogger(store)
-        return {
-            logger
-        }
-    })
+    .resolve(({ store }) => ({ logger: pinoLogger(store) }))
     .onAfterHandle(async ({ store, cache, request, set, responseValue, logger }) => {
         // cache if GET request has response and cache hit was missed
         if (request.method === "GET" && !!responseValue && !store.cacheHit) {

@@ -10,6 +10,7 @@ import { systemStatus } from "./plugins/system-status.plugin";
 import { individualUser } from "./modules/Individual_user";
 import { healthcheck } from "./plugins/heathcheck.plugin";
 import { cacheReq } from "./cache-req";
+import { logger } from "./plugins/logger.plugin";
 
 const app = new Elysia({
   name: pkg.name,
@@ -23,6 +24,7 @@ const app = new Elysia({
   .use(openapi())
   .use(serverTiming())
   .use(elysiaXSS({}))
+  .use(logger)
   .use(cacheReq)
   .use(healthcheck)
   .get("/", () => `Hello from ${pkg.name}.\n${pkg.description}`)
