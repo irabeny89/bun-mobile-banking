@@ -1,7 +1,6 @@
 import { IS_PROD_ENV } from "@/config";
 import Elysia from "elysia";
 import logixlysia from "logixlysia";
-import pkg from "../../package.json";
 
 export const logger = new Elysia({ name: "logger" })
   .use(
@@ -35,4 +34,4 @@ export const logger = new Elysia({ name: "logger" })
           "🦊 {now} {level} {duration} {method} {pathname} {status} {message} {ip}",
       },
     })
-  )
+  ).as("global")
