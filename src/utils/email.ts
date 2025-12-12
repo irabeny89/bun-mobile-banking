@@ -3,7 +3,6 @@ import { createOtpEmailHtml } from "@/emails/otp";
 import { Queue, Worker } from "bullmq";
 import { Logger } from "logixlysia";
 import { createTestAccount, createTransport, getTestMessageUrl } from "nodemailer";
-import pino from "pino";
 
 type EmailJobT = "email-verify";
 type EmailVerifyDataT = Record<"name" | "email" | "otp", string> & { logger: Logger["pino"] }
