@@ -1,8 +1,8 @@
 import Elysia from "elysia";
-import cacheSingleton from "./utils/cache";
-import { CACHE_GET } from "./config";
-import { CACHE_GET_VALUE } from "./types";
-import pinoLogger from "./utils/pino-logger";
+import cacheSingleton from "../utils/cache";
+import { CACHE_GET } from "../config";
+import { CACHE_GET_VALUE } from "../types";
+import pinoLogger from "../utils/pino-logger";
 
 export const cacheReq = new Elysia({ name: "cache-request" })
     .state("cacheHit", false)
@@ -22,12 +22,12 @@ export const cacheReq = new Elysia({ name: "cache-request" })
         logger.info("cacheReq:: checking cache")
         const cached = await cache.get(request.url);
         if (cached) {
-            logger.info("cache hit")
+            logger.info("cacheReq:: cache hit")
             const responseValue = JSON.parse(cached)
             store.cacheHit = true;
             set.headers[CACHE_GET.header] = CACHE_GET_VALUE.Hit
             logger.info({ url: request.url, responseValue }, "cacheReq:: returning cached response")
             return responseValue;
         }
-        logger.info("cache miss")
+        logger.info("cacheReq:: cache miss")
     }).as("global")
