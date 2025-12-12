@@ -9,7 +9,7 @@ import { auth } from "./modules/auth";
 import { systemStatus } from "./plugins/system-status.plugin";
 import { individualUser } from "./modules/Individual_user";
 import { healthcheck } from "./plugins/heathcheck.plugin";
-import { cacheReq } from "./cache-req";
+import { cacheReq } from "./plugins/cache-req";
 import { logger } from "./plugins/logger.plugin";
 import { compression } from "./plugins/compress.plugin";
 import { rateLimitPlugin } from "./plugins/rate-limit.plugin";

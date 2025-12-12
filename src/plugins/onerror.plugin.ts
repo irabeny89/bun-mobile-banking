@@ -29,7 +29,7 @@ export const errorHandler = new Elysia({ name: "error-handler" })
       return errRes
     }
     else {
-      const { message } = error as any;
+      const { response: { error: { message } } } = error as any;
       const errRes: ErrorResponse = {
         status: "error",
         error: {

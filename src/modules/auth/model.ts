@@ -1,9 +1,9 @@
 import { errorSchemaFactory, successSchemaFactory } from "@/utils/response";
 import { t } from "elysia";
-import { UserModel } from "../user/model";
+import { IndividualUserModel } from "../Individual_user/model";
 
 export namespace AuthModel {
-    export const tokenPayloadSchema = t.Pick(UserModel.userSchema, [
+    export const tokenPayloadSchema = t.Pick(IndividualUserModel.userSchema, [
         "id",
         "userType",
         "email"
@@ -16,20 +16,26 @@ export namespace AuthModel {
     })
     export type TokenT = typeof tokenSchema.static;
 
-    export const registerSchema = t.Pick(UserModel.userSchema, [
-        "userType",
+    export const registerBodySchema = t.Pick(IndividualUserModel.userSchema, [
         "firstName",
         "middleName",
         "lastName",
         "email",
-        "phone",
         "password",
-        "address",
     ]);
-    export type RegisterT = typeof registerSchema.static;
+    export type RegisterBodyT = typeof registerBodySchema.static;
 
-    export const registerSuccessSchema = successSchemaFactory(tokenSchema)
+    export const registerSuccessSchema = successSchemaFactory(t.Object({
+        message: t.String(),
+    }))
     export type RegisterSuccessT = typeof registerSuccessSchema.static;
+
+    export const registerServiceReturnSchema = t.Object({
+        note: t.UnionEnum(["existing user", "verify email"]),
+        otp: t.String(),
+        message: t.String()
+    })
+    export type RegisterServiceReturnT = typeof registerServiceReturnSchema.static;
 
     export const verifySchema = t.Object({
         email: t.String(),
