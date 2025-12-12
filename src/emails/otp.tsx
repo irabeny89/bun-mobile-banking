@@ -1,27 +1,29 @@
+import { OTP_TTL } from "@/config";
 import { Section, Tailwind, Text } from "@react-email/components";
 import * as React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { render } from "@react-email/render";
 
 type Props = {
   otp: string;
+  name: string;
 };
-export default function OTPEmail({ otp }: Props) {
+export default function OtpEmail({ otp, name }: Props) {
   return (
     <Tailwind>
       <Section className="flex justify-center items-center w-full min-h-screen font-sans">
         <Section className="flex flex-col items-center w-76 rounded-2xl px-6 py-1 bg-gray-50">
           <Text className="text-xs font-medium text-violet-500">
-            Verify your Email Address
+            One Time Password (OTP)
           </Text>
           <Text className="text-gray-500 my-0">
-            Use the following code to verify your email address
+            Use the following code to complete your verification
           </Text>
           <Text className="text-5xl font-bold pt-2">{otp}</Text>
           <Text className="text-gray-400 font-light text-xs pb-4">
-            This code is valid for 10 minutes
+            This code is valid for {OTP_TTL / 60} minutes
           </Text>
           <Text className="text-gray-600 text-xs">
-            Thank you for joining us
+            Thank you for joining us {name}
           </Text>
         </Section>
       </Section>
@@ -29,6 +31,6 @@ export default function OTPEmail({ otp }: Props) {
   );
 }
 
-export function createOptEmailHtml(otp: string) {
-  return renderToStaticMarkup(<OTPEmail otp={otp} />);
+export function createOtpEmailHtml(otp: string, name: string) {
+  return render(<OtpEmail otp={otp} name={name} />);
 }
