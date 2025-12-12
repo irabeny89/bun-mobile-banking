@@ -11,7 +11,6 @@ import { individualUser } from "./modules/Individual_user";
 import { healthcheck } from "./plugins/heathcheck.plugin";
 import { cacheReq } from "./plugins/cache-req";
 import { logger } from "./plugins/logger.plugin";
-import { compression } from "./plugins/compress.plugin";
 import { rateLimitPlugin } from "./plugins/rate-limit.plugin";
 
 const app = new Elysia({
@@ -28,7 +27,6 @@ const app = new Elysia({
   .use(elysiaXSS({}))
   .use(logger)
   .use(cacheReq)
-  .use(compression)
   .use(rateLimitPlugin)
   .use(healthcheck)
   .get("/", () => `Hello from ${pkg.name}.\n${pkg.description}`)

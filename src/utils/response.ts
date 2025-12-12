@@ -15,7 +15,7 @@ export function successSchemaFactory<T extends TProperties & TSchema>(
 ) {
   return type === "paging data"
     ? t.Object({
-      status: t.Literal("success"),
+      type: t.Literal("success"),
       data: t.Array(dataSchema),
       pagination: t.Object({
         cursor: t.String(),
@@ -23,7 +23,7 @@ export function successSchemaFactory<T extends TProperties & TSchema>(
       }),
     })
     : t.Object({
-      status: t.Literal("success"),
+      type: t.Literal("success"),
       data: dataSchema,
     });
 }
@@ -33,18 +33,16 @@ export function successSchemaFactory<T extends TProperties & TSchema>(
  */
 export function errorSchemaFactory() {
   return t.Object({
-    status: t.Literal("error"),
+    type: t.Literal("error"),
     error: t.Object({
-      code: t.Optional(t.String()),
+      code: t.Union([t.String(), t.Number()]),
       message: t.String(),
-      details: t.Optional(
-        t.Array(
-          t.Object({
-            path: t.String(),
-            message: t.String(),
-          })
-        )
-      ),
+      details: t.Array(
+        t.Object({
+          path: t.String(),
+          message: t.String(),
+        })
+      )
     }),
   });
 }

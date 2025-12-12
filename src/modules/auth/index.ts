@@ -38,26 +38,19 @@ export const auth = new Elysia({
       logger
     }
   })
-  .post("/register/individual-user", async ({ body, status, logger, set }) => {
-    try {
-      logger.info("auth:: registering individual user")
-      const res = await AuthService.register(body, logger)
-      return res === "user exist"
-        ? status(400, {
-          status: "error",
-          error: { message: "User already exists", code: "USER_EXIST" }
-        })
-        : status(200, {
-          status: "success",
-          data: { message: `Check your email to complete your registration within ${OTP_TTL / 60} minutes.` }
-        })
-    } catch (error) {
-      logger.error(error, "auth:: error registering individual user")
-      set.status = 500;
-      return status(500, {
-        status: "error",
-        error: { message: "Internal server error", code: "INTERNAL_SERVER_ERROR" }
-      })
+  .post("/register/individual-user", async ({ body, logger, set }) => {
+    logger.info("auth:: registering individual user")
+    const res = await AuthService.register(body, logger)
+    if (res === "user exist") {
+      set.status = 400
+      return {
+        type: "error",
+        error: { message: "User already exists", code: "USER_EXIST", details: [] }
+      }
+    }
+    return {
+      type: "success",
+      data: { message: `Check your email to complete your registration within ${OTP_TTL / 60} minutes.` }
     }
   }, {
     body: AuthModel.registerBodySchema,
