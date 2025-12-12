@@ -26,10 +26,10 @@ src/
 ## Prerequisites
 
 *   **Node.js:** v22.10.0
-*   **Bun:** v1.1.56
-*   **PostgreSQL:** v16.0
-*   **Redis:** v7.2.1
-*   **NPM:** v9.16.0
+*   **Bun:** v1.3.0
+*   **PostgreSQL:** v18.0
+*   **Redis:** v9.0.0
+*   **NPM:** v10.16.0
 
 ## Technology Stack
 
@@ -50,29 +50,43 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| **POST** | `/register` | Register a new user (Individual/Business). |
-| **POST** | `/verify` | Verify email/mobile via OTP. |
+| **POST** | `/register/individual-user` | Register a new user (Individual). |
+| **POST** | `/register/business-user` | Register a new user (Business). |
+| **POST** | `/verify/email` | Verify email via OTP. |
+| **POST** | `/verify/mobile` | Verify mobile via OTP. |
 | **POST** | `/login` | Authenticate user and return JWT. |
 | **POST** | `/refresh-token` | Refresh access token. |
 | **POST** | `/password/forgot` | Initiate password recovery. |
 | **POST** | `/password/reset` | Reset password using recovery token. |
 | **POST** | `/logout` | Invalidate user session. |
 
-### 2. User Profile & KYC
-**Base URL**: `/api/v1/users`
+### 2. Individual User Profile & KYC
+**Base URL**: `/api/v1/individual-users`
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | **GET** | `/me` | Get current user's profile details. |
 | **POST** | `/update/photo-url` | Update photo ID URL. |
 | **POST** | `/kyc` | Submit KYC documents (Photo ID, Address). |
-| **POST** | `/kyb` | Submit KYB documents (Address Proof). |
 | **GET** | `/kyc/status` | Check current KYC verification status. |
 | **POST** | `/pin/set` | Set transaction PIN. |
 | **POST** | `/pin/change` | Change transaction PIN. |
 | **POST** | `/security/mfa` | Enable/Disable MFA. |
 
-### 3. Account Management
+### 3. Business User Profile & KYB
+**Base URL**: `/api/v1/business-users`
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| **GET** | `/me` | Get current user's profile details. |
+| **POST** | `/update/photo-url` | Update photo ID URL. |
+| **POST** | `/kyb` | Submit KYB documents (Address Proof). |
+| **GET** | `/kyb/status` | Check current KYB verification status. |
+| **POST** | `/pin/set` | Set transaction PIN. |
+| **POST** | `/pin/change` | Change transaction PIN. |
+| **POST** | `/security/mfa` | Enable/Disable MFA. |
+
+### 4. Account Management
 **Base URL**: `/api/v1/accounts`
 
 | Method | Endpoint | Description |
@@ -82,7 +96,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **GET** | `/{accountId}/transactions` | Get transaction history for an account. |
 | **POST** | `/{accountId}/statement` | Request account statement (PDF/Email). |
 
-### 4. Transactions & Transfers
+### 5. Transactions & Transfers
 **Base URL**: `/api/v1/transfers`
 
 | Method | Endpoint | Description |
@@ -95,7 +109,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/beneficiaries` | Add a new beneficiary. |
 | **DELETE**| `/beneficiaries/{id}` | Remove a beneficiary. |
 
-### 5. Payments & Bills
+### 6. Payments & Bills
 **Base URL**: `/api/v1/payments`
 
 | Method | Endpoint | Description |
@@ -106,7 +120,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/airtime` | Purchase airtime or data. |
 | **POST** | `/validate` | Validate customer ID for a biller. |
 
-### 6. Card Management
+### 7. Card Management
 **Base URL**: `/api/v1/cards`
 
 | Method | Endpoint | Description |
@@ -118,7 +132,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/{cardId}/pin` | Change card PIN. |
 | **GET** | `/{cardId}/details` | Get sensitive card details (for virtual cards). |
 
-### 7. Loans
+### 8. Loans
 **Base URL**: `/api/v1/loans`
 
 | Method | Endpoint | Description |
@@ -128,7 +142,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **GET** | `/active` | Get details of active loans. |
 | **GET** | `/history` | Get loan repayment history. |
 
-### 8. Investments
+### 9. Investments
 **Base URL**: `/api/v1/investments`
 
 | Method | Endpoint | Description |
@@ -138,7 +152,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **GET** | `/` | List user investments. |
 | **POST** | `/{investmentId}/liquidate` | Liquidate an investment early. |
 
-### 9. Support
+### 10. Support
 **Base URL**: `/api/v1/support`
 
 | Method | Endpoint | Description |
