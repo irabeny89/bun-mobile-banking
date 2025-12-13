@@ -1,6 +1,8 @@
 # Install RestClient for VSCode to run this file 
 
 @baseUrl = http://localhost:3000
+@email = irabeny89@gmail.com
+@password = @fluxus#2026
 
 # Root
 GET {{baseUrl}}
@@ -21,8 +23,8 @@ Content-Type: application/json
 {
   "firstName": "Ernest",
   "lastName": "Irabor",
-  "email": "irabeny89@gmail.com",
-  "password": "@fluxus#2026",
+  "email": "{{email}}",
+  "password": "{{password}}",
   "gender": "m"
 }
 
@@ -35,3 +37,14 @@ Content-Type: application/json
 {
   "otp": "{{otp}}"
 }
+
+###
+# Login Individual User
+POST {{baseUrl}}/api/v1/auth/login/individual-user
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+

@@ -8,7 +8,36 @@ import { emailQueue } from "@/utils/email";
 import pino from "pino";
 import { IndividualUserModel } from "../Individual_user/model";
 
+type RegisterCompleteParamsT = {
+    body: AuthModel.RegisterCompleteT,
+    logger: pino.Logger
+}
 type RegisterCompleteResultT = "user exist" | "invalid otp" | IndividualUserModel.UserT
+type LoginParamsT = {
+    body: AuthModel.LoginT,
+    logger: pino.Logger
+}
+type LoginResultT = "invalid credentials" | IndividualUserModel.UserT
+type RefreshTokenParamsT = {
+    body: AuthModel.RefreshTokenT,
+    logger: pino.Logger
+}
+type RefreshTokenResultT = "invalid token" | { accessToken: string, refreshToken: string }
+type ForgotPasswordParamsT = {
+    body: AuthModel.ForgotPasswordT,
+    logger: pino.Logger
+}
+type ForgotPasswordResultT = "invalid email" | "email sent"
+type ResetPasswordParamsT = {
+    body: AuthModel.ResetPasswordT,
+    logger: pino.Logger
+}
+type ResetPasswordResultT = "invalid token" | "password reset"
+type LogoutParamsT = {
+    body: AuthModel.LogoutT,
+    logger: pino.Logger
+}
+type LogoutResultT = "invalid token" | "logout successful"
 const cache = cacheSingleton();
 export abstract class AuthService {
     static async cacheRefreshToken(token: string, userId: string) {
@@ -41,7 +70,7 @@ export abstract class AuthService {
         logger.info("AuthService:: email queued")
         return "verify email"
     }
-    static async registerComplete({ body, logger }: { body: AuthModel.RegisterCompleteT, logger: pino.Logger }): Promise<RegisterCompleteResultT> {
+    static async registerComplete({ body, logger }: RegisterCompleteParamsT): Promise<RegisterCompleteResultT> {
         logger.info("AuthService:: validating otp and checking if user exist")
         const cacheKey = `${REGISTER_CACHE_KEY}:${body.otp}`;
         const cachedData = await cache.get(cacheKey);
@@ -59,11 +88,15 @@ export abstract class AuthService {
         logger.info("AuthService:: user created")
         return data;
     }
-    static async login(body: AuthModel.LoginT): Promise<boolean> {
-        // TODO: verify credentials
-        return true;
+    static async login({ body, logger }: LoginParamsT): Promise<LoginResultT> {
+        const user = await IndividualUserService.findByEmail(body.email);
+        if (!user) {
+            logger.info("AuthService:: invalid credentials")
+            return "invalid credentials";
+        }
+        return user;
     }
-    static async refreshToken(body: AuthModel.RefreshTokenT): Promise<boolean> {
+    static async refreshToken({ body, logger }: RefreshTokenParamsT): Promise<boolean> {
         // TODO: verify refresh token
         return true;
     }

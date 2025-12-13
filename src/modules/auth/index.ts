@@ -83,27 +83,59 @@ export const auth = new Elysia({
         type: "error",
         error: { message: "User already exists", code: "USER_EXIST", details: [] }
       }
-    } else {
-      const tokenPayload: AuthModel.TokenPayloadT = {
-        id: res.id,
-        userType: res.userType,
-        email: res.email,
-      }
-      logger.info("auth:: generating access and refresh tokens")
-      const accessToken = await jwt.sign({ payload: tokenPayload, exp: +ACCESS_TOKEN_TTL })
-      const refreshToken = await jwt.sign({ payload: tokenPayload, exp: +REFRESH_TOKEN_TTL })
-      logger.info("auth:: caching refresh token")
-      await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
-      return {
-        type: "success",
-        data: { accessToken, refreshToken, message: "OTP verified successfully", }
-      }
+    }
+    const tokenPayload: AuthModel.TokenPayloadT = {
+      id: res.id,
+      userType: res.userType,
+      email: res.email,
+    }
+    logger.info("auth:: generating access and refresh tokens")
+    const accessToken = await jwt.sign({ payload: tokenPayload, exp: +ACCESS_TOKEN_TTL })
+    const refreshToken = await jwt.sign({ payload: tokenPayload, exp: +REFRESH_TOKEN_TTL })
+    logger.info("auth:: caching refresh token")
+    await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
+    return {
+      type: "success",
+      data: { accessToken, refreshToken, message: "OTP verified successfully", }
     }
   }, {
     detail: { description: "Register individual user. Second and final step of the registration process." },
     body: AuthModel.registerCompleteSchema,
     response: {
       200: AuthModel.registerCompleteSuccessSchema,
+      400: AuthModel.errorSchema,
+      500: AuthModel.errorSchema,
+    },
+  }).post("/login/individual-user", async ({ body, logger, jwt, set }) => {
+    logger.info("auth:: logging in individual user")
+    const res = await AuthService.login({ body, logger })
+    if (res === "invalid credentials") {
+      logger.info("auth:: invalid credentials")
+      set.status = 400
+      return {
+        type: "error",
+        error: { message: "Invalid credentials", code: "INVALID_CREDENTIALS", details: [] }
+      }
+    }
+    const tokenPayload: AuthModel.TokenPayloadT = {
+      id: res.id,
+      userType: res.userType,
+      email: res.email,
+    }
+    logger.info("auth:: generating access and refresh tokens")
+    const accessToken = await jwt.sign({ payload: tokenPayload, exp: +ACCESS_TOKEN_TTL })
+    const refreshToken = await jwt.sign({ payload: tokenPayload, exp: +REFRESH_TOKEN_TTL })
+    logger.info("auth:: caching refresh token")
+    await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
+    return {
+      type: "success",
+      data: { accessToken, refreshToken, message: "Login successful", }
+    }
+  }, {
+    detail: { description: "Login individual user." },
+    body: AuthModel.loginSchema,
+    response: {
+      200: AuthModel.loginSuccessSchema,
       400: AuthModel.errorSchema,
       500: AuthModel.errorSchema,
     },
