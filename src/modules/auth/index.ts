@@ -117,6 +117,20 @@ export const auth = new Elysia({
         error: { message: "Invalid credentials", code: "INVALID_CREDENTIALS", details: [] }
       }
     }
+    if (res.mfaEnabled) {
+      logger.info("MFA enable by user")
+      const { id, email, userType, mfaEnabled } = res
+      await AuthService.sendMfaOtp({ email, id, userType, logger })
+      return {
+        type: "success",
+        data: {
+          accessToken: "",
+          refreshToken: "",
+          mfaEnabled,
+          message: "MFA OTP sent to your email. Use it to login."
+        }
+      }
+    }
     const tokenPayload: AuthModel.TokenPayloadT = {
       id: res.id,
       userType: res.userType,
@@ -129,7 +143,7 @@ export const auth = new Elysia({
     await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
     return {
       type: "success",
-      data: { accessToken, refreshToken, message: "Login successful", }
+      data: { accessToken, refreshToken, mfaEnabled: false, message: "Login successful" }
     }
   }, {
     detail: { description: "Login individual user." },

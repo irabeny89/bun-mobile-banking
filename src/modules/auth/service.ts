@@ -3,7 +3,7 @@ import { genOTP } from "@/utils/otp";
 import { AuthModel } from "./model";
 import { IndividualUserService } from "../Individual_user/service";
 import cacheSingleton from "@/utils/cache";
-import { OTP_TTL, REGISTER_CACHE_KEY, REFRESH_TOKEN_TTL, REFRESH_TOKEN_CACHE_KEY } from "@/config";
+import { OTP_TTL, REGISTER_CACHE_KEY, REFRESH_TOKEN_TTL, REFRESH_TOKEN_CACHE_KEY, MFA_OTP_CACHE_KEY } from "@/config";
 import { emailQueue } from "@/utils/email";
 import pino from "pino";
 import { IndividualUserModel } from "../Individual_user/model";
@@ -38,8 +38,22 @@ type LogoutParamsT = {
     logger: pino.Logger
 }
 type LogoutResultT = "invalid token" | "logout successful"
+type SendMfaOtpParamsT = Record<"logger", pino.Logger> & AuthModel.TokenPayloadT
 const cache = cacheSingleton();
 export abstract class AuthService {
+    static async sendMfaOtp({ email, id, logger, userType }: SendMfaOtpParamsT) {
+        const otp = await genOTP();
+        logger.debug({ otp }, "AuthService:: caching generated MFA OTP")
+        const cacheKey = `${MFA_OTP_CACHE_KEY}:${otp}`
+        await cache.set(cacheKey, JSON.stringify({ id, email, userType }))
+        await cache.expire(cacheKey, OTP_TTL)
+        logger.info("AuthService:: MFA OTP email queued")
+        await emailQueue.add("mfa-otp", {
+            otp,
+            email,
+            subject: "MFA OTP"
+        })
+    }
     static async cacheRefreshToken(token: string, userId: string) {
         await cache.set(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`, token)
         await cache.expire(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`, +REFRESH_TOKEN_TTL)
@@ -65,8 +79,13 @@ export abstract class AuthService {
         const cacheKey = `${REGISTER_CACHE_KEY}:${otp}`;
         await cache.set(cacheKey, JSON.stringify(body))
         await cache.expire(cacheKey, OTP_TTL)
-        logger.info("AuthService:: user cached")
-        await emailQueue.add("email-verify", { logger, otp, email: body.email, name: `${body.firstName} ${body.lastName}` })
+        logger.info("AuthService:: user registration data cached")
+        await emailQueue.add("email-verify", {
+            otp,
+            email: body.email,
+            name: `${body.firstName} ${body.lastName}`,
+            subject: "Email Verification"
+        })
         logger.info("AuthService:: email queued")
         return "verify email"
     }

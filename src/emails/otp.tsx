@@ -5,7 +5,7 @@ import { render } from "@react-email/render";
 
 type Props = {
   otp: string;
-  name: string;
+  name?: string;
 };
 export default function OtpEmail({ otp, name }: Props) {
   return (
@@ -16,14 +16,14 @@ export default function OtpEmail({ otp, name }: Props) {
             One Time Password (OTP)
           </Text>
           <Text className="text-gray-500 my-0">
-            Use the following code to complete your verification
+            Use the following code to authenticate
           </Text>
           <Text className="text-5xl font-bold pt-2">{otp}</Text>
           <Text className="text-gray-400 font-light text-xs pb-4">
             This code is valid for {OTP_TTL / 60} minutes
           </Text>
           <Text className="text-gray-600 text-xs">
-            Thank you for joining us {name}
+            Thank you for joining us {name ?? ""}
           </Text>
         </Section>
       </Section>
@@ -31,6 +31,6 @@ export default function OtpEmail({ otp, name }: Props) {
   );
 }
 
-export function createOtpEmailHtml(otp: string, name: string) {
+export function createOtpEmailHtml(otp: string, name?: string) {
   return render(<OtpEmail otp={otp} name={name} />);
 }

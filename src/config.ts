@@ -13,6 +13,7 @@ export const VALKEY_URL = process.env.VALKEY_URL ?? "redis://localhost:6379";
 export const OTP_TTL = 60 * 15 // 15m in seconds
 export const REGISTER_CACHE_KEY = "register"
 export const REFRESH_TOKEN_CACHE_KEY = "refresh-token"
+export const MFA_OTP_CACHE_KEY = "mfa-otp"
 export const EMAIL_FROM = process.env.EMAIL_FROM ?? "Fluxus <fluxus@ethereal.email>"
 export const CACHE_GET = {
     ttl: 10 as const, // 10s

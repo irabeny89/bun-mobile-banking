@@ -22,7 +22,8 @@ export namespace AuthModel {
         "lastName",
         "email",
         "password",
-        "gender"
+        "gender",
+        "mfaEnabled"
     ]);
     export type RegisterBodyT = typeof registerBodySchema.static;
 
@@ -47,13 +48,16 @@ export namespace AuthModel {
     export const registerCompleteSuccessSchema = successSchemaFactory(tokenSchema)
     export type RegisterCompleteSuccessT = typeof registerCompleteSuccessSchema.static;
 
-    export const loginSchema = t.Object({
-        email: t.String(),
-        password: t.String(),
-    })
+    export const loginSchema = t.Pick(IndividualUserModel.userSchema, ["email", "password"])
     export type LoginT = typeof loginSchema.static;
 
-    export const loginSuccessSchema = successSchemaFactory(tokenSchema)
+    export const loginSuccessSchema = successSchemaFactory(
+        t.Intersect([
+            tokenSchema,
+            t.Pick(IndividualUserModel.userSchema, ["mfaEnabled"]),
+            t.Object({ message: t.String() })
+        ])
+    )
     export type LoginSuccessT = typeof loginSuccessSchema.static;
 
     export const refreshTokenSchema = t.Object({
