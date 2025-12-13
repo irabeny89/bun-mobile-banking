@@ -3,12 +3,25 @@ import { genOTP } from "@/utils/otp";
 import { AuthModel } from "./model";
 import { IndividualUserService } from "../Individual_user/service";
 import cacheSingleton from "@/utils/cache";
-import { OTP_TTL, REGISTER_CACHE_KEY } from "@/config";
+import { OTP_TTL, REGISTER_CACHE_KEY, REFRESH_TOKEN_TTL, REFRESH_TOKEN_CACHE_KEY } from "@/config";
 import { emailQueue } from "@/utils/email";
 import pino from "pino";
+import { IndividualUserModel } from "../Individual_user/model";
 
+type RegisterCompleteResultT = "user exist" | "invalid otp" | IndividualUserModel.UserT
 const cache = cacheSingleton();
 export abstract class AuthService {
+    static async cacheRefreshToken(token: string, userId: string) {
+        await cache.set(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`, token)
+        await cache.expire(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`, +REFRESH_TOKEN_TTL)
+    }
+    static async removeRefreshToken(userId: string) {
+        await cache.del(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`)
+    }
+    static async refreshTokenExists(userId: string) {
+        const token = await cache.exists(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`)
+        return !!token
+    }
     static async register(body: AuthModel.RegisterBodyT, logger: pino.Logger): Promise<"user exist" | "verify email"> {
         logger.debug(body, "AuthService:: validated body")
         logger.info("AuthService:: checking if user exist")
@@ -28,9 +41,23 @@ export abstract class AuthService {
         logger.info("AuthService:: email queued")
         return "verify email"
     }
-    static async verify(body: AuthModel.VerifyT): Promise<boolean> {
-        // TODO: verify otp
-        return true;
+    static async registerComplete({ body, logger }: { body: AuthModel.RegisterCompleteT, logger: pino.Logger }): Promise<RegisterCompleteResultT> {
+        logger.info("AuthService:: validating otp and checking if user exist")
+        const cacheKey = `${REGISTER_CACHE_KEY}:${body.otp}`;
+        const cachedData = await cache.get(cacheKey);
+        if (!cachedData) {
+            logger.info("AuthService:: invalid otp")
+            return "invalid otp";
+        }
+        const userData = JSON.parse(cachedData) as AuthModel.RegisterBodyT;
+        const userExist = await IndividualUserService.existByEmail(userData.email);
+        if (userExist) {
+            logger.info("AuthService:: user exist")
+            return "user exist";
+        }
+        const data = await IndividualUserService.create(userData);
+        logger.info("AuthService:: user created")
+        return data;
     }
     static async login(body: AuthModel.LoginT): Promise<boolean> {
         // TODO: verify credentials

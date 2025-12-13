@@ -51,10 +51,10 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | **POST** | `/register/individual-user` | Register a new user (Individual). |
+| **POST** | `/register/individual-user/complete` | Verify email via OTP. |
 | **POST** | `/register/business-user` | Register a new user (Business). |
-| **POST** | `/verify/email` | Verify email via OTP. |
-| **POST** | `/verify/mobile` | Verify mobile via OTP. |
-| **POST** | `/login` | Authenticate user and return JWT. |
+| **POST** | `/login/individual-user` | Authenticate user and return JWT. |
+| **POST** | `/login/business-user` | Authenticate user and return JWT. |
 | **POST** | `/refresh-token` | Refresh access token. |
 | **POST** | `/password/forgot` | Initiate password recovery. |
 | **POST** | `/password/reset` | Reset password using recovery token. |

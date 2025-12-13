@@ -22,11 +22,13 @@ export namespace AuthModel {
         "lastName",
         "email",
         "password",
+        "gender"
     ]);
     export type RegisterBodyT = typeof registerBodySchema.static;
 
     export const registerSuccessSchema = successSchemaFactory(t.Object({
         message: t.String(),
+        nextStep: t.Literal("verify email"),
     }))
     export type RegisterSuccessT = typeof registerSuccessSchema.static;
 
@@ -37,14 +39,13 @@ export namespace AuthModel {
     })
     export type RegisterServiceReturnT = typeof registerServiceReturnSchema.static;
 
-    export const verifySchema = t.Object({
-        email: t.String(),
-        code: t.String(),
+    export const registerCompleteSchema = t.Object({
+        otp: t.String({ minLength: 6, maxLength: 6 }),
     })
-    export type VerifyT = typeof verifySchema.static;
+    export type RegisterCompleteT = typeof registerCompleteSchema.static;
 
-    export const verifySuccessSchema = successSchemaFactory(tokenSchema)
-    export type VerifySuccessT = typeof verifySuccessSchema.static;
+    export const registerCompleteSuccessSchema = successSchemaFactory(tokenSchema)
+    export type RegisterCompleteSuccessT = typeof registerCompleteSuccessSchema.static;
 
     export const loginSchema = t.Object({
         email: t.String(),

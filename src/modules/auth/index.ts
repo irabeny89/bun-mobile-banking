@@ -4,7 +4,7 @@ import { AuthModel } from "./model";
 import Elysia from "elysia";
 import { AuthService } from "./service";
 import { jwtPlugin } from "@/plugins/jwt.plugin";
-import { OTP_TTL } from "@/config";
+import { ACCESS_TOKEN_TTL, OTP_TTL, REFRESH_TOKEN_TTL, SECRET_1 } from "@/config";
 import pinoLogger from "@/utils/pino-logger";
 
 export const auth = new Elysia({
@@ -19,8 +19,8 @@ export const auth = new Elysia({
   .model({
     register: AuthModel.registerBodySchema,
     registerSuccess: AuthModel.registerSuccessSchema,
-    verify: AuthModel.verifySchema,
-    verifySuccess: AuthModel.verifySuccessSchema,
+    registerComplete: AuthModel.registerCompleteSchema,
+    registerCompleteSuccess: AuthModel.registerCompleteSuccessSchema,
     login: AuthModel.loginSchema,
     loginSuccess: AuthModel.loginSuccessSchema,
     refreshToken: AuthModel.refreshTokenSchema,
@@ -50,9 +50,13 @@ export const auth = new Elysia({
     }
     return {
       type: "success",
-      data: { message: `Check your email to complete your registration within ${OTP_TTL / 60} minutes.` }
+      data: {
+        nextStep: "verify email",
+        message: `Check your email to complete your registration within ${OTP_TTL / 60} minutes.`
+      }
     }
   }, {
+    detail: { description: "Register individual user. First step of the registration process." },
     body: AuthModel.registerBodySchema,
     response: {
       200: AuthModel.registerSuccessSchema,
@@ -63,4 +67,44 @@ export const auth = new Elysia({
       body.password = await Bun.password.hash(body.password);
       logger.debug({ hash: body.password }, "auth:: hashed plain password")
     }
+  }).post("/register/individual-user/complete", async ({ body, logger, jwt, set }) => {
+    logger.info("auth:: verifying email")
+    const res = await AuthService.registerComplete({ body, logger })
+    if (res === "invalid otp") {
+      set.status = 400
+      return {
+        type: "error",
+        error: { message: "Invalid OTP", code: "INVALID_OTP", details: [] }
+      }
+    }
+    else if (res === "user exist") {
+      set.status = 400
+      return {
+        type: "error",
+        error: { message: "User already exists", code: "USER_EXIST", details: [] }
+      }
+    } else {
+      const tokenPayload: AuthModel.TokenPayloadT = {
+        id: res.id,
+        userType: res.userType,
+        email: res.email,
+      }
+      logger.info("auth:: generating access and refresh tokens")
+      const accessToken = await jwt.sign({ payload: tokenPayload, exp: +ACCESS_TOKEN_TTL })
+      const refreshToken = await jwt.sign({ payload: tokenPayload, exp: +REFRESH_TOKEN_TTL })
+      logger.info("auth:: caching refresh token")
+      await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
+      return {
+        type: "success",
+        data: { accessToken, refreshToken, message: "OTP verified successfully", }
+      }
+    }
+  }, {
+    detail: { description: "Register individual user. Second and final step of the registration process." },
+    body: AuthModel.registerCompleteSchema,
+    response: {
+      200: AuthModel.registerCompleteSuccessSchema,
+      400: AuthModel.errorSchema,
+      500: AuthModel.errorSchema,
+    },
   })
