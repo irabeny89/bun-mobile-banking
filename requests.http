@@ -1,3 +1,5 @@
+# Install RestClient for VSCode to run this file 
+
 @baseUrl = http://localhost:3000
 
 # Root
