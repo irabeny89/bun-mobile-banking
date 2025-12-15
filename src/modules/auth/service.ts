@@ -35,6 +35,10 @@ type LogoutResultT = "invalid token" | "logout successful"
 type SendMfaOtpParamsT = Record<"logger", pino.Logger> & CommonSchema.TokenPayloadT
 const cache = cacheSingleton();
 export abstract class AuthService {
+    /**
+     * Send MFA OTP to user email
+     * @param param0 token payload data
+     */
     static async sendMfaOtp({ email, id, logger, userType }: SendMfaOtpParamsT) {
         const tokenPayload: CommonSchema.TokenPayloadT = { id, email, userType }
         const otp = await genOTP();
@@ -86,6 +90,11 @@ export abstract class AuthService {
         if (!cachedData) return null;
         return JSON.parse(cachedData) as AuthModel.RegisterBodyT;
     }
+    /**
+     * Get user MFA OTP data from cache
+     * @param otp otp sent to user email from initial registration step
+     * @returns user MFA OTP data or null if otp is invalid
+     */
     static async getMfaOtpCachedData(otp: string) {
         const cacheKey = `${MFA_OTP_CACHE_KEY}:${otp}`;
         const cachedData = await cache.get(cacheKey);
