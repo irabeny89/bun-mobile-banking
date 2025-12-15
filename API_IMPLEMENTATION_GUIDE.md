@@ -54,6 +54,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/register/individual-user/complete` | Verify email via OTP. |
 | **POST** | `/register/business-user` | Register a new user (Business). |
 | **POST** | `/login/individual-user` | Authenticate user and return JWT. |
+| **POST** | `/login/mfa-otp/individual-user` | Authenticate user with MFA OTP and return JWT. |
 | **POST** | `/login/business-user` | Authenticate user and return JWT. |
 | **POST** | `/refresh-token` | Refresh access token. |
 | **POST** | `/password/forgot` | Initiate password recovery. |
