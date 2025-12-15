@@ -21,22 +21,44 @@ export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
                 logger: pinoLogger(store)
             }
         })
-        .post("/login/individual-user", async ({ logger, jwt, set, user }) => {
+        .post("/login/individual-user", async ({ logger, jwt, set, user, body }) => {
             if (!user) {
-                logger.info("auth:: no user found")
+                logger.info("loginIndividualUser:: no user found")
                 set.status = 400
                 return {
                     type: "error" as const,
                     error: { message: "No user found", code: "NO_USER_FOUND", details: [] }
                 }
             }
-            logger.info("auth:: user verified successfully")
+            logger.debug({ pass: body.password, hash: user.password }, "loginIndividualUser:: comparing plain and hashed password")
+            if (!(await Bun.password.verify(body.password, user.password))) {
+                logger.info("loginIndividualUser:: invalid password")
+                set.status = 400
+                return {
+                    type: "error" as const,
+                    error: { message: "Invalid credentials", code: "INVALID_CREDENTIALS", details: [] }
+                }
+            }
+            if (user.mfaEnabled) {
+                logger.info("loginIndividualUser:: MFA enable by user")
+                const { id, email, userType, mfaEnabled } = user
+                await AuthService.sendMfaOtp({ email, id, userType, logger })
+                return {
+                    type: "success" as const,
+                    data: {
+                        accessToken: "",
+                        refreshToken: "",
+                        mfaEnabled,
+                        message: "MFA OTP sent to your email. Use it to login."
+                    }
+                }
+            }
             const tokenPayload: CommonSchema.TokenPayloadT = {
                 id: user.id,
                 userType: user.userType,
                 email: user.email,
             }
-            logger.info("auth:: generating access and refresh tokens")
+            logger.info("loginIndividualUser:: user verified, generating access and refresh tokens")
             const accessToken = await jwt.sign({
                 payload: tokenPayload,
                 exp: +ACCESS_TOKEN_TTL
@@ -45,7 +67,7 @@ export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
                 payload: tokenPayload,
                 exp: +REFRESH_TOKEN_TTL
             })
-            logger.info("auth:: caching refresh token")
+            logger.info("loginIndividualUser:: caching refresh token")
             await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
             return {
                 type: "success" as const,
@@ -57,39 +79,6 @@ export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
                 description: "Login individual user."
             },
             body: AuthModel.loginSchema,
-            beforeHandle: async ({ user, body, logger, set }) => {
-                if (!user) {
-                    logger.info("auth:: no user found")
-                    set.status = 400
-                    return {
-                        type: "error" as const,
-                        error: { message: "No user found", code: "NO_USER_FOUND", details: [] }
-                    }
-                }
-                logger.debug({ pass: body.password, hash: user.password }, "auth:: comparing plain and hashed password")
-                if (!(await Bun.password.verify(body.password, user.password))) {
-                    logger.info("auth:: invalid password")
-                    set.status = 400
-                    return {
-                        type: "error" as const,
-                        error: { message: "Invalid credentials", code: "INVALID_CREDENTIALS", details: [] }
-                    }
-                }
-                if (user.mfaEnabled) {
-                    logger.info("MFA enable by user")
-                    const { id, email, userType, mfaEnabled } = user
-                    await AuthService.sendMfaOtp({ email, id, userType, logger })
-                    return {
-                        type: "success" as const,
-                        data: {
-                            accessToken: "",
-                            refreshToken: "",
-                            mfaEnabled,
-                            message: "MFA OTP sent to your email. Use it to login."
-                        }
-                    }
-                }
-            },
             response: {
                 200: "loginSuccess",
                 400: "error",
