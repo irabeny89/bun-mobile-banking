@@ -33,7 +33,7 @@
     "@react-email/preview-server": "5.0.7",
     "@types/nodemailer": "^7.0.4",
     "bun-types": "latest",
-    "react-email": "^5.0.7"
+    "react-email": "^5.0.8"
   },
   "module": "src/index.js"
 }
