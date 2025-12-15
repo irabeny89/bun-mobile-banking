@@ -86,14 +86,10 @@ export abstract class AuthService {
         if (!cachedData) return null;
         return JSON.parse(cachedData) as AuthModel.RegisterBodyT;
     }
-    static async loginMfaOtp({ body, logger }: LoginMfaOtpParamsT): Promise<LoginMfaOtpResultT> {
-        const cacheKey = `${MFA_OTP_CACHE_KEY}:${body.otp}`;
+    static async getMfaOtpCachedData(otp: string) {
+        const cacheKey = `${MFA_OTP_CACHE_KEY}:${otp}`;
         const cachedData = await cache.get(cacheKey);
-        if (!cachedData) {
-            logger.info("AuthService:: invalid otp")
-            return "invalid otp";
-        }
-        logger.info("AuthService:: otp validated")
+        if (!cachedData) return null;
         return JSON.parse(cachedData) as CommonSchema.TokenPayloadT;
     }
     static async refreshToken({ body, logger }: RefreshTokenParamsT): Promise<boolean> {
