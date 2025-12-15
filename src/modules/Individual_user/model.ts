@@ -6,14 +6,11 @@ import { t } from "elysia";
 
 export namespace IndividualUserModel {
     export const userSchema = t.Object({
-        id: t.String({ format: "uuid" }),
+        id: CommonSchema.idSchema,
         userType: CommonSchema.userTypeSchema,
         firstName: t.String({ pattern: "^[a-zA-Z]{1,128}$" }),
         lastName: t.String({ pattern: "^[a-zA-Z]{1,128}$" }),
-        email: t.String({
-            format: "email",
-            examples: ["individual@example.com", "business@example.com"],
-        }),
+        email: CommonSchema.emailSchema,
         middleName: t.Optional(t.String({ pattern: "^[a-zA-Z]{1,128}$" })),
         phone: t.Optional(t.String({
             pattern: "^[0-9]{11}$",

@@ -1,15 +1,9 @@
-import { errorSchemaFactory, successSchemaFactory } from "@/utils/response";
+import { successSchemaFactory } from "@/utils/response";
 import { t } from "elysia";
 import { IndividualUserModel } from "../Individual_user/model";
+import { CommonSchema } from "@/share/schema";
 
 export namespace AuthModel {
-    export const tokenPayloadSchema = t.Pick(IndividualUserModel.userSchema, [
-        "id",
-        "userType",
-        "email"
-    ])
-    export type TokenPayloadT = typeof tokenPayloadSchema.static;
-
     export const tokenSchema = t.Object({
         accessToken: t.String(),
         refreshToken: t.String(),
@@ -41,7 +35,7 @@ export namespace AuthModel {
     export type RegisterServiceReturnT = typeof registerServiceReturnSchema.static;
 
     export const registerCompleteSchema = t.Object({
-        otp: t.String({ minLength: 6, maxLength: 6 }),
+        otp: CommonSchema.otpSchema,
     })
     export type RegisterCompleteT = typeof registerCompleteSchema.static;
 
@@ -59,6 +53,12 @@ export namespace AuthModel {
         ])
     )
     export type LoginSuccessT = typeof loginSuccessSchema.static;
+
+    export const loginMfaOtpSchema = t.Object({ otp: CommonSchema.otpSchema })
+    export type LoginMfaOtpT = typeof loginMfaOtpSchema.static;
+
+    export const loginMfaOtpSuccessSchema = successSchemaFactory(tokenSchema)
+    export type LoginMfaOtpSuccessT = typeof loginMfaOtpSuccessSchema.static;
 
     export const refreshTokenSchema = t.Object({
         refreshToken: t.String(),
@@ -99,7 +99,4 @@ export namespace AuthModel {
         email: t.String(),
     }))
     export type LogoutSuccessT = typeof logoutSuccessSchema.static;
-
-    export const errorSchema = errorSchemaFactory();
-    export type ErrorSchemaT = typeof errorSchema.static;
 }

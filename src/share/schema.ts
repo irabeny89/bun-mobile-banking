@@ -1,3 +1,5 @@
+import { IndividualUserModel } from "@/modules/Individual_user/model";
+import { errorSchemaFactory } from "@/utils/response";
 import { t } from "elysia";
 
 export namespace CommonSchema {
@@ -6,6 +8,19 @@ export namespace CommonSchema {
             .Decode((value) => value.trim())
             .Encode((value) => value.trim());
     }
+
+    export const errorSchema = errorSchemaFactory();
+    export type ErrorSchemaT = typeof errorSchema.static;
+
+    export const idSchema = t.String({ format: "uuid" });
+    export type IdSchemaT = typeof idSchema.static;
+
+    export const emailSchema = t.String({
+        format: "email",
+        examples: ["individual@example.com", "business@example.com"],
+    })
+    export type EmailSchemaT = typeof emailSchema.static;
+
     export const userTypeSchema = t.UnionEnum(["individual", "business"], {
         description: "User Type",
         examples: ["individual", "business"],
@@ -23,4 +38,14 @@ export namespace CommonSchema {
         examples: ["tier1", "tier2", "tier3"],
     });
     export type KycTier = typeof kycTierSchema.static;
+
+    export const tokenPayloadSchema = t.Object({
+        id: idSchema,
+        userType: userTypeSchema,
+        email: emailSchema,
+    })
+    export type TokenPayloadT = typeof tokenPayloadSchema.static;
+
+    export const otpSchema = t.String({ minLength: 6, maxLength: 6 });
+    export type OtpT = typeof otpSchema.static;
 }

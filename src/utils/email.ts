@@ -18,13 +18,13 @@ const getTransporter = async () => {
         })
         return transporter
     } else {
-        const { pass, user } = await createTestAccount();
+        const { pass, user, smtp } = await createTestAccount();
+        console.info("emailQueue.getTransporter:: test account created using nodemailer smtp below")
+        console.table(smtp)
         const transporter = createTransport({
-            debug: !IS_PROD_ENV,
-            host: "smtp.ethereal.email",
-            port: 587,
-            secure: false,
-            auth: { user, pass }
+            debug: true,
+            auth: { user, pass },
+            ...smtp,
         })
         return transporter
     }

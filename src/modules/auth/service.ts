@@ -1,28 +1,22 @@
 /// Service handle business logic, decoupled from Elysia controller
 import { genOTP } from "@/utils/otp";
 import { AuthModel } from "./model";
-import { IndividualUserService } from "../Individual_user/service";
 import cacheSingleton from "@/utils/cache";
 import { OTP_TTL, REGISTER_CACHE_KEY, REFRESH_TOKEN_TTL, REFRESH_TOKEN_CACHE_KEY, MFA_OTP_CACHE_KEY } from "@/config";
 import { emailQueue } from "@/utils/email";
 import pino from "pino";
-import { IndividualUserModel } from "../Individual_user/model";
+import { CommonSchema } from "@/share/schema";
 
-type RegisterCompleteParamsT = {
-    body: AuthModel.RegisterCompleteT,
-    logger: pino.Logger
-}
-type RegisterCompleteResultT = "user exist" | "invalid otp" | IndividualUserModel.UserT
-type LoginParamsT = {
-    body: AuthModel.LoginT,
-    logger: pino.Logger
-}
-type LoginResultT = "invalid credentials" | IndividualUserModel.UserT
 type RefreshTokenParamsT = {
     body: AuthModel.RefreshTokenT,
     logger: pino.Logger
 }
-type RefreshTokenResultT = "invalid token" | { accessToken: string, refreshToken: string }
+type LoginMfaOtpParamsT = {
+    body: AuthModel.LoginMfaOtpT,
+    logger: pino.Logger
+}
+type LoginMfaOtpResultT = "invalid otp" | CommonSchema.TokenPayloadT
+type RefreshTokenResultT = "invalid token" | CommonSchema.TokenPayloadT
 type ForgotPasswordParamsT = {
     body: AuthModel.ForgotPasswordT,
     logger: pino.Logger
@@ -38,14 +32,15 @@ type LogoutParamsT = {
     logger: pino.Logger
 }
 type LogoutResultT = "invalid token" | "logout successful"
-type SendMfaOtpParamsT = Record<"logger", pino.Logger> & AuthModel.TokenPayloadT
+type SendMfaOtpParamsT = Record<"logger", pino.Logger> & CommonSchema.TokenPayloadT
 const cache = cacheSingleton();
 export abstract class AuthService {
     static async sendMfaOtp({ email, id, logger, userType }: SendMfaOtpParamsT) {
+        const tokenPayload: CommonSchema.TokenPayloadT = { id, email, userType }
         const otp = await genOTP();
         logger.debug({ otp }, "AuthService:: caching generated MFA OTP")
-        const cacheKey = `${MFA_OTP_CACHE_KEY}:${otp}`
-        await cache.set(cacheKey, JSON.stringify({ id, email, userType }))
+        const cacheKey = `${MFA_OTP_CACHE_KEY}:${otp}`;
+        await cache.set(cacheKey, JSON.stringify(tokenPayload))
         await cache.expire(cacheKey, OTP_TTL)
         logger.info("AuthService:: MFA OTP email queued")
         await emailQueue.add("mfa-otp", {
@@ -65,15 +60,7 @@ export abstract class AuthService {
         const token = await cache.exists(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`)
         return !!token
     }
-    static async register(body: AuthModel.RegisterBodyT, logger: pino.Logger): Promise<"user exist" | "verify email"> {
-        logger.debug(body, "AuthService:: validated body")
-        logger.info("AuthService:: checking if user exist")
-        const existingUser = await IndividualUserService.existByEmail(body.email);
-        if (existingUser) {
-            logger.info("AuthService:: user exist")
-            return "user exist"
-        }
-        logger.info("AuthService:: user does not exist")
+    static async register(body: AuthModel.RegisterBodyT, logger: pino.Logger) {
         const otp = await genOTP()
         logger.debug({ otp }, "AuthService:: OTP generated")
         const cacheKey = `${REGISTER_CACHE_KEY}:${otp}`;
@@ -87,33 +74,27 @@ export abstract class AuthService {
             subject: "Email Verification"
         })
         logger.info("AuthService:: email queued")
-        return "verify email"
     }
-    static async registerComplete({ body, logger }: RegisterCompleteParamsT): Promise<RegisterCompleteResultT> {
-        logger.info("AuthService:: validating otp and checking if user exist")
-        const cacheKey = `${REGISTER_CACHE_KEY}:${body.otp}`;
+    /**
+     * Get user registration data (from initial registration step) from cache
+     * @param otp otp sent to user email from initial registration step
+     * @returns user registration data or null if otp is invalid
+     */
+    static async getUserRegisterData(otp: string) {
+        const cacheKey = `${REGISTER_CACHE_KEY}:${otp}`;
+        const cachedData = await cache.get(cacheKey);
+        if (!cachedData) return null;
+        return JSON.parse(cachedData) as AuthModel.RegisterBodyT;
+    }
+    static async loginMfaOtp({ body, logger }: LoginMfaOtpParamsT): Promise<LoginMfaOtpResultT> {
+        const cacheKey = `${MFA_OTP_CACHE_KEY}:${body.otp}`;
         const cachedData = await cache.get(cacheKey);
         if (!cachedData) {
             logger.info("AuthService:: invalid otp")
             return "invalid otp";
         }
-        const userData = JSON.parse(cachedData) as AuthModel.RegisterBodyT;
-        const userExist = await IndividualUserService.existByEmail(userData.email);
-        if (userExist) {
-            logger.info("AuthService:: user exist")
-            return "user exist";
-        }
-        const data = await IndividualUserService.create(userData);
-        logger.info("AuthService:: user created")
-        return data;
-    }
-    static async login({ body, logger }: LoginParamsT): Promise<LoginResultT> {
-        const user = await IndividualUserService.findByEmail(body.email);
-        if (!user) {
-            logger.info("AuthService:: invalid credentials")
-            return "invalid credentials";
-        }
-        return user;
+        logger.info("AuthService:: otp validated")
+        return JSON.parse(cachedData) as CommonSchema.TokenPayloadT;
     }
     static async refreshToken({ body, logger }: RefreshTokenParamsT): Promise<boolean> {
         // TODO: verify refresh token

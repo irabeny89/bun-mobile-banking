@@ -27,7 +27,7 @@ export const logger = new Elysia({ name: "logger" })
         pino: {
           level: "debug",
           prettyPrint: true,
-          redact: ["password", "token"],
+          redact: ["password", "pin", "token"],
         },
         ip: true,
         customLogFormat:
