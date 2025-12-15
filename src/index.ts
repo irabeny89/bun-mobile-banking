@@ -12,6 +12,7 @@ import { healthcheck } from "./plugins/heathcheck.plugin";
 import { cacheReq } from "./plugins/cache-req";
 import { logger } from "./plugins/logger.plugin";
 import { rateLimitPlugin } from "./plugins/rate-limit.plugin";
+import { apiDocs } from "./plugins/api-docs.plugin";
 
 const app = new Elysia({
   name: pkg.name,
@@ -22,7 +23,7 @@ const app = new Elysia({
   .use(errorHandler)
   .use(systemStatus)
   .use(cors())
-  .use(openapi())
+  .use(apiDocs)
   .use(serverTiming())
   .use(elysiaXSS({}))
   .use(logger)
