@@ -25,7 +25,8 @@ Content-Type: application/json
   "lastName": "Irabor",
   "email": "{{email}}",
   "password": "{{password}}",
-  "gender": "m"
+  "gender": "m",
+  "mfaEnabled": true
 }
 
 ###
@@ -48,3 +49,12 @@ Content-Type: application/json
   "password": "{{password}}"
 }
 
+###
+# Login Individual user with MFA OTP
+# @prompt otp Your one-time password in your mailbox
+POST {{baseUrl}}/api/v1/auth/login/mfa-otp/individual-user
+Content-Type: application/json
+
+{
+  "otp": "{{otp}}"
+}
