@@ -51,4 +51,5 @@ BEFORE UPDATE ON individual_users
 FOR EACH ROW
 EXECUTE FUNCTION set_update_timestamp();
 
+CREATE INDEX IF NOT EXISTS idx_individual_users_email ON individual_users(email);
 CREATE INDEX IF NOT EXISTS idx_individual_users_created_at ON individual_users(created_at);
