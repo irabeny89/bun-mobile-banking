@@ -8,6 +8,7 @@ import { ACCESS_TOKEN_TTL, OTP_TTL, REFRESH_TOKEN_TTL, SECRET_1 } from "@/config
 import pinoLogger from "@/utils/pino-logger";
 import { CommonSchema } from "@/share/schema";
 import { IndividualUserService } from "../Individual_user/service";
+import { registerIndividualUser } from "./routes/register-individual-user";
 
 export const auth = new Elysia({
     prefix: "/auth",
@@ -18,9 +19,8 @@ export const auth = new Elysia({
     },
 })
     .use(jwtPlugin)
+    .use(registerIndividualUser)
     .model({
-        register: AuthModel.registerBodySchema,
-        registerSuccess: AuthModel.registerSuccessSchema,
         registerComplete: AuthModel.registerCompleteSchema,
         registerCompleteSuccess: AuthModel.registerCompleteSuccessSchema,
         login: AuthModel.loginSchema,
@@ -42,38 +42,6 @@ export const auth = new Elysia({
         return {
             logger
         }
-    })
-    .post("/register/individual-user", async ({ body, logger }) => {
-        logger.info("auth:: registering individual user")
-        await AuthService.register(body, logger)
-        return {
-            type: "success",
-            data: {
-                nextStep: "verify email",
-                message: `Check your email to complete your registration within ${OTP_TTL / 60} minutes.`
-            }
-        }
-    }, {
-        detail: { description: "Register individual user. First step of the registration process." },
-        body: AuthModel.registerBodySchema,
-        beforeHandle: async ({ body, set, logger }) => {
-            const userExist = await IndividualUserService.existByEmail(body.email)
-            if (userExist) {
-                logger.info("auth:: user already exists")
-                set.status = 400
-                return {
-                    type: "error" as const,
-                    error: { message: "User already exists", code: "USER_EXIST", details: [] }
-                }
-            }
-            body.password = await Bun.password.hash(body.password)
-            logger.debug("auth:: hashed plain password")
-        },
-        response: {
-            200: "registerSuccess",
-            400: "error",
-            500: "error",
-        },
     })
     .guard({ body: "registerComplete" }, app => app
         .resolve(async ({ body, logger, set }) => {
