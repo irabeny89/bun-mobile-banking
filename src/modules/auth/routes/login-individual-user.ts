@@ -1,11 +1,9 @@
-import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from "@/config";
 import { IndividualUserService } from "@/modules/Individual_user/service";
 import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import Elysia from "elysia";
 import { AuthModel } from "../model";
 import { AuthService } from "../service";
-import { jwtPlugin } from "@/plugins/jwt.plugin";
 
 export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
     .model({
@@ -13,7 +11,6 @@ export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
         loginSuccess: AuthModel.loginSuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .use(jwtPlugin)
     .guard({ body: "login" }, app => app
         .resolve(async ({ body, store }) => {
             return {
@@ -21,7 +18,7 @@ export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
                 logger: pinoLogger(store)
             }
         })
-        .post("/login/individual-user", async ({ logger, jwt, set, user, body }) => {
+        .post("/login/individual-user", async ({ logger, set, user, body }) => {
             if (!user) {
                 logger.info("loginIndividualUser:: no user found")
                 set.status = 400
@@ -53,22 +50,15 @@ export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
                     }
                 }
             }
-            const tokenPayload: CommonSchema.TokenPayloadT = {
+            const payload: CommonSchema.TokenPayloadT = {
                 id: user.id,
                 userType: user.userType,
                 email: user.email,
             }
             logger.info("loginIndividualUser:: user verified, generating access and refresh tokens")
-            const accessToken = await jwt.sign({
-                payload: tokenPayload,
-                exp: +ACCESS_TOKEN_TTL
-            })
-            const refreshToken = await jwt.sign({
-                payload: tokenPayload,
-                exp: +REFRESH_TOKEN_TTL
-            })
+            const { accessToken, refreshToken } = AuthService.createTokens(payload)
             logger.info("loginIndividualUser:: caching refresh token")
-            await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
+            await AuthService.cacheRefreshToken(refreshToken, payload.id)
             return {
                 type: "success" as const,
                 data: { accessToken, refreshToken, mfaEnabled: false, message: "Login successful" }

@@ -1,11 +1,9 @@
-import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from "@/config";
 import { IndividualUserService } from "@/modules/Individual_user/service";
 import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import Elysia from "elysia";
 import { AuthService } from "../service";
 import { AuthModel } from "../model";
-import { jwtPlugin } from "@/plugins/jwt.plugin";
 
 export const registerIndividualUserComplete = new Elysia({
     name: "registerIndividualUserComplete"
@@ -16,7 +14,6 @@ export const registerIndividualUserComplete = new Elysia({
         error: CommonSchema.errorSchema,
     })
     .guard({ body: "registerComplete" }, app => app
-        .use(jwtPlugin)
         .resolve(async ({ body, store, set }) => {
             const logger = pinoLogger(store)
             const registerData = await AuthService.getUserRegisterData(body.otp)
@@ -31,7 +28,7 @@ export const registerIndividualUserComplete = new Elysia({
             logger.info("registerIndividualUserComplete:: otp verified successfully")
             return { registerData, logger }
         })
-        .post("/register/individual-user/complete", async ({ logger, jwt, registerData }) => {
+        .post("/register/individual-user/complete", async ({ logger, registerData }) => {
             logger?.info("registerIndividualUserComplete:: creating individual user")
             const res = await IndividualUserService.create(registerData!)
             logger?.info("registerIndividualUserComplete:: individual user created successfully")
@@ -41,8 +38,7 @@ export const registerIndividualUserComplete = new Elysia({
                 email: res.email,
             }
             logger?.info("registerIndividualUserComplete:: generating access and refresh tokens")
-            const accessToken = await jwt.sign({ payload: tokenPayload, exp: +ACCESS_TOKEN_TTL })
-            const refreshToken = await jwt.sign({ payload: tokenPayload, exp: +REFRESH_TOKEN_TTL })
+            const { accessToken, refreshToken } = AuthService.createTokens(tokenPayload)
             logger?.info("registerIndividualUserComplete:: caching refresh token")
             await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
             return {

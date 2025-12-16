@@ -1,4 +1,3 @@
-import { IndividualUserModel } from "@/modules/Individual_user/model";
 import { errorSchemaFactory } from "@/utils/response";
 import { t } from "elysia";
 

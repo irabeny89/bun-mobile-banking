@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS individual_users (
   id UUID PRIMARY KEY DEFAULT uuidv7(),
-  user_type VARCHAR(128) NOT NULL DEFAULT 'individual-user',
+  user_type VARCHAR(128) NOT NULL DEFAULT 'individual',
   first_name VARCHAR(128) NOT NULL,
   last_name VARCHAR(128) NOT NULL,
   password_hash VARCHAR NOT NULL,
