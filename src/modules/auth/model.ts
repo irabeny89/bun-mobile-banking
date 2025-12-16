@@ -94,7 +94,7 @@ export namespace AuthModel {
     export type LogoutT = typeof logoutSchema.static;
 
     export const logoutSuccessSchema = successSchemaFactory(t.Object({
-        email: t.String(),
+        message: t.String(),
     }))
     export type LogoutSuccessT = typeof logoutSuccessSchema.static;
 }

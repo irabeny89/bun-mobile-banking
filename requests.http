@@ -88,3 +88,12 @@ Content-Type: application/json
   "newPassword": "{{newPassword}}",
   "otp": "{{otp}}"
 }
+
+###
+# Logout Individual User
+POST {{baseUrl}}/api/v1/auth/logout/individual
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
