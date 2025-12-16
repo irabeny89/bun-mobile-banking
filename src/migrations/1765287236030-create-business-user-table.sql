@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS business_users (
   id UUID PRIMARY KEY DEFAULT uuidv7(),
-  user_type VARCHAR(128) NOT NULL DEFAULT 'business-user',
+  user_type VARCHAR(128) NOT NULL DEFAULT 'business',
   email VARCHAR UNIQUE NOT NULL,
   password VARCHAR NOT NULL,
   phone VARCHAR(20) UNIQUE,
