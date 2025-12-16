@@ -7,10 +7,6 @@ import { AuthService } from "../service";
 
 export const forgotPasswordIndividual = new Elysia({
     name: "forgot-password-individual",
-    detail: {
-        tags: ["Auth", "Individual User"],
-        description: "Forgot password individual user."
-    }
 })
     .model({
         forgotPasswordIndividual: AuthModel.forgotPasswordSchema,
@@ -52,7 +48,9 @@ export const forgotPasswordIndividual = new Elysia({
                 }
             },
             detail: {
-                description: "Forgot password individual user.",
+                tags: ["Auth", "Individual User"],
+                description: "Forgot password as individual user.",
+                summary: "OTP get sent to user email"
             },
             body: "forgotPasswordIndividual",
             response: {
