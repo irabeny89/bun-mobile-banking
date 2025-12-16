@@ -11,6 +11,7 @@ import { resetPasswordIndividual } from "./routes/reset-password-individual";
 import { logoutIndividual } from "./routes/logout-individual";
 
 export const auth = new Elysia({
+    name: "auth",
     prefix: "/auth",
     detail: {
         description:
