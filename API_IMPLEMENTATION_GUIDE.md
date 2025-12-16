@@ -25,11 +25,9 @@ src/
 
 ## Prerequisites
 
-*   **Node.js:** v22.10.0
 *   **Bun:** v1.3.0
 *   **PostgreSQL:** v18.0
 *   **Redis:** v9.0.0
-*   **NPM:** v10.16.0
 
 ## Technology Stack
 
@@ -50,20 +48,23 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| **POST** | `/register/individual-user` | Register a new user (Individual). |
-| **POST** | `/register/individual-user/complete` | Verify email via OTP. |
-| **POST** | `/login/individual-user` | Authenticate user and return JWT. |
-| **POST** | `/login/mfa-otp/individual-user` | Authenticate user with MFA OTP and return JWT. |
-| **POST** | `/refresh-token/individual-user` | Refresh access token for individual user. |
-| **POST** | `/register/business-user` | Register a new user (Business). |
-| **POST** | `/login/business-user` | Authenticate user and return JWT. |
-| **POST** | `/refresh-token/business-user` | Refresh access token for business user. |
-| **POST** | `/password/forgot` | Initiate password recovery. |
-| **POST** | `/password/reset` | Reset password using recovery token. |
-| **POST** | `/logout` | Invalidate user session. |
+| **POST** | `/register/individual` | Register a new user (Individual). First step. |
+| **POST** | `/register/individual/complete` | Verify email via OTP. Last step. |
+| **POST** | `/login/individual` | Authenticate user and return JWT. |
+| **POST** | `/login/mfa-otp/individual` | Authenticate user with MFA OTP and return JWT. |
+| **POST** | `/refresh-token/individual` | Refresh access token for individual user. |
+| **POST** | `/forgot-password/individual` | Initiate individual user password recovery. |
+| **POST** | `/reset-password/individual` | Reset individual user password using recovery token. |
+| **POST** | `/logout/individual` | Invalidate individual user session. |
+| **POST** | `/register/business` | Register a new user (Business). |
+| **POST** | `/login/business` | Authenticate user and return JWT. |
+| **POST** | `/refresh-token/business` | Refresh access token for business user. |
+| **POST** | `/forgot-password/business` | Initiate business user password recovery. |
+| **POST** | `/reset-password/business` | Reset business user password using recovery token. |
+| **POST** | `/logout/business` | Invalidate business user session. |
 
 ### 2. Individual User Profile & KYC
-**Base URL**: `/api/v1/individual-users`
+**Base URL**: `/api/v1/individual`
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
@@ -76,7 +77,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/security/mfa` | Enable/Disable MFA. |
 
 ### 3. Business User Profile & KYB
-**Base URL**: `/api/v1/business-users`
+**Base URL**: `/api/v1/business`
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
