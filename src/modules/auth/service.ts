@@ -55,6 +55,17 @@ export abstract class AuthService {
         })
     }
     /**
+     * Get user MFA OTP data from cache
+     * @param otp otp sent to user email from initial registration step
+     * @returns user MFA OTP data or null if otp is invalid
+     */
+    static async getMfaOtpCachedData(otp: string) {
+        const cacheKey = `${MFA_OTP_CACHE_KEY}:${otp}`;
+        const cachedData = await cache.get(cacheKey);
+        if (!cachedData) return null;
+        return JSON.parse(cachedData) as CommonSchema.TokenPayloadT;
+    }
+    /**
      * Create access and refresh tokens
      * @param payload token payload data
      * @returns refresh token and access token
@@ -144,17 +155,6 @@ export abstract class AuthService {
         const cachedData = await cache.get(cacheKey);
         if (!cachedData) return null;
         return JSON.parse(cachedData) as AuthModel.RegisterBodyT;
-    }
-    /**
-     * Get user MFA OTP data from cache
-     * @param otp otp sent to user email from initial registration step
-     * @returns user MFA OTP data or null if otp is invalid
-     */
-    static async getMfaOtpCachedData(otp: string) {
-        const cacheKey = `${MFA_OTP_CACHE_KEY}:${otp}`;
-        const cachedData = await cache.get(cacheKey);
-        if (!cachedData) return null;
-        return JSON.parse(cachedData) as CommonSchema.TokenPayloadT;
     }
     static async refreshToken({ body, logger }: RefreshTokenParamsT): Promise<boolean> {
         // TODO: verify refresh token

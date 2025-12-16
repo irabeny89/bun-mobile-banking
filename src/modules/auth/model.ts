@@ -74,7 +74,8 @@ export namespace AuthModel {
     export type ForgotPasswordT = typeof forgotPasswordSchema.static;
 
     export const forgotPasswordSuccessSchema = successSchemaFactory(t.Object({
-        email: t.String(),
+        message: t.Literal("Password reset request successful. Check your email for the reset code"), 
+        nextStep: t.Literal("Reset Password with OTP")
     }))
     export type ForgotPasswordSuccessT = typeof forgotPasswordSuccessSchema.static;
 
