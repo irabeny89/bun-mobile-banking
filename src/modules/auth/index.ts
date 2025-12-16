@@ -10,7 +10,6 @@ import { refreshTokenIndividual } from "./routes/refresh-token-individual";
 export const auth = new Elysia({
     prefix: "/auth",
     detail: {
-        tags: ["Auth"],
         description:
             "Authentication and onboarding service to authenticate, authorize and onboard users.",
     },
