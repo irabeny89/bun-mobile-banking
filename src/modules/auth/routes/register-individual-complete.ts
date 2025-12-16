@@ -48,7 +48,8 @@ export const registerIndividualComplete = new Elysia({
         }, {
             detail: {
                 tags: ["Auth", "Individual User"],
-                description: "Register individual user. Second and final step of the registration process."
+                description: "Register individual user. Second and final step of the registration process.",
+                summary: "Register individual complete"
             },
             body: "registerComplete",
             beforeHandle: async ({ registerData, set, logger }) => {
@@ -78,7 +79,6 @@ export const registerIndividualComplete = new Elysia({
             response: {
                 200: "registerCompleteSuccess",
                 400: "error",
-                500: "error",
             },
         })
     )

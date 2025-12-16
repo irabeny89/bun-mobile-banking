@@ -24,7 +24,7 @@ export const loginMfaIndividual = new Elysia({
                 logger.info("loginMfaIndividual:: invalid otp")
                 set.status = 400
                 return {
-                    type: "error",
+                    type: "error" as const,
                     error: { message: "Invalid OTP", code: "INVALID_OTP", details: [] }
                 }
             }
@@ -38,7 +38,10 @@ export const loginMfaIndividual = new Elysia({
             }
         }, {
             tags: ["Auth", "Individual User"],
-            detail: { description: "Login individual user with MFA OTP." },
+            detail: { 
+                description: "Login individual user with MFA OTP.",
+                summary: "MFA OTP login"
+            },
             body: AuthModel.loginMfaOtpSchema,
             response: {
                 200: "loginMfaOtpSuccess",

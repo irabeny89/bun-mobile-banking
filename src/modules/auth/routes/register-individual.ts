@@ -31,7 +31,8 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
     }, {
         detail: {
             tags: ["Auth", "Individual User"],
-            description: "Register individual user. First step of the registration process."
+            description: "Register individual user. First step of the registration process.",
+            summary: "Registration individual start"
         },
         body: AuthModel.registerBodySchema,
         beforeHandle: async ({ body, set, logger }) => {
@@ -50,6 +51,5 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
         response: {
             200: "registerSuccess",
             400: "error",
-            500: "error",
         },
     })

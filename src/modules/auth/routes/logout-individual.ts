@@ -38,7 +38,8 @@ export const logoutIndividual = new Elysia({ name: "logout-individual" })
     }, {
         detail: {
             tags: ["Auth", "Individual User"],
-            description: "Logout individual user."
+            description: "Logout individual user.",
+            summary: "Logout individual"
         },
         body: "logoutIndividual",
         response: {

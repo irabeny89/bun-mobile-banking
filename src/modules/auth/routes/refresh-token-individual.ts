@@ -51,6 +51,7 @@ export const refreshTokenIndividual = new Elysia({
         detail: {
             tags: ["Auth", "Individual User"],
             description: "Refresh access token for individual user.",
+            summary: "Refresh tokens"
         },
         body: "refreshToken",
         response: {

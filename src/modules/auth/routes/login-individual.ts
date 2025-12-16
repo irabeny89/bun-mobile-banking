@@ -66,12 +66,12 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
         }, {
             detail: {
                 tags: ["Auth", "Individual User"],
-                description: "Login individual user."
+                description: "Login individual user. Will require MFA OTP is MFA enabled.",
+                summary: "Login the Individual"
             },
             body: AuthModel.loginSchema,
             response: {
                 200: "loginSuccess",
                 400: "error",
-                500: "error",
             },
         }))
