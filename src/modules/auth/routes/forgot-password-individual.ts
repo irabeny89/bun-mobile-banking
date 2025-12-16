@@ -49,8 +49,8 @@ export const forgotPasswordIndividual = new Elysia({
             },
             detail: {
                 tags: ["Auth", "Individual User"],
-                description: "Forgot password as individual user.",
-                summary: "OTP get sent to user email"
+                description: "Forgot password as individual user then request for OTP to reset it.",
+                summary: "Individual forgot password"
             },
             body: "forgotPasswordIndividual",
             response: {
