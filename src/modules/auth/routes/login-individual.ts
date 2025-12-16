@@ -18,7 +18,7 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
                 logger: pinoLogger(store)
             }
         })
-        .post("/login/individual-user", async ({ logger, set, user, body }) => {
+        .post("/login/individual", async ({ logger, set, user, body }) => {
             if (!user) {
                 logger.info("loginIndividual:: no user found")
                 set.status = 400
