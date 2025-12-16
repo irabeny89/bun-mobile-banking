@@ -4,8 +4,8 @@ import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import { AuthService } from "../service";
 
-export const refreshTokenIndividualUser = new Elysia({
-    name: "refreshTokenIndividualUser"
+export const refreshTokenIndividual = new Elysia({
+    name: "refreshTokenIndividual"
 })
     .model({
         refreshToken: AuthModel.refreshTokenSchema,
@@ -17,11 +17,11 @@ export const refreshTokenIndividualUser = new Elysia({
             logger: pinoLogger(store),
         }
     })
-    .post("/refresh-token/individual-user", async ({ body, set, logger }) => {
+    .post("/refresh-token/individual", async ({ body, set, logger }) => {
         const jwtPayload = await AuthService.verifyToken(body.refreshToken, "refresh", "individual", logger);
-        logger.debug({ jwtPayload }, "refreshTokenIndividualUser:: jwt payload")
+        logger.debug({ jwtPayload }, "refreshTokenIndividual:: jwt payload")
         if (!jwtPayload) {
-            logger.info("refreshTokenIndividualUser:: invalid refresh token")
+            logger.info("refreshTokenIndividual:: invalid refresh token")
             set.status = 400
             return {
                 type: "error",
@@ -32,7 +32,7 @@ export const refreshTokenIndividualUser = new Elysia({
                 }
             }
         }
-        logger.info("refreshTokenIndividualUser:: refresh token verified successfully")
+        logger.info("refreshTokenIndividual:: refresh token verified successfully")
         // ensure not to include exp, iat, jti, nbf, sub in payload
         const payload = {
             id: jwtPayload.id,
@@ -40,9 +40,9 @@ export const refreshTokenIndividualUser = new Elysia({
             userType: jwtPayload.userType
         }
         const { accessToken, refreshToken } = AuthService.createTokens(payload)
-        logger.info("refreshTokenIndividualUser:: new access and refresh tokens generated")
+        logger.info("refreshTokenIndividual:: new access and refresh tokens generated")
         await AuthService.cacheRefreshToken(refreshToken, payload.id)
-        logger.info("refreshTokenIndividualUser:: refresh token cached")
+        logger.info("refreshTokenIndividual:: refresh token cached")
         return {
             type: "success",
             data: { accessToken, refreshToken, message: "Refresh token generated successfully" }

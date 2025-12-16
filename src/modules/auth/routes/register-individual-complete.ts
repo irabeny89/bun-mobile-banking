@@ -5,8 +5,8 @@ import Elysia from "elysia";
 import { AuthService } from "../service";
 import { AuthModel } from "../model";
 
-export const registerIndividualUserComplete = new Elysia({
-    name: "registerIndividualUserComplete"
+export const registerIndividualComplete = new Elysia({
+    name: "registerIndividualComplete"
 })
     .model({
         registerComplete: AuthModel.registerCompleteSchema,
@@ -18,28 +18,28 @@ export const registerIndividualUserComplete = new Elysia({
             const logger = pinoLogger(store)
             const registerData = await AuthService.getUserRegisterData(body.otp)
             if (!registerData) {
-                logger.info("registerIndividualUserComplete:: invalid otp, no register data")
+                logger.info("registerIndividualComplete:: invalid otp, no register data")
                 set.status = 400
                 return {
                     type: "error",
                     error: { message: "Invalid OTP", code: "INVALID_OTP", details: [] }
                 }
             }
-            logger.info("registerIndividualUserComplete:: otp verified successfully")
+            logger.info("registerIndividualComplete:: otp verified successfully")
             return { registerData, logger }
         })
-        .post("/register/individual-user/complete", async ({ logger, registerData }) => {
-            logger?.info("registerIndividualUserComplete:: creating individual user")
+        .post("/register/individual/complete", async ({ logger, registerData }) => {
+            logger?.info("registerIndividualComplete:: creating individual user")
             const res = await IndividualUserService.create(registerData!)
-            logger?.info("registerIndividualUserComplete:: individual user created successfully")
+            logger?.info("registerIndividualComplete:: individual user created successfully")
             const tokenPayload: CommonSchema.TokenPayloadT = {
                 id: res.id,
                 userType: res.userType,
                 email: res.email,
             }
-            logger?.info("registerIndividualUserComplete:: generating access and refresh tokens")
+            logger?.info("registerIndividualComplete:: generating access and refresh tokens")
             const { accessToken, refreshToken } = AuthService.createTokens(tokenPayload)
-            logger?.info("registerIndividualUserComplete:: caching refresh token")
+            logger?.info("registerIndividualComplete:: caching refresh token")
             await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
             return {
                 type: "success",
@@ -53,7 +53,7 @@ export const registerIndividualUserComplete = new Elysia({
             body: "registerComplete",
             beforeHandle: async ({ registerData, set, logger }) => {
                 if (!registerData) {
-                    logger?.info("registerIndividualUserComplete:: no register data")
+                    logger?.info("registerIndividualComplete:: no register data")
                     set.status = 400
                     return {
                         type: "error" as const,

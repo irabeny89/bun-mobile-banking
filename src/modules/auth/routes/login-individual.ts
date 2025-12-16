@@ -5,7 +5,7 @@ import Elysia from "elysia";
 import { AuthModel } from "../model";
 import { AuthService } from "../service";
 
-export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
+export const loginIndividual = new Elysia({ name: "loginIndividual" })
     .model({
         login: AuthModel.loginSchema,
         loginSuccess: AuthModel.loginSuccessSchema,
@@ -20,16 +20,16 @@ export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
         })
         .post("/login/individual-user", async ({ logger, set, user, body }) => {
             if (!user) {
-                logger.info("loginIndividualUser:: no user found")
+                logger.info("loginIndividual:: no user found")
                 set.status = 400
                 return {
                     type: "error" as const,
                     error: { message: "No user found", code: "NO_USER_FOUND", details: [] }
                 }
             }
-            logger.debug({ pass: body.password, hash: user.password }, "loginIndividualUser:: comparing plain and hashed password")
+            logger.debug({ pass: body.password, hash: user.password }, "loginIndividual:: comparing plain and hashed password")
             if (!(await Bun.password.verify(body.password, user.password))) {
-                logger.info("loginIndividualUser:: invalid password")
+                logger.info("loginIndividual:: invalid password")
                 set.status = 400
                 return {
                     type: "error" as const,
@@ -37,7 +37,7 @@ export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
                 }
             }
             if (user.mfaEnabled) {
-                logger.info("loginIndividualUser:: MFA enable by user")
+                logger.info("loginIndividual:: MFA enable by user")
                 const { id, email, userType, mfaEnabled } = user
                 await AuthService.sendMfaOtp({ email, id, userType, logger })
                 return {
@@ -55,9 +55,9 @@ export const loginIndividualUser = new Elysia({ name: "loginIndividualUser" })
                 userType: user.userType,
                 email: user.email,
             }
-            logger.info("loginIndividualUser:: user verified, generating access and refresh tokens")
+            logger.info("loginIndividual:: user verified, generating access and refresh tokens")
             const { accessToken, refreshToken } = AuthService.createTokens(payload)
-            logger.info("loginIndividualUser:: caching refresh token")
+            logger.info("loginIndividual:: caching refresh token")
             await AuthService.cacheRefreshToken(refreshToken, payload.id)
             return {
                 type: "success" as const,

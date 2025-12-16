@@ -6,7 +6,7 @@ import { AuthModel } from "../model";
 import { AuthService } from "../service";
 import { CommonSchema } from "@/share/schema";
 
-export const registerIndividualUser = new Elysia({ name: "registerIndividualUser" })
+export const registerIndividual = new Elysia({ name: "registerIndividual" })
     .model({
         register: AuthModel.registerBodySchema,
         registerSuccess: AuthModel.registerSuccessSchema,
@@ -18,7 +18,7 @@ export const registerIndividualUser = new Elysia({ name: "registerIndividualUser
             logger
         }
     })
-    .post("/register/individual-user", async ({ body, logger }) => {
+    .post("/register/individual", async ({ body, logger }) => {
         logger.info("auth:: registering individual user")
         await AuthService.register(body, logger)
         return {

@@ -4,8 +4,8 @@ import Elysia from "elysia";
 import { AuthModel } from "../model";
 import { AuthService } from "../service";
 
-export const loginMfaIndividualUser = new Elysia({
-    name: "loginMfaIndividualUser"
+export const loginMfaIndividual = new Elysia({
+    name: "loginMfaIndividual"
 })
     .model({
         loginMfaOtp: AuthModel.loginMfaOtpSchema,
@@ -19,18 +19,18 @@ export const loginMfaIndividualUser = new Elysia({
                 payload: await AuthService.getMfaOtpCachedData(body.otp)
             }
         })
-        .post("/login/mfa-otp/individual-user", async ({ logger, set, payload }) => {
+        .post("/login/mfa-otp/individual", async ({ logger, set, payload }) => {
             if (!payload) {
-                logger.info("loginMfaIndividualUser:: invalid otp")
+                logger.info("loginMfaIndividual:: invalid otp")
                 set.status = 400
                 return {
                     type: "error",
                     error: { message: "Invalid OTP", code: "INVALID_OTP", details: [] }
                 }
             }
-            logger.info(payload, "loginMfaIndividualUser:: generating access and refresh tokens with payload")
+            logger.info(payload, "loginMfaIndividual:: generating access and refresh tokens with payload")
             const { accessToken, refreshToken } = AuthService.createTokens(payload)
-            logger.info("loginMfaIndividualUser:: caching refresh token")
+            logger.info("loginMfaIndividual:: caching refresh token")
             await AuthService.cacheRefreshToken(refreshToken, payload.id)
             return {
                 type: "success",
