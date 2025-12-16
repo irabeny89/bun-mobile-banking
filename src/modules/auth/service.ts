@@ -7,6 +7,7 @@ import { emailQueue } from "@/utils/email";
 import pino from "pino";
 import { CommonSchema } from "@/share/schema";
 import { sign, verify } from "jsonwebtoken";
+import dbSingleton from "@/utils/db";
 
 type RefreshTokenParamsT = {
     body: AuthModel.RefreshTokenT,
@@ -35,6 +36,7 @@ type LogoutParamsT = {
 type LogoutResultT = "invalid token" | "logout successful"
 type SendMfaOtpParamsT = Record<"logger", pino.Logger> & CommonSchema.TokenPayloadT
 const cache = cacheSingleton();
+const db = dbSingleton();
 export abstract class AuthService {
     /**
      * Send MFA OTP to user email
@@ -156,16 +158,12 @@ export abstract class AuthService {
         if (!cachedData) return null;
         return JSON.parse(cachedData) as AuthModel.RegisterBodyT;
     }
-    static async refreshToken({ body, logger }: RefreshTokenParamsT): Promise<boolean> {
-        // TODO: verify refresh token
-        return true;
-    }
-    static async forgotPassword(body: AuthModel.ForgotPasswordT): Promise<boolean> {
-        // TODO: verify email
-        return true;
-    }
-    static async resetPassword(body: AuthModel.ResetPasswordT): Promise<boolean> {
-        // TODO: verify reset token
+    static async resetPasswordIndividual(id: string, newPassword: string): Promise<boolean> {
+        await db`
+            UPDATE individual_users
+            SET password_hash = ${newPassword}
+            WHERE id = ${id}
+        `
         return true;
     }
     static async logout(body: AuthModel.LogoutT): Promise<boolean> {

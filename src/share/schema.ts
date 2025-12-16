@@ -47,4 +47,11 @@ export namespace CommonSchema {
 
     export const otpSchema = t.String({ minLength: 6, maxLength: 6 });
     export type OtpT = typeof otpSchema.static;
+
+    export const passwordSchema = t.String({
+        minLength: 8,
+        maxLength: 128,
+        error: "Password must be between 8 and 128 characters",
+    })
+    export type PasswordT = typeof passwordSchema.static;
 }

@@ -74,21 +74,18 @@ export namespace AuthModel {
     export type ForgotPasswordT = typeof forgotPasswordSchema.static;
 
     export const forgotPasswordSuccessSchema = successSchemaFactory(t.Object({
-        message: t.Literal("Password reset request successful. Check your email for the reset code"), 
+        message: t.Literal("Password reset request successful. Check your email for the reset code"),
         nextStep: t.Literal("Reset Password with OTP")
     }))
     export type ForgotPasswordSuccessT = typeof forgotPasswordSuccessSchema.static;
 
     export const resetPasswordSchema = t.Object({
-        email: t.String(),
-        password: t.String(),
-        code: t.String(),
+        newPassword: CommonSchema.passwordSchema,
+        otp: CommonSchema.otpSchema,
     })
     export type ResetPasswordT = typeof resetPasswordSchema.static;
 
-    export const resetPasswordSuccessSchema = successSchemaFactory(t.Object({
-        email: t.String(),
-    }))
+    export const resetPasswordSuccessSchema = successSchemaFactory(tokenSchema)
     export type ResetPasswordSuccessT = typeof resetPasswordSuccessSchema.static;
 
     export const logoutSchema = t.Object({

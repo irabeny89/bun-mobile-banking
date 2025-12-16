@@ -29,11 +29,7 @@ export namespace IndividualUserModel {
         nin: t.Optional(t.String({ pattern: "^[0-9]{11}$", description: "National Identity Number must be a valid number", examples: ["12345678901"] })),
         govtId: t.Optional(t.String({ pattern: "^[a-zA-Z0-9]{1,128}$", description: "Government ID must be a valid string", examples: ["12345678901"] })),
         tin: t.Optional(t.String({ pattern: "^[0-9]$", description: "Tax Identification Number must be a valid number", examples: ["1234567890"] })),
-        password: t.String({
-            minLength: 8,
-            maxLength: 128,
-            error: "Password must be between 8 and 128 characters",
-        }),
+        password: CommonSchema.passwordSchema,
         photoId: t.Optional(t.String({ format: "uri", description: "Photo ID must be a valid URL", examples: ["https://example.com/photo-id.jpg"] })),
         kycTier: t.Optional(CommonSchema.kycTierSchema),
         pin: t.Optional(t.String({ pattern: "^[0-9]{4}$", description: "Transaction PIN must be 4 digits", error: "Pin must be 4 digits" })),

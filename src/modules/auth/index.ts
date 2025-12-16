@@ -7,6 +7,7 @@ import { loginIndividual } from "./routes/login-individual";
 import { loginMfaIndividual } from "./routes/login-mfa-individual";
 import { refreshTokenIndividual } from "./routes/refresh-token-individual";
 import { forgotPasswordIndividual } from "./routes/forgot-password-individual";
+import { resetPasswordIndividual } from "./routes/reset-password-individual";
 
 export const auth = new Elysia({
     prefix: "/auth",
@@ -21,3 +22,4 @@ export const auth = new Elysia({
     .use(loginMfaIndividual)
     .use(refreshTokenIndividual)
     .use(forgotPasswordIndividual)
+    .use(resetPasswordIndividual)
