@@ -102,3 +102,13 @@ Content-Type: application/json
 # Get authorized individual user data
 GET {{baseUrl}}/api/v1/individuals/me
 Authorization: Bearer {{accessToken}}
+
+###
+# Toggle MFA
+POST {{baseUrl}}/api/v1/individuals/mfa
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "mfaEnabled": true
+}

@@ -74,7 +74,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **GET** | `/kyc/status` | Check current KYC verification status. |
 | **POST** | `/pin/set` | Set transaction PIN. |
 | **POST** | `/pin/change` | Change transaction PIN. |
-| **POST** | `/security/mfa` | Enable/Disable MFA. |
+| **POST** | `/mfa` | Enable/Disable MFA. |
 
 ### 3. Business User Profile & KYB
 **Base URL**: `/api/v1/business`

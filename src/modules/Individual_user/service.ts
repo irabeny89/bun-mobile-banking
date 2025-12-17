@@ -49,4 +49,13 @@ export abstract class IndividualUserService {
     `
     return res[0] as IndividualUserModel.UserT;
   }
+
+  static async setMfa(id: string, mfaEnabled: boolean) {
+    const res = await sql`
+      UPDATE individual_users
+      SET mfa_enabled = ${mfaEnabled}
+      WHERE id = ${id}
+    `
+    return res;
+  }
 }

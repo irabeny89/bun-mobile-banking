@@ -1,6 +1,7 @@
 /** Controller handle HTTP related operations eg. routing, request validation */
 import { me } from "./routes/me";
 import Elysia from "elysia";
+import { mfa } from "./routes/mfa";
 
 export const individualUser = new Elysia({
     name: "individual-user",
@@ -11,3 +12,4 @@ export const individualUser = new Elysia({
     },
 })
     .use(me)
+    .use(mfa)
