@@ -172,7 +172,4 @@ export namespace IndividualUserModel {
 
     export const postMfaSuccessSchema = successSchemaFactory(postMfaSchema);
     export type PostMfaSuccessT = typeof postMfaSuccessSchema.static;
-
-    export const errorSchema = errorSchemaFactory();
-    export type ErrorSchemaT = typeof errorSchema.static;
 }
