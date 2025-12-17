@@ -14,16 +14,15 @@ export const registerIndividualComplete = new Elysia({
         error: CommonSchema.errorSchema,
     })
     .guard({ body: "registerComplete" }, app => app
-        .resolve(async ({ body, store, set }) => {
+        .resolve(async ({ body, store, status }) => {
             const logger = pinoLogger(store)
             const registerData = await AuthService.getUserRegisterData(body.otp)
             if (!registerData) {
                 logger.info("registerIndividualComplete:: invalid otp, no register data")
-                set.status = 400
-                return {
+                return status(400, {
                     type: "error",
                     error: { message: "Invalid OTP", code: "INVALID_OTP", details: [] }
-                }
+                })
             }
             logger.info("registerIndividualComplete:: otp verified successfully")
             return { registerData, logger }
