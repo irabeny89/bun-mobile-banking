@@ -3,6 +3,7 @@ import { AuthModel } from "../model";
 import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import { AuthService } from "../service";
+import { ERROR_RESPONSE_CODES } from "@/types";
 
 export const refreshTokenIndividual = new Elysia({
     name: "refreshTokenIndividual"
@@ -27,7 +28,7 @@ export const refreshTokenIndividual = new Elysia({
                 type: "error",
                 error: {
                     message: "Invalid refresh token",
-                    code: "INVALID_REFRESH_TOKEN",
+                    code: ERROR_RESPONSE_CODES.INVALID_TOKEN,
                     details: []
                 }
             }

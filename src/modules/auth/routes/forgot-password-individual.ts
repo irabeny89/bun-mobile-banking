@@ -4,6 +4,7 @@ import Elysia from "elysia";
 import { AuthModel } from "../model";
 import { IndividualUserService } from "@/modules/Individual_user/service";
 import { AuthService } from "../service";
+import { ERROR_RESPONSE_CODES } from "@/types";
 
 export const forgotPasswordIndividual = new Elysia({
     name: "forgot-password-individual",
@@ -41,7 +42,7 @@ export const forgotPasswordIndividual = new Elysia({
                         type: "error" as const,
                         error: {
                             message: "User not found",
-                            code: "USER_NOT_FOUND",
+                            code: ERROR_RESPONSE_CODES.NOT_FOUND,
                             details: []
                         }
                     }

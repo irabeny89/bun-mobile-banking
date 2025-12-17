@@ -3,6 +3,7 @@ import { IndividualUserModel } from "../model";
 import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import { userMacro } from "@/plugins/user-macro.plugin";
+import { ERROR_RESPONSE_CODES } from "@/types";
 
 export const me = new Elysia({ name: "me-individual" })
     .use(userMacro)
@@ -23,7 +24,11 @@ export const me = new Elysia({ name: "me-individual" })
             set.status = 404
             return {
                 type: "error",
-                error: { message: "User not found", code: "USER_NOT_FOUND", details: [] }
+                error: {
+                    message: "User not found",
+                    code: ERROR_RESPONSE_CODES.NOT_FOUND,
+                    details: []
+                }
             }
         }
         logger.info("me:: user found, returning data")

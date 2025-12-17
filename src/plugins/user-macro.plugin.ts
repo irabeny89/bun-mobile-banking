@@ -1,6 +1,7 @@
 import { AuthService } from "@/modules/auth/service";
 import { IndividualUserService } from "@/modules/Individual_user/service";
 import { CommonSchema } from "@/share/schema";
+import { ERROR_RESPONSE_CODES } from "@/types";
 import pinoLogger from "@/utils/pino-logger";
 import Elysia from "elysia";
 
@@ -16,7 +17,7 @@ export const userMacro = new Elysia({ name: "user-macro" })
                         type: "error",
                         error: {
                             message: "Unauthorized",
-                            code: "UNAUTHORIZED",
+                            code: ERROR_RESPONSE_CODES.UNAUTHORIZED,
                             details: []
                         }
                     })
@@ -28,7 +29,7 @@ export const userMacro = new Elysia({ name: "user-macro" })
                         type: "error",
                         error: {
                             message: "Unauthorized",
-                            code: "UNAUTHORIZED",
+                            code: ERROR_RESPONSE_CODES.UNAUTHORIZED,
                             details: []
                         }
                     })
@@ -42,7 +43,7 @@ export const userMacro = new Elysia({ name: "user-macro" })
                         type: "error",
                         error: {
                             message: "Unauthorized",
-                            code: "UNAUTHORIZED",
+                            code: ERROR_RESPONSE_CODES.UNAUTHORIZED,
                             details: []
                         }
                     })

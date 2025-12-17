@@ -4,6 +4,7 @@ import pinoLogger from "@/utils/pino-logger";
 import Elysia from "elysia";
 import { AuthModel } from "../model";
 import { AuthService } from "../service";
+import { ERROR_RESPONSE_CODES } from "@/types";
 
 export const loginIndividual = new Elysia({ name: "loginIndividual" })
     .model({
@@ -24,7 +25,7 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
                 set.status = 400
                 return {
                     type: "error" as const,
-                    error: { message: "No user found", code: "NO_USER_FOUND", details: [] }
+                    error: { message: "No user found", code: ERROR_RESPONSE_CODES.NOT_FOUND, details: [] }
                 }
             }
             logger.info("loginIndividual:: comparing plain and hashed password")
@@ -33,7 +34,7 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
                 set.status = 400
                 return {
                     type: "error" as const,
-                    error: { message: "Invalid credentials", code: "INVALID_CREDENTIALS", details: [] }
+                    error: { message: "Invalid credentials", code: ERROR_RESPONSE_CODES.INVALID_CREDENTIALS, details: [] }
                 }
             }
             if (user.mfaEnabled) {

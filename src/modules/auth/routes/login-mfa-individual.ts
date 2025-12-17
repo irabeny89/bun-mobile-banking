@@ -3,6 +3,7 @@ import pinoLogger from "@/utils/pino-logger";
 import Elysia from "elysia";
 import { AuthModel } from "../model";
 import { AuthService } from "../service";
+import { ERROR_RESPONSE_CODES } from "@/types";
 
 export const loginMfaIndividual = new Elysia({
     name: "loginMfaIndividual"
@@ -25,7 +26,11 @@ export const loginMfaIndividual = new Elysia({
                 set.status = 400
                 return {
                     type: "error" as const,
-                    error: { message: "Invalid OTP", code: "INVALID_OTP", details: [] }
+                    error: { 
+                        message: "Invalid OTP", 
+                        code: ERROR_RESPONSE_CODES.INVALID_OTP, 
+                        details: [] 
+                    }
                 }
             }
             logger.info(payload, "loginMfaIndividual:: generating access and refresh tokens with payload")

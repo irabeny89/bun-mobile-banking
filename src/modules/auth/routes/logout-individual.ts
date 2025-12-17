@@ -3,6 +3,7 @@ import { AuthModel } from "../model";
 import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import { AuthService } from "../service";
+import { ERROR_RESPONSE_CODES } from "@/types";
 
 export const logoutIndividual = new Elysia({ name: "logout-individual" })
     .model({
@@ -23,8 +24,8 @@ export const logoutIndividual = new Elysia({ name: "logout-individual" })
             return {
                 type: "error" as const,
                 error: {
-                    code: "invalid_token",
-                    message: "Invalid token",
+                    code: ERROR_RESPONSE_CODES.INVALID_TOKEN,
+                    message: "Invalid refresh token",
                     details: []
                 }
             }

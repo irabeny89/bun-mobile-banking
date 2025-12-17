@@ -5,6 +5,7 @@ import Elysia from "elysia";
 import { AuthModel } from "../model";
 import { AuthService } from "../service";
 import { CommonSchema } from "@/share/schema";
+import { ERROR_RESPONSE_CODES } from "@/types";
 
 export const registerIndividual = new Elysia({ name: "registerIndividual" })
     .model({
@@ -42,7 +43,11 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
                 set.status = 400
                 return {
                     type: "error" as const,
-                    error: { message: "User already exists", code: "USER_EXIST", details: [] }
+                    error: { 
+                        message: "User already exists", 
+                        code: ERROR_RESPONSE_CODES.USER_EXIST, 
+                        details: [] 
+                    }
                 }
             }
             body.password = await Bun.password.hash(body.password)

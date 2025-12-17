@@ -1,6 +1,8 @@
 import rateLimit from "@/utils/rate-limit";
 import Elysia from "elysia";
 import pinoLogger from "@/utils/pino-logger";
+import { ERROR_RESPONSE_CODES } from "@/types";
+import { CommonSchema } from "@/share/schema";
 
 export const rateLimitPlugin = new Elysia({ name: "rateLimit" })
     .onRequest(async ({ server, request, status, store }) => {
@@ -11,23 +13,27 @@ export const rateLimitPlugin = new Elysia({ name: "rateLimit" })
                 const { limited } = await rateLimit(ip)
                 if (limited) {
                     logger.error("rateLimitPlugin:: rate limit exceeded");
-                    return status(429, {
-                        status: "error",
+                    const errRes: CommonSchema.ErrorSchemaT = {
+                        type: "error",
                         error: {
-                            code: "TOO_MANY_REQUESTS",
-                            message: "Too many requests"
+                            code: ERROR_RESPONSE_CODES.TOO_MANY_REQUESTS,
+                            message: "Too many requests",
+                            details: []
                         }
-                    })
+                    }
+                    return status(429, errRes)
                 }
             }
         } catch (error) {
             logger.error(error, "rateLimitPlugin:: rate limit error");
-            return status(500, {
-                status: "error",
+            const errRes: CommonSchema.ErrorSchemaT = {
+                type: "error",
                 error: {
-                    code: "INTERNAL_SERVER_ERROR",
-                    message: "Internal server error"
+                    code: ERROR_RESPONSE_CODES.INTERNAL_SERVER_ERROR,
+                    message: "Internal server error",
+                    details: []
                 }
-            })
+            }
+            return status(500, errRes)
         }
     }).as("global")

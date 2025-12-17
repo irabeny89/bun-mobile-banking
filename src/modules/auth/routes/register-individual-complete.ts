@@ -4,6 +4,7 @@ import pinoLogger from "@/utils/pino-logger";
 import Elysia from "elysia";
 import { AuthService } from "../service";
 import { AuthModel } from "../model";
+import { ERROR_RESPONSE_CODES } from "@/types";
 
 export const registerIndividualComplete = new Elysia({
     name: "registerIndividualComplete"
@@ -21,7 +22,11 @@ export const registerIndividualComplete = new Elysia({
                 logger.info("registerIndividualComplete:: invalid otp, no register data")
                 return status(400, {
                     type: "error",
-                    error: { message: "Invalid OTP", code: "INVALID_OTP", details: [] }
+                    error: { 
+                        message: "Invalid OTP", 
+                        code: ERROR_RESPONSE_CODES.INVALID_OTP, 
+                        details: [] 
+                    }
                 })
             }
             logger.info("registerIndividualComplete:: otp verified successfully")
@@ -52,25 +57,17 @@ export const registerIndividualComplete = new Elysia({
             },
             body: "registerComplete",
             beforeHandle: async ({ registerData, set, logger }) => {
-                if (!registerData) {
-                    logger?.info("registerIndividualComplete:: no register data")
-                    set.status = 400
-                    return {
-                        type: "error" as const,
-                        error: {
-                            message: "No register data. Please try and register again.",
-                            code: "NO_REGISTER_DATA",
-                            details: []
-                        }
-                    }
-                }
                 const userExist = await IndividualUserService.existByEmail(registerData.email)
                 if (userExist) {
                     logger?.info("registerIndividualUser:: user already exists")
                     set.status = 400
                     return {
                         type: "error" as const,
-                        error: { message: "User already exists", code: "USER_EXIST", details: [] }
+                        error: { 
+                            message: "User already exists", 
+                            code: ERROR_RESPONSE_CODES.USER_EXIST, 
+                            details: [] 
+                        }
                     }
                 }
                 logger?.debug(registerData, "registerIndividualUser:: register data verified successfully")
