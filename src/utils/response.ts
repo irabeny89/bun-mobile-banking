@@ -41,6 +41,7 @@ export function errorSchemaFactory() {
         t.Object({
           path: t.String(),
           message: t.String(),
+          value: t.String(),
         })
       )
     }),

@@ -97,3 +97,8 @@ Content-Type: application/json
 {
   "refreshToken": "{{refreshToken}}"
 }
+
+###
+# Get authorized individual user data
+GET {{baseUrl}}/api/v1/individuals/me
+Authorization: Bearer {{accessToken}}

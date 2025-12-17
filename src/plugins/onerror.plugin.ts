@@ -27,6 +27,7 @@ export const errorHandler = new Elysia({ name: "error-handler" })
       errRes.error.details = detail.errors.map((error: any) => ({
         path: error.path,
         message: error.message,
+        value: error.value,
       }))
     }
     else {
