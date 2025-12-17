@@ -27,7 +27,7 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
                     error: { message: "No user found", code: "NO_USER_FOUND", details: [] }
                 }
             }
-            logger.debug({ pass: body.password, hash: user.password }, "loginIndividual:: comparing plain and hashed password")
+            logger.info("loginIndividual:: comparing plain and hashed password")
             if (!(await Bun.password.verify(body.password, user.password))) {
                 logger.info("loginIndividual:: invalid password")
                 set.status = 400
