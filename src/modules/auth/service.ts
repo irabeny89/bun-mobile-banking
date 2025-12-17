@@ -85,21 +85,21 @@ export abstract class AuthService {
      * @param userType individual or business
      * @returns token payload or false if token is invalid
      */
-    static async verifyToken(token: string, tokenType: "access" | "refresh", userType: CommonSchema.UserType, logger: pino.Logger) {
+    static async verifyToken(token: string, tokenType: "access" | "refresh", userType: CommonSchema.UserType, logger?: pino.Logger) {
         try {
             const payload = verify(token, tokenType === "access" ? SECRET_1 : SECRET_2) as CommonSchema.TokenPayloadT
-            logger.info("AuthService:: token verified successfully")
+            logger?.info("AuthService:: token verified successfully")
             if (payload.userType !== userType) {
-                logger.debug({ argUserType: userType, payloadUserType: payload.userType }, "AuthService:: user type mismatch")
+                logger?.debug({ argUserType: userType, payloadUserType: payload.userType }, "AuthService:: user type mismatch")
                 return false;
             }
             if (tokenType === "refresh" && token !== await this.getRefreshToken(payload.id)) {
-                logger.debug("AuthService:: refresh token mismatch")
+                logger?.debug("AuthService:: refresh token mismatch")
                 return false;
             }
             return payload;
         } catch (error) {
-            logger.debug({ error }, "AuthService:: token verification failed")
+            logger?.debug({ error }, "AuthService:: token verification failed")
             return false;
         }
     }
