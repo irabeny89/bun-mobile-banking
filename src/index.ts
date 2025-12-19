@@ -13,8 +13,9 @@ import { logger } from "./plugins/logger.plugin";
 import { rateLimitPlugin } from "./plugins/rate-limit.plugin";
 import { apiDocs } from "./plugins/api-docs.plugin";
 import { kyc } from "./modules/kyc";
+import { PORT } from "./config";
 
-new Elysia({
+export const app = new Elysia({
   name: pkg.name,
   detail: {
     description: pkg.description
@@ -36,4 +37,6 @@ new Elysia({
     .use(individualUser)
     .use(kyc)
   )
-  .listen(3000);
+  .listen(PORT);
+  
+export type App = typeof app

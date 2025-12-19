@@ -1,8 +1,10 @@
+export const PORT = process.env.PORT ?? "3000";
 export const DEFAULT_OTP_LENGTH = 6;
 export const WORD_SEPARATOR = "-";
 export const RATE_LIMIT_DEFAULT_TTL = 3600; // 1 hour in seconds
 export const RATE_LIMIT_DEFAULT_LIMIT = 5e3; // 5k requests per hour
 export const RATE_LIMIT_KEY = "ratelimit";
+export const NODE_ENV = process.env.NODE_ENV ?? "development";
 export const IS_PROD_ENV = process.env.NODE_ENV === "production";
 export const SECRET_1 = process.env.SECRET_1 ?? "53Cu7eS3kr3Et";
 export const SECRET_2 = process.env.SECRET_2 ?? "sEkU7E53Kr33t";

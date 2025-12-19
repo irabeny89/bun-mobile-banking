@@ -16,6 +16,7 @@ declare module "bun" {
     VALKEY_PORT: string;
     VALKEY_URL: string;
     EMAIL_FROM: string;
+    PORT: string;
   }
 }
 
