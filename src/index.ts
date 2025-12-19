@@ -12,8 +12,9 @@ import { cacheReq } from "./plugins/cache-req";
 import { logger } from "./plugins/logger.plugin";
 import { rateLimitPlugin } from "./plugins/rate-limit.plugin";
 import { apiDocs } from "./plugins/api-docs.plugin";
+import { kyc } from "./modules/kyc";
 
-const app = new Elysia({
+new Elysia({
   name: pkg.name,
   detail: {
     description: pkg.description
@@ -30,5 +31,9 @@ const app = new Elysia({
   .use(rateLimitPlugin)
   .use(healthcheck)
   .get("/", () => `Hello from ${pkg.name}.\n${pkg.description}`)
-  .group("/api/v1", (app) => app.use(auth).use(individualUser))
+  .group("/api/v1", (app) => app
+    .use(auth)
+    .use(individualUser)
+    .use(kyc)
+  )
   .listen(3000);

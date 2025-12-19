@@ -1,7 +1,7 @@
 /// Model define the data structure and validation for the request and response
 
 import { CommonSchema } from "@/share/schema";
-import { errorSchemaFactory, successSchemaFactory } from "@/utils/response";
+import { successSchemaFactory } from "@/utils/response";
 import { t } from "elysia";
 
 export namespace IndividualUserModel {

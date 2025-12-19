@@ -14,6 +14,13 @@ export namespace CommonSchema {
     export const idSchema = t.String({ format: "uuid" });
     export type IdSchemaT = typeof idSchema.static;
 
+    export const IdAndTimestampSchema = t.Object({
+        id: idSchema,
+        createdAt: t.Date(),
+        updatedAt: t.Date(),
+    })
+    export type IdAndTimestampSchemaT = typeof IdAndTimestampSchema.static;
+
     export const emailSchema = t.String({
         format: "email",
         examples: ["individual@example.com", "business@example.com"],

@@ -19,3 +19,24 @@ export const CACHE_GET = {
     ttl: 10 as const, // 10s
     header: "x-cache",
 }
+export const tier1Limit = {
+    description: "Tier 1 - Low Value",
+    singleDeposit: 5e6,
+    dailyDebit: 5e6,
+    balance: 3e7,
+    currency: "NGN"
+}
+export const tier2Limit = {
+    description: "Tier 2 - Medium Value",
+    singleDeposit: 1e7,
+    dailyDebit: 2e7,
+    balance: 5e7,
+    currency: "NGN"
+}
+export const tier3Limit = {
+    description: "Tier 3 - High Value",
+    singleDeposit: 5e8,
+    dailyDebit: 1e9,
+    balance: Number.MAX_SAFE_INTEGER,
+    currency: "NGN"
+}

@@ -110,5 +110,11 @@ Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "mfaEnabled": true
+  "mfaEnabled": false
 }
+
+###
+# Get tier 1 status
+GET {{baseUrl}}/api/v1/kyc/tier1
+Authorization: Bearer {{accessToken}}
+

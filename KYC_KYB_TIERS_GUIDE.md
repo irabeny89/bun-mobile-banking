@@ -43,51 +43,64 @@ If a customer's account activity exceeds the limits of their current tier, their
 In Nigeria, building a mobile banking app requires adhering strictly to the Central Bank of Nigeria (CBN) regulations. KYC for individuals is managed via the BVN/NIN system, and KYB for businesses focuses on the CAC registration system. Both rely heavily on integrating with RegTech aggregators via APIs.
 
 ### Part 1: Performing KYC for Individual Users
+
 The process for individuals is a tiered approach, starting with basic identity collection and escalating to verification using national identifiers.
 
 #### A. Data Collection (Mobile App Inputs)
+
 Your mobile app UI must capture the following required inputs:
-Full Legal Name
-Date of Birth
-Gender
-Phone Number
-Residential Address
-Passport Photograph
-Bank Verification Number (BVN)
-National Identity Number (NIN)
+
+- Full Legal Name
+- Date of Birth
+- Gender
+- Phone Number
+- Residential Address
+- Passport Photograph
+- Bank Verification Number (BVN)
+- National Identity Number (NIN)
 
 #### B. Verification Process (Backend & RegTech Aggregator)
+
 The backend uses a RegTech aggregator (e.g., Paystack, Mono, Identitypass) to verify the data against NIBSS records:
-Backend Call: Your Node.js backend sends the BVN, fullName, and dateOfBirth to the aggregator's API endpoint.
-Aggregator Verification: The aggregator communicates with NIBSS/NIMC databases.
+
+- `Backend Call`: Your Node.js backend sends the BVN, fullName, and dateOfBirth to the aggregator's API endpoint.
+- `Aggregator Verification`: The aggregator communicates with NIBSS/NIMC databases.
 Status Confirmation:
-Success: The API returns a successful match. The user can be moved to KYC Tier 2 or 3.
-Failure/Mismatch: The user is restricted to KYC Tier 1 limits (₦100,000 daily limit) until corrected or manually reviewed.
-Proof of Address (for Tier 3): The user uploads a utility bill or bank statement, which is reviewed (either manually or using an automated document verification service) to unlock unlimited transactions.
+- `Success`: The API returns a successful match. The user can be moved to KYC Tier 2 or 3.
+- `Failure/Mismatch`: The user is restricted to KYC Tier 1 limits (₦100,000 daily limit) until corrected or manually reviewed.
+
+`Proof of Address (for Tier 3)`: The user uploads a utility bill or bank statement, which is reviewed (either manually or using an automated document verification service) to unlock unlimited transactions.
 
 ### Part 2: Performing KYB for Business Users
+
 KYB for businesses focuses on verifying the entity's legal standing with the Corporate Affairs Commission (CAC) and confirming the identity of its owners.
 
 #### A. Data Collection (Mobile App Inputs)
+
 The app needs specific inputs regarding the business structure:
-Legal Business Name
-CAC Registration Number
-Business TIN (Tax Identification Number)
-Business Type (LTD, Enterprise, etc.)
-Registered Address
-List of all Ultimate Beneficial Owners (UBOs) and Directors.
+
+- Legal Business Name
+- CAC Registration Number
+- Business TIN (Tax Identification Number)
+- Business Type (LTD, Enterprise, etc.)
+- Registered Address
+- List of all Ultimate Beneficial Owners (UBOs) and Directors.
 
 #### B. Verification Process (Backend & RegTech Aggregator)
+
 The backend workflow involves two main verification steps:
-Business Verification (CAC Lookup):
-Your backend sends the CAC Registration Number and Legal Business Name to the aggregator's KYB API.
+
+- `Business Verification (CAC Lookup)`:
+<br>Your backend sends the CAC Registration Number and Legal Business Name to the aggregator's KYB API.
 The aggregator verifies the business registration status and returns official data (e.g., active status, date of incorporation).
 The backend confirms the business is legitimate and active.
-UBO/Director Verification (Individual KYC Check):
-For every director or UBO listed (typically those owning 25% or more, as per CBN rules), you must run a standard individual KYC check.
+
+- `UBO/Director Verification (Individual KYC Check)`:
+<br>For every director or UBO listed (typically those owning 25% or more, as per CBN rules), you must run a standard individual KYC check.
 You collect their personal BVN via the app and verify it using the same process described in Part 1.
 
 #### C. Final Status
+
 Once both the business entity is verified and all associated UBOs have their BVNs confirmed, the business user is onboarded and gains full access to business banking services.
 
 ## Transaction Limits By KYC Tier
@@ -99,12 +112,33 @@ Financial institutions must adhere to these caps to comply with Anti-Money Laund
 The limits are designed to align the level of risk with the required identification documentation. Exceeding these limits typically results in the account being frozen (placed on "Post No Debit") until the customer provides the necessary documentation to upgrade their tier. 
 
 ### CBN Mandated Limits
-These are the maximum allowed limits that all Nigerian banking apps must enforce (Note: some specific mobile money circulars have slightly different sub-limits, but these are the general banking limits):
 
-| Tier 	| Maximum Single Deposit Amount	| Maximum Daily Cumulative Transaction Limit	| Maximum Cumulative Account Balance |
-|---	|---	|---	|--- |
-| Tier 1 (Low Value)	| ₦50,000	| ₦100,000	| ₦300,000 |
-| Tier 2 (Medium Value)	| ₦100,000	| ₦500,000	| No specific limit mentioned in recent documents |
-| Tier 3 (High Value)	| No Limit	| No Limit	| No Limit |
+In 2025, the Central Bank of Nigeria (CBN) maintains a Three-Tiered Know Your Customer (KYC) framework to balance financial inclusion with security. As of December 2, 2025, all accounts must be linked to both a verified Bank Verification Number (BVN) and a National Identification Number (NIN) to remain active.
+
+#### Table 1: Account Limits (Tier 1 to Tier 3)
+
+| Feature | Tier 1 (Low Value) | Tier 2 (Medium Value) | Tier 3 (High Value) |
+| :--- | :--- | :--- | :--- |
+| Max Single Deposit | ₦50,000 | ₦100,000 | ₦5,000,000 |
+| Max Cumulative Balance | ₦300,000 | ₦500,000 | Unlimited |
+| Max Daily Transaction | ₦50,000 | ₦100,000 – ₦200,000 | ₦5,000,000 – ₦10,000,000 |
+
+#### Table 2: Required Documentation for Each Tier
+
+| Requirement | Tier 1 | Tier 2 | Tier 3 |
+| :--- | :--- | :--- | :--- |
+| Basic Info (Name, DOB, etc.) | Required | Required | Required |
+| BVN & NIN | Mandatory (Either/Both) | Both Mandatory | Both Mandatory |
+| Utility Bill | Not Required | Recommended | Mandatory |
+| Valid Govt. ID Card | Not Required | Not Required | Mandatory |
+| Tax ID (TIN) | Not Required | Not Required | Mandatory from Jan 2026 |
 
 > ### Important Note: Banking apps can choose to implement stricter internal limits if they have a lower risk appetite, but they cannot exceed the CBN's mandated maximums. 
+
+## User Consent and Privacy
+
+***Explicit Consent***: The GAID 2025 emphasizes that consent must be "informed and unambiguous".
+
+Users providing a NIN for identity verification do not automatically authorize you to use the phone number or address stored in that database for your marketing or service delivery.
+
+***Transparency***: You are required to provide an accessible Privacy Notice explaining exactly which data you are collecting and why. Collecting contact info directly ensures users are aware of what they are sharing with you.
