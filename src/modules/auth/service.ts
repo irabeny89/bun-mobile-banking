@@ -142,7 +142,7 @@ export abstract class AuthService {
         await emailQueue.add("email-verify", {
             otp,
             email: body.email,
-            name: `${body.firstName} ${body.lastName}`,
+            name: "Anonymous User",
             subject: "Email Verification"
         })
         logger.info("AuthService:: email queued")
