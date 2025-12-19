@@ -20,7 +20,6 @@ export const tier1Status = new Elysia({ name: "tier1-status" })
     })
     .get("/tier1", async ({ user, logger, set }) => {
         const tier1Status = await KycService.getTier1Status(user.id)
-        logger.debug(tier1Status, "tier 1 status")
         if (!tier1Status) {
             logger.error("Tier 1 status not found")
             set.status = 404
