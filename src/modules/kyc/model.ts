@@ -48,6 +48,12 @@ export namespace KycModel {
             description: "Last name must be a valid name",
             examples: ["Tom"]
         }),
+        phone: t.Optional(t.Nullable(t.String({
+            pattern: "^[0-9]{11}$",
+            error: "Phone number must be 11 digits",
+            description: "Mobile phone number must be 11 digits",
+            examples: ["08012345678"],
+        }))),
         gender: CommonSchema.genderSchema,
         dob: t.Date({
             description: "Date of birth must be a valid date",
