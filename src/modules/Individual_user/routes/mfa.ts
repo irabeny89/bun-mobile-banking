@@ -13,12 +13,12 @@ export const mfa = new Elysia({ name: "mfa-individual" })
         error: CommonSchema.errorSchema
     })
     .resolve(({ store }) => ({ logger: pinoLogger(store) }))
-    .post("/mfa", async ({ logger, user }) => {
+    .post("/mfa", async ({ logger, user, body }) => {
         logger.info(`mfa:: ${user.mfaEnabled ? "enabling" : "disabling"} MFA`);
-        await IndividualUserService.setMfa(user.id, !user.mfaEnabled);
+        await IndividualUserService.setMfa(user.id, body.mfaEnabled);
         return {
             type: "success",
-            data: { mfaEnabled: user.mfaEnabled }
+            data: { mfaEnabled: body.mfaEnabled }
         }
     }, {
         detail: {
