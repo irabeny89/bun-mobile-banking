@@ -9,31 +9,6 @@ import { CommonSchema } from "@/share/schema";
 import { sign, verify } from "jsonwebtoken";
 import dbSingleton from "@/utils/db";
 
-type RefreshTokenParamsT = {
-    body: AuthModel.RefreshTokenT,
-    logger: pino.Logger
-}
-type LoginMfaOtpParamsT = {
-    body: AuthModel.LoginMfaOtpT,
-    logger: pino.Logger
-}
-type LoginMfaOtpResultT = "invalid otp" | CommonSchema.TokenPayloadT
-type RefreshTokenResultT = "invalid token" | CommonSchema.TokenPayloadT
-type ForgotPasswordParamsT = {
-    body: AuthModel.ForgotPasswordT,
-    logger: pino.Logger
-}
-type ForgotPasswordResultT = "invalid email" | "email sent"
-type ResetPasswordParamsT = {
-    body: AuthModel.ResetPasswordT,
-    logger: pino.Logger
-}
-type ResetPasswordResultT = "invalid token" | "password reset"
-type LogoutParamsT = {
-    body: AuthModel.LogoutT,
-    logger: pino.Logger
-}
-type LogoutResultT = "invalid token" | "logout successful"
 type SendMfaOtpParamsT = Record<"logger", pino.Logger> & CommonSchema.TokenPayloadT
 const cache = cacheSingleton();
 const db = dbSingleton();
@@ -164,10 +139,6 @@ export abstract class AuthService {
             SET password_hash = ${newPassword}
             WHERE id = ${id}
         `
-        return true;
-    }
-    static async logout(body: AuthModel.LogoutT): Promise<boolean> {
-        // TODO: invalidate refresh token
         return true;
     }
 }
