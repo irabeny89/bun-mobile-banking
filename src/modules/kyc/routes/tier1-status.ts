@@ -43,7 +43,7 @@ export const tier1Status = new Elysia({ name: "tier1-status" })
     }, {
         user: ["individual"],
         detail: {
-            tags: ["KYC"],
+            tags: ["KYC", "Individual User"],
             description: "Get tier 1 status on your uploaded data",
             summary: "Get tier 1 status"
         },

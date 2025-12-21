@@ -73,7 +73,7 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
         },
         user: ["individual"],
         detail: {
-            tags: ["KYC"],
+            tags: ["KYC", "Individual User"],
             description: "Verify tier 1 data",
             summary: "Verify tier 1 data"
         },
