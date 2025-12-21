@@ -9,22 +9,31 @@ export namespace KycModel {
     export const tierStatusSchema = t.UnionEnum(["pending", "failed", "success"])
     export type tierStatusT = typeof tierStatusSchema.static
 
-    export const tier1SuccessSchema = successSchemaFactory(t.Object({
+    export const tier1ResponseDataSchema = t.Object({
         currentTier: currentTierSchema,
         tier1Status: tierStatusSchema,
-    }))
+    })
+    export type Tier1ResponseDataT = typeof tier1ResponseDataSchema.static
+
+    export const tier1SuccessSchema = successSchemaFactory(tier1ResponseDataSchema)
     export type Tier1SuccessT = typeof tier1SuccessSchema.static;
 
-    export const tier2SuccessSchema = successSchemaFactory(t.Object({
+    export const tier2ResponseDataSchema = t.Object({
         currentTier: currentTierSchema,
         tier2Status: tierStatusSchema,
-    }))
+    })
+    export type Tier2ResponseDataT = typeof tier2ResponseDataSchema.static
+    
+    export const tier2SuccessSchema = successSchemaFactory(tier2ResponseDataSchema)
     export type Tier2SuccessT = typeof tier2SuccessSchema.static;
 
-    export const tier3SuccessSchema = successSchemaFactory(t.Object({
+    export const tier3ResponseDataSchema = t.Object({
         currentTier: currentTierSchema,
         tier3Status: tierStatusSchema,
-    }))
+    })
+    export type Tier3ResponseDataT = typeof tier3ResponseDataSchema.static
+
+    export const tier3SuccessSchema = successSchemaFactory(tier3ResponseDataSchema)
     export type Tier3SuccessT = typeof tier3SuccessSchema.static;
 
     export const tier1DataSchema = t.Object({
@@ -34,22 +43,27 @@ export namespace KycModel {
             examples: ["https://example.com/photo-id.jpg"]
         }),
         firstName: t.String({
-            pattern: "^[a-zA-Z]{1,128}$",
+            minLength: 1,
+            maxLength: 128,
             description: "First name must be a valid name",
             examples: ["John"]
         }),
         middleName: t.Optional(t.Nullable(t.String({
-            pattern: "^[a-zA-Z]{1,128}$",
+            minLength: 1,
+            maxLength: 128,
             description: "Middle name must be a valid name",
             examples: ["Doe"]
         }))),
         lastName: t.String({
-            pattern: "^[a-zA-Z]{1,128}$",
+            minLength: 1,
+            maxLength: 128,
             description: "Last name must be a valid name",
             examples: ["Tom"]
         }),
         phone: t.Optional(t.Nullable(t.String({
-            pattern: "^[0-9]{11}$",
+            pattern: "^\\d+$",
+            minLength: 11,
+            maxLength: 11,
             error: "Phone number must be 11 digits",
             description: "Mobile phone number must be 11 digits",
             examples: ["08012345678"],
@@ -60,27 +74,34 @@ export namespace KycModel {
             examples: ["2000-01-01"]
         }),
         bvn: t.String({
-            pattern: "^[0-9]{11}$",
+            pattern: "^\\d+$",
+            minLength: 11,
+            maxLength: 11,
             description: "Bank Verification Number must be a valid number",
             examples: ["12345678901"]
         }),
         nin: t.String({
-            pattern: "^[0-9]{11}$",
+            pattern: "^\\d+$",
+            minLength: 11,
+            maxLength: 11,
             description: "National Identity Number must be a valid number",
             examples: ["12345678901"]
         }),
         street: t.String({
-            pattern: "^[a-zA-Z0-9]{1,256}$",
+            minLength: 1,
+            maxLength: 128,
             description: "Street address must be a valid address",
             examples: ["123 Main St"]
         }),
         city: t.String({
-            pattern: "^[a-zA-Z0-9]{1,128}$",
+            minLength: 1,
+            maxLength: 128,
             description: "City must be a valid city",
             examples: ["Ikeja"]
         }),
         state: t.String({
-            pattern: "^[a-zA-Z0-9]{1,128}$",
+            minLength: 1,
+            maxLength: 128,
             description: "State must be a valid state",
             examples: ["Lagos"]
         }),
@@ -128,7 +149,6 @@ export namespace KycModel {
         "lastName",
         "gender",
         "dob",
-        "bvn",
         "nin",
         "street",
         "city",

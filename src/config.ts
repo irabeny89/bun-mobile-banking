@@ -17,6 +17,23 @@ export const REGISTER_CACHE_KEY = "register"
 export const REFRESH_TOKEN_CACHE_KEY = "refresh-token"
 export const MFA_OTP_CACHE_KEY = "mfa-otp"
 export const EMAIL_FROM = process.env.EMAIL_FROM ?? "Fluxus <fluxus@ethereal.email>"
+export const DOJAH = {
+    appId: process.env.DOJAH_APPID,
+    secret: process.env.DOJAH_SECRET,
+    url: "https://api.dojah.io",
+    ip: "20.112.64.208",
+    sandbox: {
+        url: "https://sandbox.dojah.io",
+        bvn: "22222222222",
+        nin: "70123456789",
+        /** Voters Identification Number */
+        vin: "91F6B1F5BE29535558655586",
+        phone: "09011111111",
+        accountNumber: "3046507407",
+        bankCode: "011",
+    }
+}
+
 export const CACHE_GET = {
     ttl: 10 as const, // 10s
     header: "x-cache",
@@ -41,4 +58,241 @@ export const tier3Limit = {
     dailyDebit: 1e9,
     balance: Number.MAX_SAFE_INTEGER,
     currency: "NGN"
+}
+
+export const DOJAH_NIN_LOOKUP_RESPONSE_MOCK_DATA = {
+    entity: {
+        first_name: "John",
+        last_name: "Doe",
+        gender: "Male",
+        middle_name: "",
+        photo: "/9j/4AAQSkZJRgABAgAAAQABAAD/2wBDAAgGBgc...",
+        date_of_birth: "1982-01-01",
+        email: "abc@gmail.com",
+        phone_number: "08012345678",
+        employment_status: "unemployment",
+        marital_status: "Single"
+    }
+}
+export const DOJAH_BVN_VALIDATION_RESPONSE_MOCK_DATA = {
+    entity: {
+        bvn: {
+            value: "22222222222",
+            status: true
+        },
+        first_name: {
+            confidence_value: 100,
+            status: true
+        },
+        last_name: {
+            confidence_value: 100,
+            status: true
+        }
+    }
+}
+export const DOJAH_WEBHOOK_EVENT_MOCK_DATA = {
+    aml: {
+        status: false
+    },
+    data: {
+        id: {
+            data: {
+                id_url: "https://images.dojah.io/id_sample_id_1720624047.jpg",
+                id_data: {
+                    extras: "",
+                    last_name: "John",
+                    first_name: "Doe",
+                    mrz_status: "",
+                    date_issued: "2019-01-01",
+                    expiry_date: "2020-01-01",
+                    middle_name: "",
+                    nationality: "Nigerian",
+                    date_of_birth: "1990-01-01",
+                    document_type: "National ID",
+                    document_number: "123456789"
+                },
+                back_url: "https://images.dojah.io/id_sample_id_1720624047.jpg"
+            },
+            status: true,
+            message: "Successfully verified your id"
+        },
+        email: {
+            data: {
+                email: "abc@gmail.com"
+            },
+            status: true,
+            message: "abc@gmail.com validation Successful"
+        },
+        index: {
+            data: {},
+            status: true,
+            message: "Successfully continued to the main checks."
+        },
+        selfie: {
+            data: {
+                selfie_url: "https://images.dojah.io/selfie_sample_image_1720624219.jpg"
+            },
+            status: true,
+            message: "Successfully validated your liveness"
+        },
+        countries: {
+            data: {
+                country: "Nigeria"
+            },
+            status: true,
+            message: "Successfully continued to the next step."
+        },
+        user_data: {
+            data: {
+                dob: "1990-12-03",
+                last_name: "John",
+                first_name: "Doe"
+            },
+            status: true,
+            message: ""
+        },
+        business_id: {
+            image_url: "https://images.dojah.io/selfie_sample_image_1720624219.jpg",
+            business_name: "ABC Company LIMITED",
+            business_type: "Business",
+            business_number: "1237654",
+            business_address: "",
+            registration_date: ""
+        },
+        phone_number: {
+            data: {
+                phone: "234810123456"
+            },
+            status: true,
+            message: "2348103817187 validation Successful"
+        },
+        business_data: {
+            business_name: null,
+            business_type: "BN",
+            business_number: null,
+            business_address: null,
+            registration_date: null
+        },
+        government_data: {
+            data: {
+                bvn: {
+                    entity: {
+                        bvn: "222222222222",
+                        nin: "",
+                        email: "",
+                        title: "",
+                        gender: "Male",
+                        customer: "6bb82c41-e15e-4308-b99d-e9640818eca9",
+                        image_url: "https://images.dojah.io/id_John_Doe_1720615487.jpg",
+                        last_name: "John",
+                        first_name: "Doe",
+                        middle_name: "Anon",
+                        nationality: "",
+                        name_on_card: "",
+                        watch_listed: "",
+                        date_of_birth: "01-Jun-1982",
+                        lga_of_origin: "",
+                        phone_number1: "08011111111",
+                        phone_number2: "",
+                        marital_status: "",
+                        enrollment_bank: "",
+                        state_of_origin: "",
+                        level_of_account: "",
+                        lga_of_residence: "",
+                        enrollment_branch: "",
+                        registration_date: "",
+                        state_of_residence: "",
+                        residential_address: ""
+                    }
+                },
+                nin: {
+                    entity: {
+                        nin: "1234567891",
+                        firstname: "John",
+                        middlename: "Doe",
+                        surname: "Anon",
+                        maidenname: "",
+                        telephoneno: "0901234567",
+                        state: "",
+                        place: "",
+                        profession: "ZOOLOGY",
+                        title: "",
+                        height: "167",
+                        email: "",
+                        birthdate: "1960-01-01",
+                        birthstate: "",
+                        birthcountry: "Not Available",
+                        centralID: "",
+                        documentno: "",
+                        educationallevel: "tertiary",
+                        employmentstatus: "unemployed",
+                        othername: "",
+                        pfirstname: "",
+                        pmiddlename: "",
+                        psurname: "",
+                        nspokenlang: "YORUBA",
+                        ospokenlang: "",
+                        religion: "christianity",
+                        residence_Town: "",
+                        residence_lga: "Alimosho",
+                        residence_state: "Lagos",
+                        residencestatus: "birth",
+                        residence_AddressLine1: "No 2 Anon house, John does estate, Lagos state, Nigeria",
+                        residence_AddressLine2: "",
+                        self_origin_lga: "",
+                        self_origin_place: "",
+                        self_origin_state: "",
+                        signature: null,
+                        nationality: null,
+                        gender: "Female",
+                        trackingId: "",
+                        customer: "1234444y373737373737373737",
+                        image_url: "https://images.dojah.io/id_SANDBOX_1721830110.jpg"
+                    }
+                }
+            },
+            status: true,
+            message: ""
+        },
+        additional_document: [
+            {
+                document_url: "https://dojah-image.s3.amazonaws.com/66bcc73a4ff8e1003100454212aec768-3344-4df5-88f6-7e723c46cbb0.jpeg",
+                document_type: "image"
+            }
+        ]
+    },
+    value: "123456",
+    id_url: "https://images.dojah.io/id_sample_id_1720624047.jpg",
+    status: true,
+    id_type: "BVN",
+    message: "Successfully completed the verification.",
+    back_url: "https://images.dojah.io/id_sample_id_1720624047.jpg",
+    metadata: {
+        ipinfo: {
+            as: "AS29465 MTN NIGERIA Communication limited",
+            isp: "MTN NIGERIA Communication limited",
+            lat: 6.4474,
+            lon: 3.3903,
+            org: "MTN Nigeria",
+            zip: "",
+            city: "Lagos",
+            proxy: false,
+            query: "102.89.34.49",
+            mobile: true,
+            status: "success",
+            country: "Nigeria",
+            hosting: true,
+            district: "",
+            timezone: "Africa/Lagos",
+            region_name: "Lagos"
+        },
+        device_info: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+    },
+    selfie_url: "https://images.dojah.io/selfie_sample_image_1720624219.jpg",
+    reference_id: "DJ-31038041E0",
+    verification_url: "https://app.dojah.io/verifications/bio-data/49fd74a4-8181-4ce8-a87a-0e63f7159257",
+    verification_mode: "LIVENESS",
+    verification_type: "RC-NUMBER",
+    verification_value: "123456",
+    verification_status: "Completed"
 }

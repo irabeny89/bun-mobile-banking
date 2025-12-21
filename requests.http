@@ -115,3 +115,22 @@ Content-Type: application/json
 GET {{baseUrl}}/api/v1/kyc/tier1
 Authorization: Bearer {{accessToken}}
 
+###
+# Verify tier 1
+POST {{baseUrl}}/api/v1/kyc/tier1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "photoId": "https://example.com/photo-id.jpg",
+  "firstName": "John",
+  "middleName": "Doe",
+  "lastName": "Tom",
+  "gender": "m",
+  "dob": "2000-01-01",
+  "nin": "12345678901",
+  "street": "123 Main St",
+  "city": "Ikeja",
+  "state": "Lagos"
+}
+

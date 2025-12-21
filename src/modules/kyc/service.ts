@@ -1,8 +1,42 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
+import { DOJAH, IS_PROD_ENV } from "@/config";
+import { DojahBvnValidateArgs, DojahBvnValidateResponse, DojahNinLookupArgs, DojahNinLookupResponse } from "@/types";
+import { Logger } from "logixlysia";
+import { kycQueue } from "@/utils/kyc";
+import { encrypt } from "@/utils/encryption";
+
+const headers = new Headers();
+headers.set("Content-Type", "application/json");
+headers.set("AppId", DOJAH.appId);
+headers.set("Authorization", `Bearer ${DOJAH.secret}`);
+
+const baseUrl = IS_PROD_ENV ? DOJAH.url : DOJAH.sandbox.url;
 
 const sql = dbSingleton();
 export class KycService {
+    static dojahVerifyWebhook(requestIp: string) {
+        return requestIp === DOJAH.ip
+    }
+    static async dojahLookupNin({ nin }: DojahNinLookupArgs) {
+        const url = new URL(baseUrl + "/api/v1/kyc/nin");
+        url.searchParams.set("nin", nin);
+        return await fetch(url, { headers });
+    }
+    static async dojahValidateBvn(data: DojahBvnValidateArgs) {
+        const url = new URL(baseUrl + "/api/v1/kyc/bvn");
+        url.searchParams.set("bvn", data.bvn);
+        url.searchParams.set("first_name", data.firstName);
+        url.searchParams.set("last_name", data.lastName);
+        return await fetch(url, { headers });
+    }
+    static async createKyc(userId: string, data: KycModel.PostTier1BodyT) {
+        const tier1Data = encrypt(JSON.stringify(data));
+        await sql`
+            INSERT INTO kyc (user_id, tier1_data)
+            VALUES (${userId}, ${tier1Data})
+        `
+    }
     static async getTier1Status(userId: string) {
         const kyc: Pick<KycModel.DbDataT, "currentTier" | "tier1Status">[] = await sql`
             SELECT current_tier as "currentTier", tier1_status as "tier1Status"
