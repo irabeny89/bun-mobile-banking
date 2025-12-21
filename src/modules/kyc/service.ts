@@ -1,9 +1,7 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
 import { DOJAH, IS_PROD_ENV } from "@/config";
-import { DojahBvnValidateArgs, DojahBvnValidateResponse, DojahNinLookupArgs, DojahNinLookupResponse } from "@/types";
-import { Logger } from "logixlysia";
-import { kycQueue } from "@/utils/kyc";
+import { DojahBvnValidateArgs, DojahNinLookupArgs } from "@/types";
 import { encrypt } from "@/utils/encryption";
 
 const headers = new Headers();
@@ -33,8 +31,8 @@ export class KycService {
     static async createKyc(userId: string, data: KycModel.PostTier1BodyT) {
         const tier1Data = encrypt(JSON.stringify(data));
         await sql`
-            INSERT INTO kyc (user_id, tier1_data)
-            VALUES (${userId}, ${tier1Data})
+            INSERT INTO kyc (user_id, tier1_data, tier1_status)
+            VALUES (${userId}, ${tier1Data}, 'success')
         `
     }
     static async getTier1Status(userId: string) {
