@@ -90,6 +90,23 @@ export const DOJAH_BVN_VALIDATION_RESPONSE_MOCK_DATA = {
         }
     }
 }
+export const DOJAH_VIN_LOOKUP_RESPONSE_MOCK_DATA = {
+    entity: {
+        full_name: "JOHN DOE",
+        voter_identification_number: "91F1234567890123",
+        gender: "Male",
+        occupation: "STUDENT",
+        time_of_registration: "2011-02-18 13:59:46",
+        state: "ONDO",
+        local_government: "IDANRE",
+        registration_area_ward: "",
+        polling_unit: "OJAJIGBOKIN, O/S IN FRONT OF ABANA I & II",
+        polling_unit_code: "12/03/04/005",
+        address: "NO 16 OWODE QTS KABBA",
+        phone: "0812345678",
+        date_of_birth: "1960-10-16"
+    }
+}
 export const DOJAH_WEBHOOK_EVENT_MOCK_DATA = {
     aml: {
         status: false

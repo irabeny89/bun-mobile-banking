@@ -37,7 +37,7 @@ export enum ERROR_RESPONSE_CODES {
 	NOT_FOUND = "NOT_FOUND",
 	INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
 	TOO_MANY_REQUESTS = "TOO_MANY_REQUESTS",
-    BAD_REQUEST = "BAD_REQUEST",
+	BAD_REQUEST = "BAD_REQUEST",
 }
 
 export type DojahNinLookupArgs = {
@@ -82,6 +82,27 @@ export type DojahBvnValidateResponse = {
 			/** true if last name is valid */
 			status: boolean
 		}
+	}
+}
+export type DojahVinLookupArgs = {
+	/** Voter Identification Number */
+	vin: string;
+}
+export type DojahVinLookupResponse = {
+	entity: {
+		full_name: string,
+		voter_identification_number: string,
+		gender: string,
+		occupation: string,
+		time_of_registration: string,
+		state: string,
+		local_government: string,
+		registration_area_ward: string,
+		polling_unit: string,
+		polling_unit_code: string,
+		address: string,
+		phone: string,
+		date_of_birth: string
 	}
 }
 

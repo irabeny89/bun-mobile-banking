@@ -110,14 +110,19 @@ export namespace KycModel {
     export type Tier1DataT = typeof tier1DataSchema.static
 
     export const tier2DataSchema = t.Object({
-        idType: t.UnionEnum(["inernational passport", "driver's license", "national ID card"]),
+        idType: t.UnionEnum([
+            "voter's ID card",
+            "international passport", 
+            "driver's license", 
+            "national ID card",
+        ], { description: "Government ID type i.e international passport, driver's license, voter's ID card or national ID card" }),
         govtId: t.String({
-            description: "Government ID number i.e international passport, driver's license or national ID card number",
+            description: "Government ID number from international passport, driver's license, voter's ID card or national ID card",
             examples: ["12345678901"]
         }),
         idUrl: t.String({
             format: "uri",
-            description: "Government ID image URL i.e uploaded international passport, driver's license or national ID card",
+            description: "Government ID image URL i.e uploaded international passport, driver's license, voter's ID card or national ID card",
             examples: ["https://example.com/govt-id.jpg"]
         }),
     })
@@ -129,7 +134,7 @@ export namespace KycModel {
             description: "Live selfie image URL i.e uploaded selfie from biometric(or selfie) verification or false if not.",
             examples: ["https://example.com/live-selfie.jpg"]
         }),
-        addressType: t.UnionEnum(["utility bill", "bank statement"]),
+        addressType: t.UnionEnum(["utility bill", "bank statement"], { description: "Address type i.e utility bill or bank statement" }),
         addressProof: t.String({
             format: "uri",
             description: "Address proof image URL i.e uploaded utility bill or bank statement",

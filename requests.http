@@ -139,3 +139,14 @@ Content-Type: application/json
 GET {{baseUrl}}/api/v1/kyc/tier2
 Authorization: Bearer {{accessToken}}
 
+###
+# Verify tier 2
+POST {{baseUrl}}/api/v1/kyc/tier2
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "idType": "voter's ID card",
+  "govtId": "12345678901",
+  "idUrl": "https://example.com/govt-id.jpg"
+}

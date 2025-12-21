@@ -1,7 +1,7 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
 import { DOJAH, IS_PROD_ENV } from "@/config";
-import { DojahBvnValidateArgs, DojahNinLookupArgs } from "@/types";
+import { DojahBvnValidateArgs, DojahNinLookupArgs, DojahVinLookupArgs } from "@/types";
 import { encrypt } from "@/utils/encryption";
 
 const headers = new Headers();
@@ -26,6 +26,11 @@ export class KycService {
         url.searchParams.set("bvn", data.bvn);
         url.searchParams.set("first_name", data.firstName);
         url.searchParams.set("last_name", data.lastName);
+        return await fetch(url, { headers });
+    }
+    static async dojahLookupVin({ vin }: DojahVinLookupArgs) {
+        const url = new URL(baseUrl + "/api/v1/kyc/vin");
+        url.searchParams.set("vin", vin);
         return await fetch(url, { headers });
     }
     static async createKyc(userId: string, data: KycModel.PostTier1BodyT) {
@@ -56,5 +61,13 @@ export class KycService {
             currentTier: kyc[0].currentTier,
             tier2Status: kyc[0].tier2Status,
         } : null;
+    }
+    static async updateTier2Status(userId: string, data: KycModel.PostTier2BodyT) {
+        const tier2Data = encrypt(JSON.stringify(data));
+        await sql`
+            UPDATE kyc
+            SET tier2_data = ${tier2Data}, tier2_status = 'success'
+            WHERE user_id = ${userId}
+        `
     }
 }

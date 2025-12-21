@@ -3,18 +3,25 @@ import { KycModel } from "@/modules/kyc/model";
 import { KycService } from "@/modules/kyc/service";
 import { Queue, Worker } from "bullmq";
 
-type KycJobT = "tier_1_insert" | "tier_2_insert" | "tier_3_insert";
+type KycJobT = "tier_1_insert" | "tier_2_update" | "tier_3_update";
 type Tier1DataT = {
     userId: string;
 } & KycModel.PostTier1BodyT
-type KycJobDataT = Tier1DataT
+type Tier2DataT = {
+    userId: string;
+} & KycModel.PostTier2BodyT
+type KycJobDataT = Tier1DataT | Tier2DataT
 
 const KYC_QUEUE_NAME = "kyc-insertion" as const;
 export const kycQueue = new Queue<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME)
 const worker = new Worker<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME, async (job) => {
     if (job.name === "tier_1_insert") {
         console.info("kycQueue.worker.tier_1_insert:: job started")
-        await KycService.createKyc(job.data.userId, job.data)
+        await KycService.createKyc(job.data.userId, job.data as Tier1DataT)
+    }
+    if (job.name === "tier_2_update") {
+        console.info("kycQueue.worker.tier_2_update:: job started")
+        await KycService.updateTier2Status(job.data.userId, job.data as Tier2DataT)
     }
 }, { connection: { url: VALKEY_URL } })
 
