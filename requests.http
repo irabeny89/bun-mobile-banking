@@ -123,14 +123,19 @@ Content-Type: application/json
 
 {
   "photoId": "https://example.com/photo-id.jpg",
-  "firstName": "John",
-  "middleName": "Doe",
-  "lastName": "Tom",
+  "firstName": "Ernest",
+  "middleName": "Ojewolo",
+  "lastName": "Irabor",
   "gender": "m",
-  "dob": "2000-01-01",
+  "dob": "1989-02-16",
   "nin": "12345678901",
   "street": "123 Main St",
   "city": "Ikeja",
   "state": "Lagos"
 }
+
+###
+# Get tier 2 status
+GET {{baseUrl}}/api/v1/kyc/tier2
+Authorization: Bearer {{accessToken}}
 
