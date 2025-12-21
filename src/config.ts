@@ -16,7 +16,7 @@ export const OTP_TTL = 60 * 15 // 15m in seconds
 export const REGISTER_CACHE_KEY = "register"
 export const REFRESH_TOKEN_CACHE_KEY = "refresh-token"
 export const MFA_OTP_CACHE_KEY = "mfa-otp"
-export const EMAIL_FROM = process.env.EMAIL_FROM ?? "Fluxus <fluxus@ethereal.email>"
+export const EMAIL_FROM = process.env.EMAIL_FROM ?? "Bun <bun@ethereal.email>"
 export const DOJAH = {
     appId: process.env.DOJAH_APPID,
     secret: process.env.DOJAH_SECRET,

@@ -1,4 +1,4 @@
-# Fluxus Mobile Banking
+# Bun Mobile Banking
 
 A mobile banking application built with [Elysia](https://elysia.dev).
 User type includes individual and business.
