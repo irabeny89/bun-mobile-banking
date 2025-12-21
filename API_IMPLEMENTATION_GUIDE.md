@@ -83,13 +83,10 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | :--- | :--- | :--- |
 | **GET** | `/tier1` | Get Tier 1 KYC data and status. |
 | **POST** | `/tier1` | Verify Tier 1 KYC documents. |
-| **PUT** | `/tier1` | Update Tier 1 KYC documents. |
 | **GET** | `/tier2` | Get Tier 2 KYC data and status. |
 | **POST** | `/tier2` | Verify Tier 2 KYC documents. |
-| **PUT** | `/tier2` | Update Tier 2 KYC documents. |
 | **GET** | `/tier3` | Get Tier 3 KYC data and status. |
 | **POST** | `/tier3` | Verify Tier 3 KYC documents. |
-| **PUT** | `/tier3` | Update Tier 3 KYC documents. |
 
 ### 3. Business User Profile & KYB
 **Base URL**: `/api/v1/business`
