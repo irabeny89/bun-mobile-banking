@@ -66,7 +66,10 @@ export class KycService {
         const tier2Data = encrypt(JSON.stringify(data));
         await sql`
             UPDATE kyc
-            SET tier2_data = ${tier2Data}, tier2_status = 'success'
+            SET 
+                tier2_data = ${tier2Data}, 
+                tier2_status = 'success',
+                current_tier = 'tier_2'
             WHERE user_id = ${userId}
         `
     }
