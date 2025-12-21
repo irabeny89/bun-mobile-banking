@@ -46,4 +46,15 @@ export class KycService {
             tier1Status: kyc[0].tier1Status,
         } : null;
     }
+    static async getTier2Status(userId: string) {
+        const kyc: Pick<KycModel.DbDataT, "currentTier" | "tier2Status">[] = await sql`
+            SELECT current_tier as "currentTier", tier2_status as "tier2Status"
+            FROM kyc
+            WHERE user_id = ${userId}
+        `
+        return kyc[0] ? {
+            currentTier: kyc[0].currentTier,
+            tier2Status: kyc[0].tier2Status,
+        } : null;
+    }
 }

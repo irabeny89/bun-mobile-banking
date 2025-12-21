@@ -1,8 +1,9 @@
 import Elysia from "elysia";
 import { tier1Status } from "./routes/tier1-status";
 import { tier1Verify } from "./routes/tier1-verify";
+import { tier2Status } from "./routes/tier2-status";
 
-export const kyc = new Elysia({ 
+export const kyc = new Elysia({
     name: "kyc",
     prefix: "/kyc",
     detail: {
@@ -11,3 +12,4 @@ export const kyc = new Elysia({
 })
     .use(tier1Status)
     .use(tier1Verify)
+    .use(tier2Status)
