@@ -11,7 +11,7 @@ User Type: Individual - KYC
 
 - [ ] User registration (NIN/Bank verification)
 - [ ] KYC compliance (photo ID, address verification, etc.)
-- [ ] OTP and email/mobile verification
+- [x] OTP and email/mobile verification
 
 User Type: Business - KYB
 

@@ -150,3 +150,8 @@ Content-Type: application/json
   "govtId": "12345678901",
   "idUrl": "https://example.com/govt-id.jpg"
 }
+
+###
+# Get tier 3 status
+GET {{baseUrl}}/api/v1/kyc/tier3
+Authorization: Bearer {{accessToken}}

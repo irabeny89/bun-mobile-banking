@@ -62,6 +62,17 @@ export class KycService {
             tier2Status: kyc[0].tier2Status,
         } : null;
     }
+    static async getTier3Status(userId: string) {
+        const kyc: Pick<KycModel.DbDataT, "currentTier" | "tier3Status">[] = await sql`
+            SELECT current_tier as "currentTier", tier3_status as "tier3Status"
+            FROM kyc
+            WHERE user_id = ${userId}
+        `
+        return kyc[0] ? {
+            currentTier: kyc[0].currentTier,
+            tier3Status: kyc[0].tier3Status,
+        } : null;
+    }
     static async updateTier2Status(userId: string, data: KycModel.PostTier2BodyT) {
         const tier2Data = encrypt(JSON.stringify(data));
         await sql`
@@ -70,6 +81,17 @@ export class KycService {
                 tier2_data = ${tier2Data}, 
                 tier2_status = 'success',
                 current_tier = 'tier_2'
+            WHERE user_id = ${userId}
+        `
+    }
+    static async updateTier3Status(userId: string, data: KycModel.PostTier3BodyT) {
+        const tier3Data = encrypt(JSON.stringify(data));
+        await sql`
+            UPDATE kyc
+            SET 
+                tier3_data = ${tier3Data}, 
+                tier3_status = 'success',
+                current_tier = 'tier_3'
             WHERE user_id = ${userId}
         `
     }
