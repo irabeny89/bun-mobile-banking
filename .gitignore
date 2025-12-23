@@ -46,3 +46,6 @@ codebook.toml
 .vscode
 # rough notes
 rough-notes.md
+
+# garage
+storage/
