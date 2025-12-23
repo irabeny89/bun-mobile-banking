@@ -1,7 +1,7 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
 import { DOJAH, IS_PROD_ENV } from "@/config";
-import { DojahBvnValidateArgs, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahVinLookupArgs } from "@/types";
+import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahVinLookupArgs } from "@/types";
 import { decrypt, encrypt } from "@/utils/encryption";
 
 const headers = new Headers();
@@ -16,26 +16,39 @@ export class KycService {
     static dojahVerifyWebhook(requestIp: string) {
         return requestIp === DOJAH.ip
     }
-    static async dojahLookupNin({ nin }: DojahNinLookupArgs) {
+    static dojahLookupNin({ nin }: DojahNinLookupArgs) {
         const url = new URL(baseUrl + "/api/v1/kyc/nin");
         url.searchParams.set("nin", nin);
-        return await fetch(url, { headers });
+        return fetch(url, { headers });
     }
-    static async dojahValidateBvn(data: DojahBvnValidateArgs) {
+    static dojahValidateBvn(data: DojahBvnValidateArgs) {
         const url = new URL(baseUrl + "/api/v1/kyc/bvn");
         url.searchParams.set("bvn", data.bvn);
         url.searchParams.set("first_name", data.firstName);
         url.searchParams.set("last_name", data.lastName);
-        return await fetch(url, { headers });
+        return fetch(url, { headers });
     }
-    static async dojahLookupVin({ vin }: DojahVinLookupArgs) {
+    static dojahLookupVin({ vin }: DojahVinLookupArgs) {
         const url = new URL(baseUrl + "/api/v1/kyc/vin");
         url.searchParams.set("vin", vin);
-        return await fetch(url, { headers });
+        return fetch(url, { headers });
     }
-    static async dojahVerifyUtilityBill(data: DojahUtilityBillVerifyArgs) {
+    static dojahVerifyUtilityBill(data: DojahUtilityBillVerifyArgs) {
         const url = new URL(baseUrl + "/api/v1/document/analysis/utility_bill");
-        return await fetch(url, {
+        return fetch(url, {
+            headers,
+            method: "POST",
+            body: JSON.stringify(data)
+        });
+    }
+    /**
+     * Use Dojah liveness check api to verify a base64 encoded image.
+     * @param data image in data should be base64
+     * @returns response
+     */
+    static dojahVerifySelfie(data: DojahLiveSelfieVerifyArgs) {
+        const url = new URL(baseUrl + "/api/v1/ml/liveness");
+        return fetch(url, {
             headers,
             method: "POST",
             body: JSON.stringify(data)

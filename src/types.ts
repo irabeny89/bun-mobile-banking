@@ -135,7 +135,76 @@ export type DojahUtilityBillVerifyResponse = {
 		};
 	};
 }
-
+export type DojahLiveSelfieVerifyArgs = {
+	/** Image format should be in Base64 */
+	image: string;
+}
+export type DojahLiveSelfieVerifyResponse = {
+	entity: {
+		liveness: {
+			liveness_check: boolean;
+			liveness_probability: number;
+		};
+		face: {
+			face_detected: boolean;
+			message: string;
+			multiface_detected: boolean;
+			details: {
+				age_range: {
+					low: number;
+					high: number;
+				};
+				smile: {
+					value: boolean;
+					confidence: number;
+				};
+				gender: {
+					value: string;
+					confidence: number;
+				};
+				eyeglasses: {
+					value: boolean;
+					confidence: number;
+				};
+				sunglasses: {
+					value: boolean;
+					confidence: number;
+				};
+				beard: {
+					value: boolean;
+					confidence: number;
+				};
+				mustache: {
+					value: boolean;
+					confidence: number;
+				};
+				eyes_open: {
+					value: boolean;
+					confidence: number;
+				};
+				mouth_open: {
+					value: boolean;
+					confidence: number;
+				};
+				emotions: {
+					type: string;
+					confidence: number;
+				}[];
+			};
+			quality: {
+				brightness: number;
+				sharpness: number;
+			};
+			confidence: number;
+			bounding_box: {
+				width: number;
+				height: number;
+				left: number;
+				top: number;
+			};
+		};
+	};
+};
 export type DojahWebhookVerificationStatus = "Ongoing"
 	| "Abandoned"
 	| "Completed"
