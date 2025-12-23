@@ -23,7 +23,7 @@ export namespace KycModel {
         tier2Status: tierStatusSchema,
     })
     export type Tier2ResponseDataT = typeof tier2ResponseDataSchema.static
-    
+
     export const tier2SuccessSchema = successSchemaFactory(tier2ResponseDataSchema)
     export type Tier2SuccessT = typeof tier2SuccessSchema.static;
 
@@ -112,8 +112,8 @@ export namespace KycModel {
     export const tier2DataSchema = t.Object({
         idType: t.UnionEnum([
             "voter's ID card",
-            "international passport", 
-            "driver's license", 
+            "international passport",
+            "driver's license",
             "national ID card",
         ], { description: "Government ID type i.e international passport, driver's license, voter's ID card or national ID card" }),
         govtId: t.String({
@@ -139,10 +139,6 @@ export namespace KycModel {
             format: "uri",
             description: "Address proof image URL i.e uploaded utility bill or bank statement",
             examples: ["https://example.com/address-proof.jpg"]
-        }),
-        tin: t.String({
-            description: "Tax Identification Number",
-            examples: ["12345678901"]
         })
     })
     export type Tier3DataT = typeof tier3DataSchema.static;
@@ -168,13 +164,16 @@ export namespace KycModel {
     ])
     export type PostTier2BodyT = typeof postTier2BodySchema.static;
 
-    export const postTier3BodySchema = t.Pick(tier3DataSchema, [
-        "liveSelfie",
+    export const postTier3AddressProofBodySchema = t.Pick(tier3DataSchema, [
         "proofType",
         "addressProof",
-        "tin"
     ])
-    export type PostTier3BodyT = typeof postTier3BodySchema.static;
+    export type PostTier3AddressProofBodyT = typeof postTier3AddressProofBodySchema.static;
+
+    export const postTier3LiveSelfieBodySchema = t.Pick(tier3DataSchema, [
+        "liveSelfie",
+    ])
+    export type PostTier3LiveSelfieBodyT = typeof postTier3LiveSelfieBodySchema.static;
 
     export const dbData = t.Intersect([
         CommonSchema.IdAndTimestampSchema,

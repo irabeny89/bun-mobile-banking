@@ -10,10 +10,13 @@ type Tier1DataT = {
 type Tier2DataT = {
     userId: string;
 } & KycModel.PostTier2BodyT
-type Tier3DataT = {
+type Tier3AddressProofDataT = {
     userId: string
-} & KycModel.PostTier3BodyT
-type KycJobDataT = Tier1DataT | Tier2DataT | Tier3DataT
+} & KycModel.PostTier3AddressProofBodyT
+type Tier3LiveSelfieDataT = {
+    userId: string
+} & KycModel.PostTier3LiveSelfieBodyT
+type KycJobDataT = Tier1DataT | Tier2DataT | Tier3AddressProofDataT | Tier3LiveSelfieDataT
 
 const KYC_QUEUE_NAME = "kyc-insertion" as const;
 export const kycQueue = new Queue<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME)
@@ -28,7 +31,15 @@ const worker = new Worker<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME, async (
     }
     if (job.name === "tier_3_update") {
         console.info("kycQueue.worker.tier_3_update:: job started")
-        await KycService.updateTier3Status(job.data.userId, job.data as Tier3DataT)
+        const tier3Data = await KycService.getTier3Data(job.data.userId) ?? {
+            liveSelfie: "",
+            addressProof: "", 
+            proofType: "" as KycModel.PostTier3AddressProofBodyT["proofType"], 
+        }
+        await KycService.updateTier3Status(job.data.userId, { 
+            ...tier3Data,
+            ...job.data
+        })
     }
 }, { connection: { url: VALKEY_URL } })
 

@@ -7,18 +7,18 @@ import { kycQueue } from "@/utils/kyc";
 import { DojahUtilityBillVerifyResponse, ERROR_RESPONSE_CODES } from "@/types";
 import { KycService } from "../service";
 
-export const tier3Verify = new Elysia({ name: "tier3-verify" })
+export const tier3VerifyAddressProof = new Elysia({ name: "tier3-verify" })
     .use(userMacro)
     .model({
-        tier3VerifyBody: KycModel.postTier3BodySchema,
+        tier3VerifyBody: KycModel.postTier3AddressProofBodySchema,
         tier3VerifySuccess: KycModel.tier3SuccessSchema,
         error: CommonSchema.errorSchema,
     })
     .resolve(({ store }) => ({ logger: pinoLogger(store) }))
-    .post("/tier3", async ({ user, body, logger }) => {
+    .post("/tier3/address-proof", async ({ user, body, logger }) => {
         await kycQueue.add("tier_3_update", {
             userId: user.id,
-            ...body
+            ...body,
         })
         logger.info("tier3Verify:: User KYC db data insertion queued")
         return {
@@ -150,8 +150,8 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
         user: ["individual"],
         detail: {
             tags: ["KYC", "Individual User"],
-            description: "Verify tier 3 data",
-            summary: "Verify tier 3 data"
+            description: "Verify tier 3 data using address proof",
+            summary: "Verify tier 3 data using address proof"
         },
         body: "tier3VerifyBody",
         response: {
