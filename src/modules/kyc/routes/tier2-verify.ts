@@ -30,7 +30,7 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
         }
     }, {
         async beforeHandle({ user, logger, set, body }) {
-            // current Dojah supports Voter Identification Number (VIN) lookup
+            // currently Dojah supports Voter Identification Number (VIN) lookup
             if (body.idType !== "voter's ID card") {
                 logger.info("tier2Verify:: ID type is not supported");
                 set.status = 400;

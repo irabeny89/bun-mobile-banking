@@ -10,7 +10,10 @@ type Tier1DataT = {
 type Tier2DataT = {
     userId: string;
 } & KycModel.PostTier2BodyT
-type KycJobDataT = Tier1DataT | Tier2DataT
+type Tier3DataT = {
+    userId: string
+} & KycModel.PostTier3BodyT
+type KycJobDataT = Tier1DataT | Tier2DataT | Tier3DataT
 
 const KYC_QUEUE_NAME = "kyc-insertion" as const;
 export const kycQueue = new Queue<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME)
@@ -23,10 +26,14 @@ const worker = new Worker<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME, async (
         console.info("kycQueue.worker.tier_2_update:: job started")
         await KycService.updateTier2Status(job.data.userId, job.data as Tier2DataT)
     }
+    if (job.name === "tier_3_update") {
+        console.info("kycQueue.worker.tier_3_update:: job started")
+        await KycService.updateTier3Status(job.data.userId, job.data as Tier3DataT)
+    }
 }, { connection: { url: VALKEY_URL } })
 
 worker.on("completed", () => {
-    console.info("kycQueue.worker.tier_1-verify:: job completed")
+    console.info("kycQueue.worker:: job completed")
 })
 
 worker.on("failed", (_, error) => {

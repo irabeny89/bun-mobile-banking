@@ -134,7 +134,7 @@ export namespace KycModel {
             description: "Live selfie image URL i.e uploaded selfie from biometric(or selfie) verification or false if not.",
             examples: ["https://example.com/live-selfie.jpg"]
         }),
-        addressType: t.UnionEnum(["utility bill", "bank statement"], { description: "Address type i.e utility bill or bank statement" }),
+        proofType: t.UnionEnum(["utility bill", "bank statement"], { description: "Address type i.e utility bill or bank statement" }),
         addressProof: t.String({
             format: "uri",
             description: "Address proof image URL i.e uploaded utility bill or bank statement",
@@ -170,7 +170,7 @@ export namespace KycModel {
 
     export const postTier3BodySchema = t.Pick(tier3DataSchema, [
         "liveSelfie",
-        "addressType",
+        "proofType",
         "addressProof",
         "tin"
     ])

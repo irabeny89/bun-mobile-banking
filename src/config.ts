@@ -107,6 +107,31 @@ export const DOJAH_VIN_LOOKUP_RESPONSE_MOCK_DATA = {
         date_of_birth: "1960-10-16"
     }
 }
+export const DOJAH_UTILITY_BILL_VERIFY_RESPONSE_MOCK_DATA = {
+    entity: {
+        result: {
+            status: "success",
+            message: ""
+        },
+        identity_info: {
+            full_name: "JOHN DOE",
+            meter_number: "SBX12345678"
+        },
+        address_info: {
+            street: "123 Sandbox Street SBX001",
+            city: "Testville",
+            state: "SB",
+            country: "Sandbox Country"
+        },
+        provider_name: "Sandbox Power Company",
+        bill_issue_date: "2025-01-15",
+        amount_paid: "100",
+        metadata: {
+            extraction_date: "2025-08-15T00:00:00.000Z",
+            is_recent: true
+        }
+    }
+}
 export const DOJAH_WEBHOOK_EVENT_MOCK_DATA = {
     aml: {
         status: false

@@ -105,6 +105,36 @@ export type DojahVinLookupResponse = {
 		date_of_birth: string
 	}
 }
+export type DojahUtilityBillVerifyArgs = {
+	input_type: "url";
+	// Image URL of the Utility Bill
+	input_value: string;
+}
+export type DojahUtilityBillVerifyResponse = {
+	entity: {
+		result: {
+			status: string;
+			message: string;
+		};
+		identity_info: {
+			full_name: string;
+			meter_number: string;
+		};
+		address_info: {
+			street: string;
+			city: string;
+			state: string;
+			country: string;
+		};
+		provider_name: string;
+		bill_issue_date: string;
+		amount_paid: string;
+		metadata: {
+			extraction_date: string;
+			is_recent: boolean;
+		};
+	};
+}
 
 export type DojahWebhookVerificationStatus = "Ongoing"
 	| "Abandoned"

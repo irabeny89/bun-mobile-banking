@@ -1,8 +1,8 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
 import { DOJAH, IS_PROD_ENV } from "@/config";
-import { DojahBvnValidateArgs, DojahNinLookupArgs, DojahVinLookupArgs } from "@/types";
-import { encrypt } from "@/utils/encryption";
+import { DojahBvnValidateArgs, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahVinLookupArgs } from "@/types";
+import { decrypt, encrypt } from "@/utils/encryption";
 
 const headers = new Headers();
 headers.set("Content-Type", "application/json");
@@ -32,6 +32,14 @@ export class KycService {
         const url = new URL(baseUrl + "/api/v1/kyc/vin");
         url.searchParams.set("vin", vin);
         return await fetch(url, { headers });
+    }
+    static async dojahVerifyUtilityBill(data: DojahUtilityBillVerifyArgs) {
+        const url = new URL(baseUrl + "/api/v1/document/analysis/utility_bill");
+        return await fetch(url, {
+            headers,
+            method: "POST",
+            body: JSON.stringify(data)
+        });
     }
     static async createKyc(userId: string, data: KycModel.PostTier1BodyT) {
         const tier1Data = encrypt(JSON.stringify(data));
@@ -94,5 +102,35 @@ export class KycService {
                 current_tier = 'tier_3'
             WHERE user_id = ${userId}
         `
+    }
+    static async getTier1Data(userId: string): Promise<KycModel.PostTier1BodyT | null> {
+        const kyc: { tier1Data: string }[] = await sql`
+            SELECT tier1_data as "tier1Data"
+            FROM kyc
+            WHERE user_id = ${userId}
+        `
+        return (kyc.length === 0 || !kyc[0].tier1Data)
+            ? null
+            : JSON.parse(decrypt(kyc[0].tier1Data));
+    }
+    static async getTier2Data(userId: string): Promise<KycModel.PostTier2BodyT | null> {
+        const kyc: { tier2Data: string }[] = await sql`
+            SELECT tier2_data as "tier2Data"
+            FROM kyc
+            WHERE user_id = ${userId}
+        `
+        return (kyc.length === 0 || !kyc[0].tier2Data)
+            ? null
+            : JSON.parse(decrypt(kyc[0].tier2Data));
+    }
+    static async getTier3Data(userId: string): Promise<KycModel.PostTier3BodyT | null> {
+        const kyc: { tier3Data: string }[] = await sql`
+            SELECT tier3_data as "tier3Data"
+            FROM kyc
+            WHERE user_id = ${userId}
+        `
+        return (kyc.length === 0 || !kyc[0].tier3Data)
+            ? null
+            : JSON.parse(decrypt(kyc[0].tier3Data));
     }
 }
