@@ -9,8 +9,8 @@ User type includes individual and business.
 
 User Type: Individual - KYC
 
-- [ ] User registration (NIN/Bank verification)
-- [ ] KYC compliance (photo ID, address verification, etc.)
+- [x] User registration (NIN/Bank verification)
+- [x] KYC compliance (photo ID, address verification, etc.)
 - [x] OTP and email/mobile verification
 
 User Type: Business - KYB
@@ -57,11 +57,11 @@ User Type: Business - KYB
 ### 8. Security
 
 - [ ] Biometric authentication (Face ID, Fingerprint)
-- [ ] 2FA (Two-Factor Authentication)
-- [ ] Session management (auto logout)
+- [x] 2FA (Two-Factor Authentication)
+- [x] Session management (auto logout)
 - [ ] Transaction PIN and OTP confirmation
 - [ ] Secret Question
-- [ ] Change password
+- [x] Change password
 
 ### 9. Support
 
