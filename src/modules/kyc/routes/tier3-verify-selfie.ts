@@ -8,7 +8,7 @@ import { DojahLiveSelfieVerifyResponse, ERROR_RESPONSE_CODES } from "@/types";
 import { KycService } from "../service";
 import { imageUrlToBase64 } from "@/utils/url-to-base64";
 
-export const tier3VerifyAddressProof = new Elysia({ name: "tier3-verify" })
+export const tier3VerifyLiveSelfie = new Elysia({ name: "tier3-verify" })
     .use(userMacro)
     .model({
         tier3VerifyBody: KycModel.postTier3LiveSelfieBodySchema,

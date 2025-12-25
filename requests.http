@@ -155,3 +155,24 @@ Content-Type: application/json
 # Get tier 3 status
 GET {{baseUrl}}/api/v1/kyc/tier3
 Authorization: Bearer {{accessToken}}
+
+###
+# Verify tier 3 address proof (part 1)
+POST {{baseUrl}}/api/v1/kyc/tier3/address-proof
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "proofType": "utility bill",
+  "addressProof": "https://example.com/address-proof.jpg"
+}
+
+###
+# Verify tier 3 liveness selfie (part 2)
+POST {{baseUrl}}/api/v1/kyc/tier3/live-selfie
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "liveSelfie": "https://example.com/live-selfie.jpg"
+}
