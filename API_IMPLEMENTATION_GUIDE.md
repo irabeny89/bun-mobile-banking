@@ -88,6 +88,8 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **GET** | `/tier3` | Get Tier 3 KYC data and status. |
 | **POST** | `/tier3/address-proof` | Verify Tier 3 KYC documents `Address Proof`. |
 | **POST** | `/tier3/live-selfie` | Verify Tier 3 KYC documents `Live Selfie`. |
+| **POST** | `/tier3/address-proof/upload` | Upload Tier 3 KYC documents `Address Proof`. |
+| **POST** | `/tier3/live-selfie/upload` | Upload Tier 3 KYC documents `Live Selfie`. |
 
 ### 3. Business User Profile & KYB
 **Base URL**: `/api/v1/business`
