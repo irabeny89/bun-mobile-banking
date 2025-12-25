@@ -1,0 +1,85 @@
+# Install RestClient for VSCode to run this file 
+
+@baseUrl = http://localhost:3000
+@email = irabeny89@gmail.com
+@password = ernestinoz2004
+
+###
+# Register Individual User - First Step
+POST {{baseUrl}}/api/v1/auth/register/individual
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "mfaEnabled": true
+}
+
+###
+# Register Individual User - Second Step
+# @prompt otp Your one-time password in your mailbox
+POST {{baseUrl}}/api/v1/auth/register/individual/complete
+Content-Type: application/json
+
+{
+  "otp": "{{otp}}"
+}
+
+###
+# Login Individual User
+POST {{baseUrl}}/api/v1/auth/login/individual
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+# Login Individual user with MFA OTP
+# @prompt otp Your one-time password in your mailbox
+POST {{baseUrl}}/api/v1/auth/login/mfa-otp/individual
+Content-Type: application/json
+
+{
+  "otp": "{{otp}}"
+}
+
+###
+# Refresh Individual user tokens
+POST {{baseUrl}}/api/v1/auth/refresh-token/individual
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###
+# Forgot Individual User Password
+POST {{baseUrl}}/api/v1/auth/forgot-password/individual
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+###
+# Reset Individual User Password
+# @prompt newPassword Your new password
+# @prompt otp Your one-time password in your mailbox
+POST {{baseUrl}}/api/v1/auth/reset-password/individual
+Content-Type: application/json
+
+{
+  "newPassword": "{{newPassword}}",
+  "otp": "{{otp}}"
+}
+
+###
+# Logout Individual User
+POST {{baseUrl}}/api/v1/auth/logout/individual
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}

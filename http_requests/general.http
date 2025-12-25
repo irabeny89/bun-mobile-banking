@@ -1,0 +1,14 @@
+# Install RestClient for VSCode to run this file 
+
+@baseUrl = http://localhost:3000
+
+# Root
+GET {{baseUrl}}
+
+###
+# Health Check
+GET {{baseUrl}}/healthcheck
+
+###
+# OpenAPI
+GET {{baseUrl}}/openapi
