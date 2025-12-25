@@ -27,16 +27,16 @@ const worker = new Worker<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME, async (
     }
     if (job.name === "tier_2_update") {
         console.info("kycQueue.worker.tier_2_update:: job started")
-        await KycService.updateTier2Status(job.data.userId, job.data as Tier2DataT)
+        await KycService.updateTier2(job.data.userId, job.data as Tier2DataT)
     }
     if (job.name === "tier_3_update") {
         console.info("kycQueue.worker.tier_3_update:: job started")
         const tier3Data = await KycService.getTier3Data(job.data.userId) ?? {
             liveSelfie: "",
-            addressProof: "", 
-            proofType: "" as KycModel.PostTier3AddressProofBodyT["proofType"], 
+            addressProof: "",
+            proofType: "" as KycModel.PostTier3AddressProofBodyT["proofType"],
         }
-        await KycService.updateTier3Status(job.data.userId, { 
+        await KycService.updateTier3(job.data.userId, {
             ...tier3Data,
             ...job.data
         })

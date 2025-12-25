@@ -94,7 +94,7 @@ export class KycService {
             tier3Status: kyc[0].tier3Status,
         } : null;
     }
-    static async updateTier2Status(userId: string, data: KycModel.PostTier2BodyT) {
+    static async updateTier2(userId: string, data: KycModel.PostTier2BodyT) {
         const tier2Data = encrypt(JSON.stringify(data));
         await sql`
             UPDATE kyc
@@ -105,7 +105,7 @@ export class KycService {
             WHERE user_id = ${userId}
         `
     }
-    static async updateTier3Status(userId: string, data: KycModel.PostTier3AddressProofBodyT & KycModel.PostTier3LiveSelfieBodyT) {
+    static async updateTier3(userId: string, data: KycModel.PostTier3AddressProofBodyT & KycModel.PostTier3LiveSelfieBodyT) {
         const tier3Data = encrypt(JSON.stringify(data));
         await sql`
             UPDATE kyc
