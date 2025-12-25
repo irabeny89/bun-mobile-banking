@@ -13,8 +13,13 @@
     "mig8:file": "bun scripts/sqlmig8.ts",
     "mig8:dir": "bun scripts/sqlmig8.ts --dir",
     "pod:app": "./scripts/app-pod.sh",
+    "pod:app:dev": "./scripts/app-pod.sh .env.development",
     "kube:play": "./scripts/kube-play.sh",
-    "kube:gen": "./scripts/pod-kube.sh"
+    "kube:gen": "./scripts/pod-kube.sh",
+    "garage": "podman exec fmb-storage /garage",
+    "garage:status": "podman exec fmb-storage /garage status",
+    "psql:dev": "export $(cat .env.development | xargs) && podman exec -ti fmb-db psql -U $POSTGRES_USER -d $POSTGRES_DB",
+    "redis-cli:dev": "export $(cat .env.development | xargs) && podman exec -ti fmb-cache redis-cli"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.0",

@@ -79,6 +79,35 @@ bun run dev
 Open <http://localhost:3000/> with your browser to see the result.
 Query `/openapi` endpoint to see OpenAPI documentation.
 
+### File Storage
+
+In development, the file storage is managed with [garage](https://garagehq.deuxfleurs.fr/), a rust based selfhost AWS S3 compatible container image. The garage config file is in [storage/garage.toml](storage/garage.toml) along with the data and metadata in the [storage/data](storage/data) and [storage/meta](storage/meta) directories.
+
+To run garage, use the following command:
+
+```bash
+podman run \
+  -d \
+  --name garaged \
+  -p 3900:3900 -p 3901:3901 -p 3902:3902 -p 3903:3903 \
+  -v ./storage/garage.toml:/etc/garage.toml \
+  -v ./storage/meta:/var/lib/garage/meta \
+  -v ./storage/data:/var/lib/garage/data \
+  dxflrs/garage:v2.1.0
+```
+
+> Note: You dont have to run the single command above. You can use the [scripts/app-pod.sh](scripts/app-pod.sh) script to run the garage container along with the app pod. Example:
+
+```bash
+./scripts/app-pod.sh .env
+# OR run script from package.json
+bun run pod:app .env
+```
+
+> Note: For further configuration(layout, bucket, etc.) visit [garage docs](https://garagehq.deuxfleurs.fr/documentation/quick-start/).
+
+In production this will be replaced with AWS S3, Cloudflare R2, or any other AWS S3 compatible storage.
+
 ### Database Migrations
 
 There are scripts to run migrations. Follow the steps below:
