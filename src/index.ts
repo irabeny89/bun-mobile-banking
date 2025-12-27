@@ -19,7 +19,8 @@ export const app = new Elysia({
   name: pkg.name,
   detail: {
     description: pkg.description
-  }
+  },
+  aot: false
 })
   .use(errorHandler)
   .use(systemStatus)
