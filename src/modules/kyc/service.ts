@@ -1,8 +1,10 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
-import { DOJAH, IS_PROD_ENV } from "@/config";
+import { DOJAH, IS_PROD_ENV, STORAGE } from "@/config";
 import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahVinLookupArgs } from "@/types";
 import { decrypt, encrypt } from "@/utils/encryption";
+import { fileStore, getUploadLocation } from "@/utils/storage";
+import { CommonSchema } from "@/share/schema";
 
 const headers = new Headers();
 headers.set("Content-Type", "application/json");
@@ -13,6 +15,20 @@ const baseUrl = IS_PROD_ENV ? DOJAH.url : DOJAH.sandbox.url;
 
 const sql = dbSingleton();
 export class KycService {
+    /**
+     * Uploads address proof file to storage and returns url to access it.
+     * @param file address proof file
+     * @param userId user id
+     * @param userType user type
+     * @returns uploaded file url
+     */
+    static async uploadAddressProof(file: File, userId: string, userType: CommonSchema.UserType) {
+        const { path, url } = getUploadLocation(STORAGE.addressProofPath, file, userType, userId)
+        await fileStore
+            .file(path)
+            .write(file)
+        return url
+    }
     static dojahVerifyWebhook(requestIp: string) {
         return requestIp === DOJAH.ip
     }

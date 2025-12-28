@@ -19,6 +19,14 @@ declare module "bun" {
 		PORT: string;
 		DOJAH_APPID: string;
 		DOJAH_SECRET: string;
+		STORAGE_BUCKET: string;
+		STORAGE_BUCKET_UTILITY_BILL: string;
+		STORAGE_BUCKET_ADDRESS_PROOF: string;
+		STORAGE_BUCKET_LIVE_SELFIE: string;
+		STORAGE_ACCESS_KEY_ID: string;
+		STORAGE_SECRET_ACCESS_KEY: string;
+		STORAGE_DEFAULT_REGION: string;
+		STORAGE_ENDPOINT_URL: string;
 	}
 }
 

@@ -4,17 +4,29 @@ import { CommonSchema } from "@/share/schema";
 import { userMacro } from "@/plugins/user-macro.plugin";
 import pinoLogger from "@/utils/pino-logger";
 import { IndividualUserService } from "../service";
+import { ERROR_RESPONSE_CODES } from "@/types";
 
 export const mfa = new Elysia({ name: "mfa-individual" })
-    .use(userMacro)
     .model({
         mfa: IndividualUserModel.postMfaSchema,
         mfaSuccess: IndividualUserModel.postMfaSuccessSchema,
         error: CommonSchema.errorSchema
     })
+    .use(userMacro)
     .resolve(({ store }) => ({ logger: pinoLogger(store) }))
-    .post("/mfa", async ({ logger, user, body }) => {
-        logger.info(`mfa:: ${user.mfaEnabled ? "enabling" : "disabling"} MFA`);
+    .post("/mfa", async ({ logger, user, body, set }) => {
+        if (!user) {
+            set.status = 404
+            return {
+                type: "error",
+                error: {
+                    details: [],
+                    message: "User not found",
+                    code: ERROR_RESPONSE_CODES.NOT_FOUND
+                }
+            }
+        }
+        logger.info(`mfa:: ${body.mfaEnabled ? "enabling" : "disabling"} MFA`);
         await IndividualUserService.setMfa(user.id, body.mfaEnabled);
         return {
             type: "success",

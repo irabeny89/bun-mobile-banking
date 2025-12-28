@@ -17,6 +17,10 @@ export const REGISTER_CACHE_KEY = "register"
 export const REFRESH_TOKEN_CACHE_KEY = "refresh-token"
 export const MFA_OTP_CACHE_KEY = "mfa-otp"
 export const EMAIL_FROM = process.env.EMAIL_FROM ?? "Bun <bun@ethereal.email>"
+export const IMAGE_UPLOAD = {
+    maxSize: process.env.IMAGE_MAX_SIZE ?? "5m",
+    mimeType: ["image/jpeg", "image/jpg", "image/png"]
+}
 export const DOJAH = {
     appId: process.env.DOJAH_APPID,
     secret: process.env.DOJAH_SECRET,
@@ -32,6 +36,16 @@ export const DOJAH = {
         accountNumber: "3046507407",
         bankCode: "011",
     }
+}
+export const STORAGE = {
+    bucket: process.env.STORAGE_BUCKET,
+    accessKeyId: process.env.STORAGE_ACCESS_KEY_ID,
+    secretAccessKey: process.env.STORAGE_SECRET_ACCESS_KEY,
+    defaultRegion: process.env.STORAGE_DEFAULT_REGION,
+    endpointUrl: process.env.STORAGE_ENDPOINT_URL,
+    addressProofPath: process.env.STORAGE_BUCKET_ADDRESS_PROOF,
+    utilityBillPath: process.env.STORAGE_BUCKET_UTILITY_BILL,
+    liveSelfiePath: process.env.STORAGE_BUCKET_LIVE_SELFIE
 }
 
 export const CACHE_GET = {

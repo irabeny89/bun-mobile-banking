@@ -1,6 +1,7 @@
 # Install RestClient for VSCode to run this file 
 
 @baseUrl = http://localhost:3000
+@formBoundary = formDataBoundary
 
 ###
 # Get tier 1 status
@@ -68,3 +69,16 @@ Content-Type: application/json
 {
   "liveSelfie": "https://example.com/live-selfie.jpg"
 }
+
+###
+# Upload address proof image
+POST {{baseUrl}}/api/v1/kyc/tier3/address-proof/upload
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary={{formBoundary}}
+
+--{{formBoundary}}
+Content-Disposition: form-data; name="addressProofImage"; filename="sample.jpeg"
+Content-Type: image/jpeg
+
+< ../dev-files/sample.jpeg
+--{{formBoundary}}--

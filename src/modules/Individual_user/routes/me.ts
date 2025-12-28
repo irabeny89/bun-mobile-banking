@@ -6,12 +6,12 @@ import { userMacro } from "@/plugins/user-macro.plugin";
 import { ERROR_RESPONSE_CODES } from "@/types";
 
 export const me = new Elysia({ name: "me-individual" })
-    .use(userMacro)
     .model({
         me: IndividualUserModel.getMeSchema,
         meSuccess: IndividualUserModel.getMeSuccessSchema,
         error: CommonSchema.errorSchema,
     })
+    .use(userMacro)
     .resolve(({ store }) => {
         const logger = pinoLogger(store)
         return {
@@ -23,9 +23,9 @@ export const me = new Elysia({ name: "me-individual" })
             logger.info("me:: user not found")
             set.status = 404
             return {
-                type: "error",
+                type: "error" as const,
                 error: {
-                    message: "User not found",
+                    message: "User not found, login or register.",
                     code: ERROR_RESPONSE_CODES.NOT_FOUND,
                     details: []
                 }

@@ -1,6 +1,8 @@
+import { IMAGE_UPLOAD } from "@/config";
 import { CommonSchema } from "@/share/schema";
 import { successSchemaFactory } from "@/utils/response";
 import { t } from "elysia";
+import { FileUnit } from "elysia/dist/type-system/types";
 
 export namespace KycModel {
     export const currentTierSchema = t.UnionEnum(["tier_1", "tier_2", "tier_3"])
@@ -176,6 +178,21 @@ export namespace KycModel {
         "liveSelfie",
     ])
     export type PostTier3LiveSelfieBodyT = typeof postTier3LiveSelfieBodySchema.static;
+
+    export const postTier3AddressProofUploadBodySchema = t.Object({
+        addressProofImage: t.File({
+            description: "Address proof image file",
+            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+            type: IMAGE_UPLOAD.mimeType
+        })
+    })
+    export type PostTier3AddressProofUploadBodyT = typeof postTier3AddressProofUploadBodySchema.static
+
+    export const postTier3AddressProofUploadResponseSchema = successSchemaFactory(t.Object({
+        message: t.Literal("Address proof uploaded successfully"),
+        url: t.String()
+    }))
+    export type PostTier3AddressProofUploadResponseT = typeof postTier3AddressProofUploadResponseSchema.static
 
     export const dbData = t.Intersect([
         CommonSchema.IdAndTimestampSchema,

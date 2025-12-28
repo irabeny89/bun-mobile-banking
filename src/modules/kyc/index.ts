@@ -6,13 +6,14 @@ import { tier2Verify } from "./routes/tier2-verify";
 import { tier3Status } from "./routes/tier3-status";
 import { tier3VerifyAddressProof } from "./routes/tier3-verify-address";
 import { tier3VerifyLiveSelfie } from "./routes/tier3-verify-selfie";
+import { tier3UploadAddressProof } from "./routes/tier3-upload-address";
 
 export const kyc = new Elysia({
     name: "kyc",
     prefix: "/kyc",
     detail: {
         description: "KYC service to handle KYC related actions."
-    }
+    },
 })
     .use(tier1Status)
     .use(tier1Verify)
@@ -21,3 +22,4 @@ export const kyc = new Elysia({
     .use(tier3Status)
     .use(tier3VerifyAddressProof)
     .use(tier3VerifyLiveSelfie)
+    .use(tier3UploadAddressProof)
