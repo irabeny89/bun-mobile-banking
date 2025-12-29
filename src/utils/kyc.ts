@@ -2,6 +2,7 @@ import { VALKEY_URL } from "@/config";
 import { KycModel } from "@/modules/kyc/model";
 import { KycService } from "@/modules/kyc/service";
 import { Queue, Worker } from "bullmq";
+import { fileStore } from "./storage";
 
 type KycJobT = "tier_1_insert" | "tier_2_update" | "tier_3_update";
 type Tier1DataT = {
@@ -10,13 +11,11 @@ type Tier1DataT = {
 type Tier2DataT = {
     userId: string;
 } & KycModel.PostTier2BodyT
-type Tier3AddressProofDataT = {
-    userId: string
-} & KycModel.PostTier3AddressProofBodyT
-type Tier3LiveSelfieDataT = {
-    userId: string
-} & KycModel.PostTier3LiveSelfieBodyT
-type KycJobDataT = Tier1DataT | Tier2DataT | Tier3AddressProofDataT | Tier3LiveSelfieDataT
+type Tier3DataT = {
+    userId: string,
+    storagePath: string
+} & KycModel.PostTier3BodyT
+type KycJobDataT = Tier1DataT | Tier2DataT | Tier3DataT
 
 const KYC_QUEUE_NAME = "kyc-insertion" as const;
 export const kycQueue = new Queue<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME)
@@ -31,15 +30,12 @@ const worker = new Worker<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME, async (
     }
     if (job.name === "tier_3_update") {
         console.info("kycQueue.worker.tier_3_update:: job started")
-        const tier3Data = await KycService.getTier3Data(job.data.userId) ?? {
-            liveSelfie: "",
-            addressProof: "",
-            proofType: "" as KycModel.PostTier3AddressProofBodyT["proofType"],
-        }
-        await KycService.updateTier3(job.data.userId, {
-            ...tier3Data,
-            ...job.data
-        })
+        // delete the unencrypted file after verification
+        const { storagePath, userId, ...rest } = job.data as Tier3DataT
+        await Promise.all([
+            fileStore.file(storagePath).delete(),
+            KycService.updateTier3(userId, rest)
+        ])
     }
 }, { connection: { url: VALKEY_URL } })
 

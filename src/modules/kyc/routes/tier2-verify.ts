@@ -17,7 +17,7 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
     .resolve(({ store }) => ({ logger: pinoLogger(store) }))
     .post("/tier2", async ({ user, body, logger }) => {
         await kycQueue.add("tier_2_update", {
-            userId: user.id,
+            userId: user!.id,
             ...body
         })
         logger.info("tier2Verify:: User KYC db data insertion queued")
@@ -38,6 +38,18 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                     type: "error" as const,
                     error: {
                         message: "ID type is not supported. Use voter's ID card number - VIN",
+                        code: ERROR_RESPONSE_CODES.BAD_REQUEST,
+                        details: []
+                    }
+                }
+            }
+            if (!user) {
+                logger.info("tier2Verify:: User not found");
+                set.status = 400;
+                return {
+                    type: "error" as const,
+                    error: {
+                        message: "User not found",
                         code: ERROR_RESPONSE_CODES.BAD_REQUEST,
                         details: []
                     }

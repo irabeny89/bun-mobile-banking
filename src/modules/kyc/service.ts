@@ -1,7 +1,7 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
 import { DOJAH, IS_PROD_ENV, STORAGE } from "@/config";
-import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahVinLookupArgs } from "@/types";
+import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs } from "@/types";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { fileStore, getUploadLocation } from "@/utils/storage";
 import { CommonSchema } from "@/share/schema";
@@ -22,13 +22,13 @@ export class KycService {
      * @param userType user type
      * @returns uploaded file url
      */
-    static async uploadAddressProof(file: File, userId: string, userType: CommonSchema.UserType) {
-        const { path, url } = getUploadLocation(STORAGE.addressProofPath, file, userType, userId)
-        await fileStore
-            .file(path)
-            .write(file)
-        return url
-    }
+    // static async uploadAddressProof(file: File, userId: string, userType: CommonSchema.UserType) {
+    //     const { path, url } = getUploadLocation(STORAGE.addressProofPath, file, userType, userId)
+    //     await fileStore
+    //         .file(path)
+    //         .write(encrypt(Buffer.from(await file.arrayBuffer())))
+    //     return url
+    // }
     static dojahVerifyWebhook(requestIp: string) {
         return requestIp === DOJAH.ip
     }
@@ -70,13 +70,76 @@ export class KycService {
             body: JSON.stringify(data)
         });
     }
+    static async livenessCheck(liveSelfie: File) {
+        const livenessErrMsg = "Verification failed - Liveness check failed"
+        const res = await KycService.dojahVerifySelfie({
+            image: Buffer.from(await liveSelfie.arrayBuffer()).toString("base64")
+        })
+        if (!res.ok) throw new Error(livenessErrMsg, { cause: await res.json() })
+        const { entity: { liveness } } = await res.json() as DojahLiveSelfieVerifyResponse
+        if (!liveness.liveness_check || liveness.liveness_probability < 0.5) {
+            throw new Error(livenessErrMsg)
+        }
+    }
+    static async verifyUtilityBill(addressProofFile: File, userId: string, userType: CommonSchema.UserType) {
+        const dojahErrMsg = "Service temporarily unavailable";
+        const tierDataErrMsg = "Verification failed - Tier 1 data not found";
+        const streetErrMsg = "Verification failed - Street name mismatch";
+        const cityErrMsg = "Verification failed - City name mismatch";
+        const stateErrMsg = "Verification failed - State name mismatch";
+        const { path } = getUploadLocation(
+            STORAGE.utilityBillPath,
+            userType,
+            userId,
+            addressProofFile.type.split("/").pop() as string
+        )
+        // N.B - remember to delete this file and only store encrypted kyc data
+        // cannot encrypt because Dojah requires the file url of unencrypted data
+        await fileStore.file(path).write(addressProofFile)
+        // verify with presigned file url with short expiration
+        const response = await KycService.dojahVerifyUtilityBill({
+            input_type: "url",
+            input_value: fileStore.presign(path, { expiresIn: 60 })
+        })
+        if (!response.ok) throw new Error(dojahErrMsg, { cause: await response.json() })
+        const {
+            entity: { address_info, metadata, result }
+        } = await response.json() as DojahUtilityBillVerifyResponse;
+        if (result.status !== "success" || !metadata.is_recent) throw new Error(dojahErrMsg)
+        const tier1Data = await KycService.getTier1Data(userId)
+        if (!tier1Data) throw new Error(tierDataErrMsg)
+        if (tier1Data.street !== address_info.street) throw new Error(streetErrMsg)
+        if (tier1Data.city !== address_info.city) throw new Error(cityErrMsg)
+        if (tier1Data.state !== address_info.state) throw new Error(stateErrMsg)
+    }
+    /**
+     * Create a new kyc record in the database with encrypted tier 1 data.
+     * @param userId user id
+     * @param data tier 1 data
+     */
     static async createKyc(userId: string, data: KycModel.PostTier1BodyT) {
-        const tier1Data = encrypt(JSON.stringify(data));
+        // get upload location for encrypted passport photo
+        const { path, url } = getUploadLocation(STORAGE.passportPhotoPath, "individual", userId, "enc")
+        // encrypt and upload passport photo to storage
+        await fileStore
+            .file(path)
+            .write(encrypt(Buffer.from(await data.passportPhoto.arrayBuffer())))
+        // encrypt and store tier 1 data with url of encrypted passport photo
+        const tier1Data = encrypt(Buffer.from(JSON.stringify({
+            ...data,
+            passportPhoto: url
+        })));
+        // insert tier 1 data into database
         await sql`
             INSERT INTO kyc (user_id, tier1_data, tier1_status)
-            VALUES (${userId}, ${tier1Data}, 'success')
+            VALUES (${userId}, ${tier1Data.toString("utf8")}, 'success')
         `
     }
+    /**
+     * Get the tier 1 status of a user.
+     * @param userId user id
+     * @returns tier 1 status
+     */
     static async getTier1Status(userId: string) {
         const kyc: Pick<KycModel.DbDataT, "currentTier" | "tier1Status">[] = await sql`
             SELECT current_tier as "currentTier", tier1_status as "tier1Status"
@@ -111,7 +174,18 @@ export class KycService {
         } : null;
     }
     static async updateTier2(userId: string, data: KycModel.PostTier2BodyT) {
-        const tier2Data = encrypt(JSON.stringify(data));
+        // get upload location for encrypted id image
+        const { path, url } = getUploadLocation(STORAGE.govtIdPath, "individual", userId, "enc")
+        // encrypt and upload id image to storage
+        await fileStore
+            .file(path)
+            .write(encrypt(Buffer.from(await data.idImage.arrayBuffer())))
+        // encrypt and store tier 2 data with url of encrypted id image
+        const tier2Data = encrypt(Buffer.from(JSON.stringify({
+            ...data,
+            idImage: url
+        })));
+        // update tier 2 data in database
         await sql`
             UPDATE kyc
             SET 
@@ -121,8 +195,25 @@ export class KycService {
             WHERE user_id = ${userId}
         `
     }
-    static async updateTier3(userId: string, data: KycModel.PostTier3AddressProofBodyT & KycModel.PostTier3LiveSelfieBodyT) {
-        const tier3Data = encrypt(JSON.stringify(data));
+    static async updateTier3(userId: string, data: KycModel.PostTier3BodyT) {
+        // get upload location for encrypted address proof
+        const addressProofUploadLocation = getUploadLocation(STORAGE.addressProofPath, "individual", userId, "enc")
+        const selfieUploadLocation = getUploadLocation(STORAGE.liveSelfiePath, "individual", userId, "enc")
+        // encrypt and upload address proof to storage
+        await fileStore
+            .file(addressProofUploadLocation.path)
+            .write(encrypt(Buffer.from(await data.addressProof.arrayBuffer())))
+        // encrypt and upload selfie to storage
+        await fileStore
+            .file(selfieUploadLocation.path)
+            .write(encrypt(Buffer.from(await data.liveSelfie.arrayBuffer())))
+        // encrypt and store tier 3 data with url of encrypted address proof
+        const tier3Data = encrypt(Buffer.from(JSON.stringify({
+            ...data,
+            addressProof: addressProofUploadLocation.url,
+            liveSelfie: selfieUploadLocation.url
+        })));
+        // update tier 3 data in database
         await sql`
             UPDATE kyc
             SET 
@@ -132,34 +223,61 @@ export class KycService {
             WHERE user_id = ${userId}
         `
     }
-    static async getTier1Data(userId: string): Promise<KycModel.PostTier1BodyT | null> {
+    /**
+     * Get encrypted tier 1 data from the db and return a decrypted object.
+     * @param userId user id
+     * @returns decrypted json object
+     */
+    static async getTier1Data(userId: string): Promise<
+        Omit<KycModel.PostTier1BodyT, "passportPhoto">
+        & Record<"passportPhoto", string>
+        | null
+    > {
         const kyc: { tier1Data: string }[] = await sql`
             SELECT tier1_data as "tier1Data"
             FROM kyc
             WHERE user_id = ${userId}
         `
-        return (kyc.length === 0 || !kyc[0].tier1Data)
-            ? null
-            : JSON.parse(decrypt(kyc[0].tier1Data));
+        if (kyc.length === 0 || !kyc[0].tier1Data) return null;
+        const dataBuf = decrypt(Buffer.from(kyc[0].tier1Data));
+        return JSON.parse(dataBuf.toString("utf8"));
     }
-    static async getTier2Data(userId: string): Promise<KycModel.PostTier2BodyT | null> {
+    /**
+     * Get encrypted tier 2 data from the db and return a decrypted object.
+     * @param userId user id
+     * @returns decrypted json object
+     */
+    static async getTier2Data(userId: string): Promise<
+        Omit<KycModel.PostTier2BodyT, "idImage">
+        & Record<"idImage", string>
+        | null
+    > {
         const kyc: { tier2Data: string }[] = await sql`
             SELECT tier2_data as "tier2Data"
             FROM kyc
             WHERE user_id = ${userId}
         `
-        return (kyc.length === 0 || !kyc[0].tier2Data)
-            ? null
-            : JSON.parse(decrypt(kyc[0].tier2Data));
+        if (kyc.length === 0 || !kyc[0].tier2Data) return null;
+        const dataBuf = decrypt(Buffer.from(kyc[0].tier2Data, "base64"));
+        return JSON.parse(dataBuf.toString("utf8"));
     }
-    static async getTier3Data(userId: string): Promise<(KycModel.PostTier3AddressProofBodyT & KycModel.PostTier3LiveSelfieBodyT) | null> {
+    /**
+     * Get encrypted tier 3 data from the db and return a decrypted object.
+     * @param userId user id
+     * @returns decrypted json object
+     */
+    static async getTier3Data(userId: string): Promise<
+        Pick<KycModel.PostTier3BodyT, "proofType">
+        & Record<"addressProof" | "liveSelfie", string>
+        | null
+    > {
         const kyc: { tier3Data: string }[] = await sql`
             SELECT tier3_data as "tier3Data"
             FROM kyc
             WHERE user_id = ${userId}
         `
-        return (kyc.length === 0 || !kyc[0].tier3Data)
-            ? null
-            : JSON.parse(decrypt(kyc[0].tier3Data));
+        if (kyc.length === 0 || !kyc[0].tier3Data) return null;
+        const dataBuf = decrypt(Buffer.from(kyc[0].tier3Data, "base64"));
+        return JSON.parse(dataBuf.toString("utf8"));
     }
 }

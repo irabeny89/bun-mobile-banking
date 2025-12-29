@@ -39,10 +39,10 @@ export namespace KycModel {
     export type Tier3SuccessT = typeof tier3SuccessSchema.static;
 
     export const tier1DataSchema = t.Object({
-        photoId: t.String({
-            format: "uri",
-            description: "Photo ID must be a valid URL",
-            examples: ["https://example.com/photo-id.jpg"]
+        passportPhoto: t.File({
+            description: "Passport photo must be a valid file",
+            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+            type: IMAGE_UPLOAD.mimeType
         }),
         firstName: t.String({
             minLength: 1,
@@ -122,33 +122,33 @@ export namespace KycModel {
             description: "Government ID number from international passport, driver's license, voter's ID card or national ID card",
             examples: ["12345678901"]
         }),
-        idUrl: t.String({
-            format: "uri",
+        idImage: t.File({
             description: "Government ID image URL i.e uploaded international passport, driver's license, voter's ID card or national ID card",
-            examples: ["https://example.com/govt-id.jpg"]
+            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+            type: IMAGE_UPLOAD.mimeType,
         }),
     })
     export type Tier2DataT = typeof tier2DataSchema.static;
 
     export const tier3DataSchema = t.Object({
-        liveSelfie: t.String({
-            format: "uri",
+        liveSelfie: t.File({
             description: "Live selfie image URL i.e uploaded selfie from biometric(or selfie) verification or false if not.",
-            examples: ["https://example.com/live-selfie.jpg"]
+            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+            type: IMAGE_UPLOAD.mimeType,
         }),
         proofType: t.UnionEnum(["utility bill", "bank statement"], {
             description: "Address type i.e utility bill or bank statement"
         }),
-        addressProof: t.String({
-            format: "uri",
+        addressProof: t.File({
             description: "Address proof image URL i.e uploaded utility bill or bank statement",
-            examples: ["https://example.com/address-proof.jpg"]
+            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+            type: IMAGE_UPLOAD.mimeType,
         })
     })
     export type Tier3DataT = typeof tier3DataSchema.static;
 
     export const postTier1BodySchema = t.Pick(tier1DataSchema, [
-        "photoId",
+        "passportPhoto",
         "firstName",
         "middleName",
         "lastName",
@@ -161,38 +161,11 @@ export namespace KycModel {
     ])
     export type PostTier1BodyT = typeof postTier1BodySchema.static;
 
-    export const postTier2BodySchema = t.Pick(tier2DataSchema, [
-        "idType",
-        "govtId",
-        "idUrl",
-    ])
+    export const postTier2BodySchema = tier2DataSchema
     export type PostTier2BodyT = typeof postTier2BodySchema.static;
 
-    export const postTier3AddressProofBodySchema = t.Pick(tier3DataSchema, [
-        "proofType",
-        "addressProof",
-    ])
-    export type PostTier3AddressProofBodyT = typeof postTier3AddressProofBodySchema.static;
-
-    export const postTier3LiveSelfieBodySchema = t.Pick(tier3DataSchema, [
-        "liveSelfie",
-    ])
-    export type PostTier3LiveSelfieBodyT = typeof postTier3LiveSelfieBodySchema.static;
-
-    export const postTier3AddressProofUploadBodySchema = t.Object({
-        addressProofImage: t.File({
-            description: "Address proof image file",
-            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
-            type: IMAGE_UPLOAD.mimeType
-        })
-    })
-    export type PostTier3AddressProofUploadBodyT = typeof postTier3AddressProofUploadBodySchema.static
-
-    export const postTier3AddressProofUploadResponseSchema = successSchemaFactory(t.Object({
-        message: t.Literal("Address proof uploaded successfully"),
-        url: t.String()
-    }))
-    export type PostTier3AddressProofUploadResponseT = typeof postTier3AddressProofUploadResponseSchema.static
+    export const postTier3BodySchema = tier3DataSchema
+    export type PostTier3BodyT = typeof postTier3BodySchema.static;
 
     export const dbData = t.Intersect([
         CommonSchema.IdAndTimestampSchema,

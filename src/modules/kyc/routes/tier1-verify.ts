@@ -17,7 +17,7 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
     .resolve(({ store }) => ({ logger: pinoLogger(store) }))
     .post("/tier1", async ({ user, body, logger }) => {
         await kycQueue.add("tier_1_insert", {
-            userId: user.id,
+            userId: user!.id,
             ...body
         })
         logger.info("tier1Verify:: User KYC db data insertion queued")
@@ -30,6 +30,18 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
         }
     }, {
         async beforeHandle({ user, logger, set, body }) {
+            if (!user) {
+                logger.info("tier1Verify:: User not found");
+                set.status = 400;
+                return {
+                    type: "error" as const,
+                    error: {
+                        message: "User not found",
+                        code: ERROR_RESPONSE_CODES.BAD_REQUEST,
+                        details: []
+                    }
+                }
+            }
             const tier1Status = await KycService.getTier1Status(user.id)
             if (tier1Status) {
                 logger.info("tier1Verify:: Tier 1 status already exist");

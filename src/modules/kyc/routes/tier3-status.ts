@@ -17,6 +17,18 @@ export const tier3Status = new Elysia({ name: "tier3-status" })
         return { logger }
     })
     .get("/tier3", async ({ user, logger, set }) => {
+        if (!user) {
+            logger.error("User not found")
+            set.status = 404
+            return {
+                type: "error" as const,
+                error: {
+                    message: "User not found",
+                    code: ERROR_RESPONSE_CODES.NOT_FOUND,
+                    details: []
+                }
+            }
+        }
         const tier3Status = await KycService.getTier3Status(user.id)
         if (!tier3Status) {
             logger.error("Tier 3 status not found")

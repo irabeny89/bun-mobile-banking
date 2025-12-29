@@ -45,7 +45,9 @@ export const STORAGE = {
     endpointUrl: process.env.STORAGE_ENDPOINT_URL,
     addressProofPath: process.env.STORAGE_BUCKET_ADDRESS_PROOF,
     utilityBillPath: process.env.STORAGE_BUCKET_UTILITY_BILL,
-    liveSelfiePath: process.env.STORAGE_BUCKET_LIVE_SELFIE
+    liveSelfiePath: process.env.STORAGE_BUCKET_LIVE_SELFIE,
+    passportPhotoPath: process.env.STORAGE_BUCKET_PASSPORT_PHOTO,
+    govtIdPath: process.env.STORAGE_BUCKET_GOVT_ID
 }
 
 export const CACHE_GET = {

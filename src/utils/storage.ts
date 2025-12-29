@@ -9,10 +9,16 @@ export const fileStore = new Bun.S3Client({
     endpoint: STORAGE.endpointUrl,
     bucket: STORAGE.bucket,
 })
-
-export function getUploadLocation(storageBucket: string, file: File, userType: CommonSchema.UserType, userId: string) {
-    const ext = file.type.split("/")[1];
-    const path = `${storageBucket}/${userType}-${userId}.${ext}`;
+/**
+ * Get the upload location for a file
+ * @param storageBucketPath - The path to the storage bucket
+ * @param userType - The type of user
+ * @param userId - The ID of the user
+ * @param ext - The extension of the file
+ * @returns The path and URL of the file
+ */
+export function getUploadLocation(storageBucketPath: string, userType: CommonSchema.UserType, userId: string, ext: string) {
+    const path = `${storageBucketPath}/${userType}-${userId}.${ext}`;
     const url = `${STORAGE.endpointUrl}/${path}`;
     return { path, url };
 }

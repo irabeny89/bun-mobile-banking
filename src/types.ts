@@ -20,6 +20,8 @@ declare module "bun" {
 		DOJAH_APPID: string;
 		DOJAH_SECRET: string;
 		STORAGE_BUCKET: string;
+		STORAGE_BUCKET_GOVT_ID: string;
+		STORAGE_BUCKET_PASSPORT_PHOTO: string;
 		STORAGE_BUCKET_UTILITY_BILL: string;
 		STORAGE_BUCKET_ADDRESS_PROOF: string;
 		STORAGE_BUCKET_LIVE_SELFIE: string;

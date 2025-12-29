@@ -65,7 +65,7 @@ export const registerIndividualComplete = new Elysia({
                         type: "error" as const,
                         error: { 
                             message: "User already exists", 
-                            code: ERROR_RESPONSE_CODES.USER_EXIST, 
+                            code: ERROR_RESPONSE_CODES.BAD_REQUEST, 
                             details: [] 
                         }
                     }
