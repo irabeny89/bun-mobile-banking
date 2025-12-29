@@ -17,6 +17,8 @@ declare module "bun" {
 		VALKEY_URL: string;
 		EMAIL_FROM: string;
 		PORT: string;
+		MONO_PUBLIC_KEY: string;
+		MONO_SECRET_KEY: string;
 		DOJAH_APPID: string;
 		DOJAH_SECRET: string;
 		STORAGE_BUCKET: string;

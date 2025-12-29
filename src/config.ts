@@ -21,6 +21,10 @@ export const IMAGE_UPLOAD = {
     maxSize: process.env.IMAGE_MAX_SIZE ?? "5m",
     mimeType: ["image/jpeg", "image/jpg", "image/png"]
 }
+export const MONO = {
+    publicKey: process.env.MONO_PUBLIC_KEY,
+    secretKey: process.env.MONO_SECRET_KEY
+}
 export const DOJAH = {
     appId: process.env.DOJAH_APPID,
     secret: process.env.DOJAH_SECRET,
