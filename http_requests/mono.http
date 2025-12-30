@@ -1,0 +1,14 @@
+@baseUrl = https://api.withmono.com
+@lookupPath = /v3/lookup/nin
+
+###
+# NIN lookup
+POST {{baseUrl}}{{lookupPath}}
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "nin": "12345678901"
+}
+

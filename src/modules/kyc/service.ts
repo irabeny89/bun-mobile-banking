@@ -1,20 +1,20 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
-import { DOJAH, IS_PROD_ENV, STORAGE } from "@/config";
-import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs } from "@/types";
+import { DOJAH, IS_PROD_ENV, MONO, STORAGE } from "@/config";
+import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs, MonoLookupNinArgs, MonoLookupNinResponse } from "@/types";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { fileStore, getUploadLocation } from "@/utils/storage";
 import { CommonSchema } from "@/share/schema";
 
-const headers = new Headers();
-headers.set("Content-Type", "application/json");
-headers.set("AppId", DOJAH.appId);
-headers.set("Authorization", `Bearer ${DOJAH.secret}`);
-
-const baseUrl = IS_PROD_ENV ? DOJAH.url : DOJAH.sandbox.url;
-
 const sql = dbSingleton();
 export class KycService {
+    static async monoLookupNin({ nin }: MonoLookupNinArgs) {
+        return fetch(MONO.baseUrl + MONO.lookupPath, {
+            headers: MONO.headers,
+            method: "POST",
+            body: JSON.stringify({ nin })
+        });
+    }
     /**
      * Uploads address proof file to storage and returns url to access it.
      * @param file address proof file
@@ -30,29 +30,29 @@ export class KycService {
     //     return url
     // }
     static dojahVerifyWebhook(requestIp: string) {
-        return requestIp === DOJAH.ip
+        return requestIp === DOJAH.webhookIp
     }
     static dojahLookupNin({ nin }: DojahNinLookupArgs) {
-        const url = new URL(baseUrl + "/api/v1/kyc/nin");
+        const url = new URL(IS_PROD_ENV ? DOJAH.url : DOJAH.url + DOJAH.ninPath);
         url.searchParams.set("nin", nin);
-        return fetch(url, { headers });
+        return fetch(url, { headers: DOJAH.headers });
     }
     static dojahValidateBvn(data: DojahBvnValidateArgs) {
-        const url = new URL(baseUrl + "/api/v1/kyc/bvn");
+        const url = new URL(IS_PROD_ENV ? DOJAH.url : DOJAH.url + DOJAH.bvnPath);
         url.searchParams.set("bvn", data.bvn);
         url.searchParams.set("first_name", data.firstName);
         url.searchParams.set("last_name", data.lastName);
-        return fetch(url, { headers });
+        return fetch(url, { headers: DOJAH.headers });
     }
     static dojahLookupVin({ vin }: DojahVinLookupArgs) {
-        const url = new URL(baseUrl + "/api/v1/kyc/vin");
+        const url = new URL(IS_PROD_ENV ? DOJAH.url : DOJAH.url + DOJAH.vinPath);
         url.searchParams.set("vin", vin);
-        return fetch(url, { headers });
+        return fetch(url, { headers: DOJAH.headers });
     }
     static dojahVerifyUtilityBill(data: DojahUtilityBillVerifyArgs) {
-        const url = new URL(baseUrl + "/api/v1/document/analysis/utility_bill");
+        const url = new URL(IS_PROD_ENV ? DOJAH.url : DOJAH.url + DOJAH.utilityBillPath);
         return fetch(url, {
-            headers,
+            headers: DOJAH.headers,
             method: "POST",
             body: JSON.stringify(data)
         });
@@ -63,9 +63,9 @@ export class KycService {
      * @returns response
      */
     static dojahVerifySelfie(data: DojahLiveSelfieVerifyArgs) {
-        const url = new URL(baseUrl + "/api/v1/ml/liveness");
+        const url = new URL(IS_PROD_ENV ? DOJAH.url : DOJAH.url + DOJAH.livenessPath);
         return fetch(url, {
-            headers,
+            headers: DOJAH.headers,
             method: "POST",
             body: JSON.stringify(data)
         });
@@ -97,7 +97,7 @@ export class KycService {
         // cannot encrypt because Dojah requires the file url of unencrypted data
         await fileStore.file(path).write(addressProofFile)
         // verify with presigned file url with short expiration
-        const response = await KycService.dojahVerifyUtilityBill({
+        const response = await this.dojahVerifyUtilityBill({
             input_type: "url",
             input_value: fileStore.presign(path, { expiresIn: 60 })
         })
@@ -106,11 +106,30 @@ export class KycService {
             entity: { address_info, metadata, result }
         } = await response.json() as DojahUtilityBillVerifyResponse;
         if (result.status !== "success" || !metadata.is_recent) throw new Error(dojahErrMsg)
-        const tier1Data = await KycService.getTier1Data(userId)
+        const tier1Data = await this.getTier1Data(userId)
         if (!tier1Data) throw new Error(tierDataErrMsg)
         if (tier1Data.street !== address_info.street) throw new Error(streetErrMsg)
         if (tier1Data.city !== address_info.city) throw new Error(cityErrMsg)
         if (tier1Data.state !== address_info.state) throw new Error(stateErrMsg)
+    }
+    static async verifyTier1Nin(userId: string, body: KycModel.PostTier1BodyT) {
+        const tier1StatusErrMsg = "Verification failed - Tier 1 status already verified"
+        const ninLookupErrMsg = "Verification failed - NIN lookup failed"
+        const nameMismatchErrMsg = "Verification failed - Name mismatch"
+        const dobMismatchErrMsg = "Verification failed - Date of birth mismatch"
+
+        const tier1Status = await this.getTier1Status(userId)
+        if (tier1Status) throw new Error(tier1StatusErrMsg)
+        const res = await this.monoLookupNin({ nin: body.nin })
+        if (!res.ok) throw new Error(ninLookupErrMsg, { cause: await res.json() })
+        const { data: lookup } = await res.json() as MonoLookupNinResponse
+        if (lookup.firstname !== body.firstName || lookup.surname !== body.lastName) {
+            throw new Error(nameMismatchErrMsg)
+        }
+        const date = new Intl.DateTimeFormat()
+        const formattedLookupDate = date.format(new Date(lookup.birthdate))
+        const formattedBodyDate = date.format(body.dob)
+        if (formattedBodyDate !== formattedLookupDate) throw new Error(dobMismatchErrMsg)
     }
     /**
      * Create a new kyc record in the database with encrypted tier 1 data.
@@ -118,21 +137,10 @@ export class KycService {
      * @param data tier 1 data
      */
     static async createKyc(userId: string, data: KycModel.PostTier1BodyT) {
-        // get upload location for encrypted passport photo
-        const { path, url } = getUploadLocation(STORAGE.passportPhotoPath, "individual", userId, "enc")
-        // encrypt and upload passport photo to storage
-        await fileStore
-            .file(path)
-            .write(encrypt(Buffer.from(await data.passportPhoto.arrayBuffer())))
-        // encrypt and store tier 1 data with url of encrypted passport photo
-        const tier1Data = encrypt(Buffer.from(JSON.stringify({
-            ...data,
-            passportPhoto: url
-        })));
-        // insert tier 1 data into database
+        const tier1Data = encrypt(Buffer.from(JSON.stringify(data)));
         await sql`
             INSERT INTO kyc (user_id, tier1_data, tier1_status)
-            VALUES (${userId}, ${tier1Data.toString("utf8")}, 'success')
+            VALUES (${userId}, ${tier1Data}, 'success')
         `
     }
     /**

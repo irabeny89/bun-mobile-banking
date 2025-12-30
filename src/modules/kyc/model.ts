@@ -38,29 +38,47 @@ export namespace KycModel {
     export const tier3SuccessSchema = successSchemaFactory(tier3ResponseDataSchema)
     export type Tier3SuccessT = typeof tier3SuccessSchema.static;
 
-    export const tier1DataSchema = t.Object({
+    export const uploadSuccessSchema = t.Object({
+        message: t.String(),
+        url: t.String({ format: "uri" })
+    })
+    export type UploadSuccessT = typeof uploadSuccessSchema.static
+
+    export const uploadPassportBodySchema = t.Object({
         passportPhoto: t.File({
             description: "Passport photo must be a valid file",
             maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
             type: IMAGE_UPLOAD.mimeType
+        })
+    })
+    export type UploadPassportBodyT = typeof uploadPassportBodySchema.static
+
+    export const uploadPassportSuccessSchema = successSchemaFactory(uploadSuccessSchema)
+    export type UploadPassportSuccessT = typeof uploadPassportSuccessSchema.static
+
+    export const tier1DataSchema = t.Object({
+        passportPhoto: t.String({
+            description: "Passport photo URL",
+            format: "uri",
+            examples: ["https://example.com/passport.jpg"]
         }),
         firstName: t.String({
             minLength: 1,
             maxLength: 128,
             description: "First name must be a valid name",
-            examples: ["John"]
+            examples: ["Samuel"]
         }),
         middleName: t.Optional(t.Nullable(t.String({
             minLength: 1,
             maxLength: 128,
             description: "Middle name must be a valid name",
-            examples: ["Doe"]
+            examples: ["Nomo"]
         }))),
         lastName: t.String({
             minLength: 1,
             maxLength: 128,
             description: "Last name must be a valid name",
-            examples: ["Tom"]
+            examples: ["Olamide"]
         }),
         phone: t.Optional(t.Nullable(t.String({
             pattern: "^\\d+$",
@@ -72,8 +90,8 @@ export namespace KycModel {
         }))),
         gender: CommonSchema.genderSchema,
         dob: t.Date({
-            description: "Date of birth must be a valid date",
-            examples: ["2000-01-01"]
+            description: "Date of birth must be a valid date.",
+            examples: ["01-06-2020"]
         }),
         bvn: t.String({
             pattern: "^\\d+$",

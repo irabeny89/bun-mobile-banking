@@ -4,6 +4,19 @@
 @formBoundary = formDataBoundary
 
 ###
+# Upload passport photo
+POST {{baseUrl}}/api/v1/kyc/upload/passport-photo
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary={{formBoundary}}
+
+--{{formBoundary}}
+Content-Disposition: form-data; name="passportPhoto"; filename="sample.jpeg"
+Content-Type: image/jpeg
+
+< ../files/sample.jpeg
+--{{formBoundary}}--
+
+###
 # Get tier 1 status
 GET {{baseUrl}}/api/v1/kyc/tier1
 Authorization: Bearer {{accessToken}}
@@ -15,12 +28,12 @@ Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "photoId": "https://example.com/photo-id.jpg",
-  "firstName": "Ernest",
-  "middleName": "Ojewolo",
-  "lastName": "Irabor",
+  "passportPhoto": "http://localhost:3900/bun-mobile-banking/kyc/passport-photos/individual-019b6cda-1d16-789c-9595-2809ecf7c707.jpeg",
+  "firstName": "Samuel",
+  "middleName": "Nomo",
+  "lastName": "Olamide",
   "gender": "m",
-  "dob": "1989-02-16",
+  "dob": "01-06-2020",
   "nin": "12345678901",
   "street": "123 Main St",
   "city": "Ikeja",
@@ -82,3 +95,5 @@ Content-Type: image/jpeg
 
 < ../dev-files/sample.jpeg
 --{{formBoundary}}--
+
+###

@@ -46,7 +46,7 @@ Content-Type: application/json
 }
 
 ###
-# Refresh Individual user tokens
+# Refresh Individual user auth tokens
 POST {{baseUrl}}/api/v1/auth/refresh-token/individual
 Content-Type: application/json
 

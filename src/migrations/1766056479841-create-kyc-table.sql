@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS kyc (
     tier1_status VARCHAR(20) DEFAULT 'pending',
     tier2_status VARCHAR(20) DEFAULT 'pending',
     tier3_status VARCHAR(20) DEFAULT 'pending',
-    tier1_data VARCHAR NOT NULL,
-    tier2_data VARCHAR DEFAULT NULL,
-    tier3_data VARCHAR DEFAULT NULL,
+    tier1_data BYTEA NOT NULL,
+    tier2_data BYTEA DEFAULT NULL,
+    tier3_data BYTEA DEFAULT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -22,16 +22,33 @@ export const IMAGE_UPLOAD = {
     mimeType: ["image/jpeg", "image/jpg", "image/png"]
 }
 export const MONO = {
-    publicKey: process.env.MONO_PUBLIC_KEY,
-    secretKey: process.env.MONO_SECRET_KEY
+    connectPublicKey: process.env.MONO_CONNECT_PUBLIC_KEY,
+    connectSecretKey: process.env.MONO_CONNECT_SECRET_KEY,
+    lookupPublicKey: process.env.MONO_LOOKUP_PUBLIC_KEY,
+    lookupSecretKey: process.env.MONO_LOOKUP_SECRET_KEY,
+    baseUrl: process.env.MONO_BASE_URL ?? "https://api.withmono.com",
+    lookupPath: process.env.MONO_LOOKUP_PATH ?? "/v3/lookup/nin",
+    headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "mono-sec-key": process.env.MONO_LOOKUP_SECRET_KEY
+    }
 }
 export const DOJAH = {
     appId: process.env.DOJAH_APPID,
     secret: process.env.DOJAH_SECRET,
-    url: "https://api.dojah.io",
-    ip: "20.112.64.208",
+    url: process.env.DOJAH_URL ?? "https://api.dojah.io",
+    ninPath: process.env.DOJAH_NIN_PATH ?? "/api/v1/kyc/nin",
+    bvnPath: process.env.DOJAH_BVN_PATH ?? "/api/v1/kyc/bvn",
+    vinPath: process.env.DOJAH_VIN_PATH ?? "/api/v1/kyc/vin",
+    phonePath: process.env.DOJAH_PHONE_PATH ?? "/api/v1/kyc/phone",
+    accountNumberPath: process.env.DOJAH_ACCOUNT_NUMBER_PATH ?? "/api/v1/kyc/account-number",
+    bankCodePath: process.env.DOJAH_BANK_CODE_PATH ?? "/api/v1/kyc/bank-code",
+    utilityBillPath: process.env.DOJAH_UTILITY_BILL_PATH ?? "/api/v1/document/analysis/utility_bill",
+    livenessPath: process.env.DOJAH_LIVENESS_PATH ?? "/api/v1/ml/liveness",
+    webhookIp: process.env.DOJAH_WEBHOOK_IP ?? "20.112.64.208",
     sandbox: {
-        url: "https://sandbox.dojah.io",
+        url: process.env.DOJAH_SANDBOX_URL ?? "https://sandbox.dojah.io",
         bvn: "22222222222",
         nin: "70123456789",
         /** Voters Identification Number */
@@ -39,6 +56,11 @@ export const DOJAH = {
         phone: "09011111111",
         accountNumber: "3046507407",
         bankCode: "011",
+    },
+    headers: {
+        "Content-Type": "application/json",
+        "AppId": process.env.DOJAH_APPID,
+        "Authorization": `Bearer ${process.env.DOJAH_SECRET}`
     }
 }
 export const STORAGE = {
@@ -51,7 +73,7 @@ export const STORAGE = {
     utilityBillPath: process.env.STORAGE_BUCKET_UTILITY_BILL,
     liveSelfiePath: process.env.STORAGE_BUCKET_LIVE_SELFIE,
     passportPhotoPath: process.env.STORAGE_BUCKET_PASSPORT_PHOTO,
-    govtIdPath: process.env.STORAGE_BUCKET_GOVT_ID
+    govtIdPath: process.env.STORAGE_BUCKET_GOVT_ID,
 }
 
 export const CACHE_GET = {

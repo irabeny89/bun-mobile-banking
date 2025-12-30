@@ -81,6 +81,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
+| **POST** | `/upload/passport-photo` | Upload passport photo. |
 | **GET** | `/tier1` | Get Tier 1 KYC data and status. |
 | **POST** | `/tier1` | Verify Tier 1 KYC documents. |
 | **GET** | `/tier2` | Get Tier 2 KYC data and status. |
