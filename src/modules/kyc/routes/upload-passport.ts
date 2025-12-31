@@ -8,7 +8,7 @@ import { fileStore, getUploadLocation } from "@/utils/storage";
 import { STORAGE } from "@/config";
 import { encrypt } from "@/utils/encryption";
 
-export const uploadPassportPhoto = new Elysia({ name: "upload-passport-photo" })
+export const uploadPassport = new Elysia({ name: "upload-passport-photo" })
     .use(userMacro)
     .model({
         uploadPassportBody: KycModel.uploadPassportBodySchema,
@@ -16,7 +16,7 @@ export const uploadPassportPhoto = new Elysia({ name: "upload-passport-photo" })
         error: CommonSchema.errorSchema,
     })
     .resolve(({ store }) => ({ logger: pinoLogger(store) }))
-    .post("/upload/passport-photo", async ({ user, body }) => {
+    .post("/tier1/upload/passport", async ({ user, body }) => {
         const { url, path } = getUploadLocation(
             STORAGE.passportPhotoPath,
             user!.userType,

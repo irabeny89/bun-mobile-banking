@@ -5,7 +5,7 @@
 
 ###
 # Upload passport photo
-POST {{baseUrl}}/api/v1/kyc/upload/passport-photo
+POST {{baseUrl}}/api/v1/kyc/tier1/upload/passport
 Authorization: Bearer {{accessToken}}
 Content-Type: multipart/form-data; boundary={{formBoundary}}
 
@@ -18,7 +18,7 @@ Content-Type: image/jpeg
 
 ###
 # Upload government ID
-POST {{baseUrl}}/api/v1/kyc/upload/govt-id
+POST {{baseUrl}}/api/v1/kyc/tier2/upload/govt-id
 Authorization: Bearer {{accessToken}}
 Content-Type: multipart/form-data; boundary={{formBoundary}}
 

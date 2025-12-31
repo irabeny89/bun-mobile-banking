@@ -16,7 +16,7 @@ export const uploadGovtId = new Elysia({ name: "upload-govt-id" })
         error: CommonSchema.errorSchema,
     })
     .resolve(({ store }) => ({ logger: pinoLogger(store) }))
-    .post("/upload/govt-id", async ({ user, body }) => {
+    .post("/tier2/upload/govt-id", async ({ user, body }) => {
         const { url, path } = getUploadLocation(
             STORAGE.govtIdPath,
             user!.userType,
