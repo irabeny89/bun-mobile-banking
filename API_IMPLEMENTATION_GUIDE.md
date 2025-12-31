@@ -25,17 +25,18 @@ src/
 
 ## Prerequisites
 
-*   **Bun:** v1.3.0
-*   **PostgreSQL:** v18.0
-*   **Redis:** v9.0.0
+* **Bun:** v1.3.0
+* **PostgreSQL:** v18.0
+* **Redis:** v9.0.0
 
 ## Technology Stack
 
 Based on the current project structure:
-*   **Runtime:** Bun
-*   **Framework:** ElysiaJS (High-performance TS framework)
-*   **Language:** TypeScript
-*   **Database:** SQL (PostgreSQL recommended for banking data consistency)
+
+* **Runtime:** Bun
+* **Framework:** ElysiaJS (High-performance TS framework)
+* **Language:** TypeScript
+* **Database:** SQL (PostgreSQL recommended for banking data consistency)
 
 ## Architecture: Modular Monolith
 
@@ -44,6 +45,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 ## Features
 
 ### 1. Authentication & Onboarding
+
 **Base URL**: `/api/v1/auth`
 
 | Method | Endpoint | Description |
@@ -64,6 +66,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/logout/business` | Invalidate business user session. |
 
 ### 2. Individual User Profile & KYC
+
 **Base URL**: `/api/v1/individual`
 
 | Method | Endpoint | Description |
@@ -77,6 +80,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/mfa` | Enable/Disable MFA. |
 
 ### 3. Individual User KYC Verification
+
 **Base URL**: `/api/v1/kyc`
 
 | Method | Endpoint | Description |
@@ -87,12 +91,13 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **GET** | `/tier2` | Get Tier 2 KYC data and status. |
 | **POST** | `/tier2/upload/govt-id` | Upload tier 2 government ID e.g voters' ID, etc |
 | **POST** | `/tier2/bvn/initiate` | Initiate BVN verification |
-| **POST** | `/tier2/bvn/verify-otp` | Verify BVN OTP|
+| **POST** | `/tier2/bvn/approve-otp` | Verify BVN OTP |
 | **POST** | `/tier2` | Verify Tier 2 KYC documents. |
 | **GET** | `/tier3` | Get Tier 3 KYC data and status. |
 | **POST** | `/tier3` | Verify Tier 3 KYC documents. |
 
 ### 3. Business User Profile & KYB
+
 **Base URL**: `/api/v1/business`
 
 | Method | Endpoint | Description |
@@ -106,6 +111,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/security/mfa` | Enable/Disable MFA. |
 
 ### 4. Account Management
+
 **Base URL**: `/api/v1/accounts`
 
 | Method | Endpoint | Description |
@@ -116,6 +122,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/{accountId}/statement` | Request account statement (PDF/Email). |
 
 ### 5. Transactions & Transfers
+
 **Base URL**: `/api/v1/transfers`
 
 | Method | Endpoint | Description |
@@ -129,6 +136,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **DELETE**| `/beneficiaries/{id}` | Remove a beneficiary. |
 
 ### 6. Payments & Bills
+
 **Base URL**: `/api/v1/payments`
 
 | Method | Endpoint | Description |
@@ -140,6 +148,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/validate` | Validate customer ID for a biller. |
 
 ### 7. Card Management
+
 **Base URL**: `/api/v1/cards`
 
 | Method | Endpoint | Description |
@@ -152,6 +161,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **GET** | `/{cardId}/details` | Get sensitive card details (for virtual cards). |
 
 ### 8. Loans
+
 **Base URL**: `/api/v1/loans`
 
 | Method | Endpoint | Description |
@@ -162,6 +172,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **GET** | `/history` | Get loan repayment history. |
 
 ### 9. Investments
+
 **Base URL**: `/api/v1/investments`
 
 | Method | Endpoint | Description |
@@ -172,6 +183,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/{investmentId}/liquidate` | Liquidate an investment early. |
 
 ### 10. Support
+
 **Base URL**: `/api/v1/support`
 
 | Method | Endpoint | Description |
