@@ -1,7 +1,7 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
 import { DOJAH, IS_PROD_ENV, MONO, STORAGE } from "@/config";
-import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs, MonoLookupNinArgs, MonoLookupNinResponse } from "@/types";
+import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs, MonoInitiateLookupBvnArgs, MonoLookupNinArgs, MonoLookupNinResponse, MonoVerifyBvnOtpArgs } from "@/types";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { fileStore, getUploadLocation } from "@/utils/storage";
 import { CommonSchema } from "@/share/schema";
@@ -9,10 +9,24 @@ import { CommonSchema } from "@/share/schema";
 const sql = dbSingleton();
 export class KycService {
     static async monoLookupNin({ nin }: MonoLookupNinArgs) {
-        return fetch(MONO.baseUrl + MONO.lookupPath, {
+        return fetch(`${MONO.baseUrl}${MONO.lookupNinPath}`, {
             headers: MONO.headers,
             method: "POST",
             body: JSON.stringify({ nin })
+        });
+    }
+    static async monoInitiateBvnLookup(args: MonoInitiateLookupBvnArgs) {
+        return fetch(`${MONO.baseUrl}${MONO.lookupBvnPath}/initiate`, {
+            headers: MONO.headers,
+            method: "POST",
+            body: JSON.stringify(args)
+        });
+    }
+    static async monoVerifyBvnOtp(args: MonoVerifyBvnOtpArgs) {
+        return fetch(`${MONO.baseUrl}${MONO.lookupBvnPath}/verify`, {
+            headers: MONO.headers,
+            method: "POST",
+            body: JSON.stringify(args)
         });
     }
     /**
@@ -181,19 +195,8 @@ export class KycService {
             tier3Status: kyc[0].tier3Status,
         } : null;
     }
-    static async updateTier2(userId: string, data: KycModel.PostTier2BodyT) {
-        // get upload location for encrypted id image
-        const { path, url } = getUploadLocation(STORAGE.govtIdPath, "individual", userId, "enc")
-        // encrypt and upload id image to storage
-        await fileStore
-            .file(path)
-            .write(encrypt(Buffer.from(await data.idImage.arrayBuffer())))
-        // encrypt and store tier 2 data with url of encrypted id image
-        const tier2Data = encrypt(Buffer.from(JSON.stringify({
-            ...data,
-            idImage: url
-        })));
-        // update tier 2 data in database
+    static async updateTier2(userId: string, data: KycModel.Tier2DataT) {
+        const tier2Data = encrypt(Buffer.from(JSON.stringify(data)));
         await sql`
             UPDATE kyc
             SET 
@@ -204,18 +207,8 @@ export class KycService {
         `
     }
     static async updateTier3(userId: string, data: KycModel.PostTier3BodyT) {
-        // get upload location for encrypted address proof
         const addressProofUploadLocation = getUploadLocation(STORAGE.addressProofPath, "individual", userId, "enc")
         const selfieUploadLocation = getUploadLocation(STORAGE.liveSelfiePath, "individual", userId, "enc")
-        // encrypt and upload address proof to storage
-        await fileStore
-            .file(addressProofUploadLocation.path)
-            .write(encrypt(Buffer.from(await data.addressProof.arrayBuffer())))
-        // encrypt and upload selfie to storage
-        await fileStore
-            .file(selfieUploadLocation.path)
-            .write(encrypt(Buffer.from(await data.liveSelfie.arrayBuffer())))
-        // encrypt and store tier 3 data with url of encrypted address proof
         const tier3Data = encrypt(Buffer.from(JSON.stringify({
             ...data,
             addressProof: addressProofUploadLocation.url,
@@ -236,11 +229,7 @@ export class KycService {
      * @param userId user id
      * @returns decrypted json object
      */
-    static async getTier1Data(userId: string): Promise<
-        Omit<KycModel.PostTier1BodyT, "passportPhoto">
-        & Record<"passportPhoto", string>
-        | null
-    > {
+    static async getTier1Data(userId: string): Promise<KycModel.PostTier1BodyT | null> {
         const kyc: { tier1Data: string }[] = await sql`
             SELECT tier1_data as "tier1Data"
             FROM kyc

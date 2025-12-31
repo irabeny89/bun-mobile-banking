@@ -5,7 +5,7 @@ import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import { ERROR_RESPONSE_CODES } from "@/types";
 import { KycService } from "../service";
-import { kycQueue } from "@/utils/kyc";
+import { kycQueue } from "@/utils/kyc-queue";
 
 export const tier1Verify = new Elysia({ name: "tier1-verify" })
     .use(userMacro)

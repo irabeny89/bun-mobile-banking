@@ -7,6 +7,7 @@ import { tier3Status } from "./routes/tier3-status";
 import { tier3Verify } from "./routes/tier3-verify";
 import { uploadPassport } from "./routes/upload-passport";
 import { uploadGovtId } from "./routes/upload-govt-id";
+import { tier2BvnInitiate } from "./routes/tier2-bvn-initiate";
 
 export const kyc = new Elysia({
     name: "kyc",
@@ -15,7 +16,6 @@ export const kyc = new Elysia({
         description: "KYC service to handle KYC related actions."
     },
 })
-    .use(uploadPassport)
     .use(tier1Status)
     .use(tier1Verify)
     .use(tier2Status)
@@ -23,3 +23,5 @@ export const kyc = new Elysia({
     .use(tier3Status)
     .use(tier3Verify)
     .use(uploadGovtId)
+    .use(uploadPassport)
+    .use(tier2BvnInitiate)

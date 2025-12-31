@@ -54,6 +54,63 @@ export enum ERROR_RESPONSE_CODES {
 	BAD_REQUEST = "BAD_REQUEST",
 }
 
+export type MonoResponse<T = null> = {
+	status: "successful" | "failed";
+	message: string;
+	timestamp: string;
+	data: T
+}
+
+export type MonoLookupBvnOtpMethods = "email" | "phone" | "phone_1" | "alternate_phone"
+
+export type MonoInitiateLookupBvnArgs = {
+	bvn: string;
+	scope?: "bank_accounts" | "identity";
+}
+
+export type MonoInitiateLookupBvnResponseData = {
+	session_id: string;
+	bvn: string;
+	methods: {
+		method: MonoLookupBvnOtpMethods;
+		hint: string;
+	}[]
+}
+
+export type MonoVerifyBvnOtpArgs = {
+	method: MonoLookupBvnOtpMethods;
+	phone_number: string;
+}
+
+export type MonoVerifyBvnOtpResponseData = null;
+
+export type MonoBvnDetailsArgs = {
+	otp: string;
+}
+
+export type MonoBvnDetailsResponseData = {
+	first_name: string;
+	last_name: string;
+	middle_name: string;
+	dob: string;
+	phone_number: string;
+	phone_number_2: string | null;
+	email: string;
+	gender: string;
+	state_of_origin: string;
+	bvn: string;
+	nin: string;
+	nationality: string;
+	address: string;
+	registration_date: string;
+	lga_of_origin: string;
+	lga_of_Residence: string;
+	marital_status: string;
+	watch_listed: boolean;
+	photoId: string;
+}
+
+
 export type MonoLookupNinArgs = {
 	nin: string;
 }

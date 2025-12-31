@@ -92,14 +92,14 @@ export namespace KycModel {
             description: "Last name must be a valid name",
             examples: ["Olamide"]
         }),
-        phone: t.Optional(t.Nullable(t.String({
+        phone: t.String({
             pattern: "^\\d+$",
             minLength: 11,
             maxLength: 11,
             error: "Phone number must be 11 digits",
             description: "Mobile phone number must be 11 digits",
             examples: ["08012345678"],
-        }))),
+        }),
         gender: CommonSchema.genderSchema,
         dob: t.Date({
             description: "Date of birth must be a valid date.",
@@ -141,7 +141,30 @@ export namespace KycModel {
     })
     export type Tier1DataT = typeof tier1DataSchema.static
 
+    export const tier2InitiateBvnLookupBodySchema = t.Object({
+        bvn: t.String({
+            pattern: "^\\d+$",
+            minLength: 11,
+            maxLength: 11,
+            description: "Bank Verification Number must be a valid number",
+            examples: ["12345678901"]
+        }),
+    })
+    export type Tier2InitiateBvnLookupBodyT = typeof tier2InitiateBvnLookupBodySchema.static
+
+    export const tier2InitiateBvnLookupSuccessSchema = successSchemaFactory(t.Object({
+        message: t.Literal("Authorize BVN access with the OTP sent to your phone.")
+    }))
+    export type Tier2InitiateBvnLookupSuccessT = typeof tier2InitiateBvnLookupSuccessSchema.static
+
     export const tier2DataSchema = t.Object({
+        bvn: t.String({
+            pattern: "^\\d+$",
+            minLength: 11,
+            maxLength: 11,
+            description: "Bank Verification Number must be a valid number",
+            examples: ["12345678901"]
+        }),
         idType: t.UnionEnum([
             "voter's ID card",
             "international passport",
@@ -152,27 +175,27 @@ export namespace KycModel {
             description: "Government ID number from international passport, driver's license, voter's ID card or national ID card",
             examples: ["12345678901"]
         }),
-        idImage: t.File({
+        imageUrl: t.String({
             description: "Government ID image URL i.e uploaded international passport, driver's license, voter's ID card or national ID card",
-            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
-            type: IMAGE_UPLOAD.mimeType,
+            format: "uri",
+            examples: ["http://localhost:3900/bun-mobile-banking/kyc/govt-id/individual-019b6cda-1d16-789c-9595-2809ecf7c707.jpeg"]
         }),
     })
     export type Tier2DataT = typeof tier2DataSchema.static;
 
     export const tier3DataSchema = t.Object({
-        liveSelfie: t.File({
+        liveSelfie: t.String({
             description: "Live selfie image URL i.e uploaded selfie from biometric(or selfie) verification or false if not.",
-            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
-            type: IMAGE_UPLOAD.mimeType,
+            format: "uri",
+            examples: ["http://localhost:3900/bun-mobile-banking/kyc/live-selfie/individual-019b6cda-1d16-789c-9595-2809ecf7c707.jpeg"]
         }),
         proofType: t.UnionEnum(["utility bill", "bank statement"], {
             description: "Address type i.e utility bill or bank statement"
         }),
-        addressProof: t.File({
+        addressProof: t.String({
             description: "Address proof image URL i.e uploaded utility bill or bank statement",
-            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
-            type: IMAGE_UPLOAD.mimeType,
+            format: "uri",
+            examples: ["http://localhost:3900/bun-mobile-banking/kyc/address-proof/individual-019b6cda-1d16-789c-9595-2809ecf7c707.jpeg"]
         })
     })
     export type Tier3DataT = typeof tier3DataSchema.static;
@@ -182,6 +205,7 @@ export namespace KycModel {
         "firstName",
         "middleName",
         "lastName",
+        "phone",
         "gender",
         "dob",
         "nin",
@@ -191,7 +215,7 @@ export namespace KycModel {
     ])
     export type PostTier1BodyT = typeof postTier1BodySchema.static;
 
-    export const postTier2BodySchema = tier2DataSchema
+    export const postTier2BodySchema = t.Omit(tier2DataSchema, ["bvn"])
     export type PostTier2BodyT = typeof postTier2BodySchema.static;
 
     export const postTier3BodySchema = tier3DataSchema

@@ -5,7 +5,8 @@ import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import { DojahVinLookupResponse, ERROR_RESPONSE_CODES } from "@/types";
 import { KycService } from "../service";
-import { kycQueue } from "@/utils/kyc";
+import { kycQueue } from "@/utils/kyc-queue";
+import cacheSingleton, { getBvnCacheKey } from "@/utils/cache";
 
 export const tier2Verify = new Elysia({ name: "tier2-verify" })
     .use(userMacro)
@@ -14,11 +15,25 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
         tier2VerifySuccess: KycModel.tier2SuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .resolve(({ store }) => ({ logger: pinoLogger(store) }))
-    .post("/tier2", async ({ user, body, logger }) => {
+    .resolve(({ store }) => ({ logger: pinoLogger(store), cache: cacheSingleton() }))
+    .post("/tier2", async ({ user, body, logger, cache, set }) => {
+        const bvn = await cache.get(getBvnCacheKey(user!.id))
+        if (!bvn) {
+            logger.info("tier2Verify:: BVN not found")
+            set.status = 400
+            return {
+                type: "error" as const,
+                error: {
+                    message: "BVN not found",
+                    code: ERROR_RESPONSE_CODES.BAD_REQUEST,
+                    details: []
+                }
+            }
+        }
         await kycQueue.add("tier_2_update", {
             userId: user!.id,
-            ...body
+            ...body,
+            bvn
         })
         logger.info("tier2Verify:: User KYC db data insertion queued")
         return {

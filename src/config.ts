@@ -16,6 +16,7 @@ export const OTP_TTL = 60 * 15 // 15m in seconds
 export const REGISTER_CACHE_KEY = "register"
 export const REFRESH_TOKEN_CACHE_KEY = "refresh-token"
 export const MFA_OTP_CACHE_KEY = "mfa-otp"
+export const BVN_CACHE_KEY = "bvn"
 export const EMAIL_FROM = process.env.EMAIL_FROM ?? "Bun <bun@ethereal.email>"
 export const IMAGE_UPLOAD = {
     maxSize: process.env.IMAGE_MAX_SIZE ?? "5m",
@@ -27,7 +28,8 @@ export const MONO = {
     lookupPublicKey: process.env.MONO_LOOKUP_PUBLIC_KEY,
     lookupSecretKey: process.env.MONO_LOOKUP_SECRET_KEY,
     baseUrl: process.env.MONO_BASE_URL ?? "https://api.withmono.com",
-    lookupPath: process.env.MONO_LOOKUP_PATH ?? "/v3/lookup/nin",
+    lookupNinPath: process.env.MONO_LOOKUP_NIN_PATH ?? "/v3/lookup/nin",
+    lookupBvnPath: process.env.MONO_LOOKUP_BVN_PATH ?? "/v3/lookup/bvn",
     headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",

@@ -3,7 +3,7 @@ import { CommonSchema } from "@/share/schema";
 import Elysia from "elysia";
 import { KycModel } from "../model";
 import pinoLogger from "@/utils/pino-logger";
-import { kycQueue } from "@/utils/kyc";
+import { kycQueue } from "@/utils/kyc-queue";
 import { ERROR_RESPONSE_CODES } from "@/types";
 import { KycService } from "../service";
 import { STORAGE } from "@/config";
