@@ -17,6 +17,19 @@ Content-Type: image/jpeg
 --{{formBoundary}}--
 
 ###
+# Upload government ID
+POST {{baseUrl}}/api/v1/kyc/upload/govt-id
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary={{formBoundary}}
+
+--{{formBoundary}}
+Content-Disposition: form-data; name="govtId"; filename="sample.jpeg"
+Content-Type: image/jpeg
+
+< ../files/sample.jpeg
+--{{formBoundary}}--
+
+###
 # Get tier 1 status
 GET {{baseUrl}}/api/v1/kyc/tier1
 Authorization: Bearer {{accessToken}}
@@ -54,7 +67,7 @@ Content-Type: application/json
 {
   "idType": "voter's ID card",
   "govtId": "12345678901",
-  "idUrl": "https://example.com/govt-id.jpg"
+  "idUrl": "http://localhost:3900/bun-mobile-banking/kyc/govt-id/individual-019b6cda-1d16-789c-9595-2809ecf7c707.jpeg"
 }
 
 ###

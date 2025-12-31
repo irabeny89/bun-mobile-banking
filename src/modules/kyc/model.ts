@@ -56,6 +56,18 @@ export namespace KycModel {
     export const uploadPassportSuccessSchema = successSchemaFactory(uploadSuccessSchema)
     export type UploadPassportSuccessT = typeof uploadPassportSuccessSchema.static
 
+    export const uploadGovtIdBodySchema = t.Object({
+        govtId: t.File({
+            description: "Government ID must be a valid file",
+            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+            type: IMAGE_UPLOAD.mimeType
+        })
+    })
+    export type UploadGovtIdBodyT = typeof uploadGovtIdBodySchema.static
+
+    export const uploadGovtIdSuccessSchema = successSchemaFactory(uploadSuccessSchema)
+    export type UploadGovtIdSuccessT = typeof uploadGovtIdSuccessSchema.static
+
     export const tier1DataSchema = t.Object({
         passportPhoto: t.String({
             description: "Passport photo URL",
