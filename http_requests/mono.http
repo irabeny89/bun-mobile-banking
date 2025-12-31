@@ -1,5 +1,6 @@
 @baseUrl = https://api.withmono.com
 @lookupPath = /v3/lookup/nin
+@bvnPath = /v2/lookup/bvn
 
 ###
 # NIN lookup
@@ -12,3 +13,37 @@ accept: application/json
     "nin": "12345678901"
 }
 
+###
+# Initiate BVN lookup #1
+POST {{baseUrl}}{{bvnPath}}/initiate
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "bvn": "12345678901"
+}
+
+###
+# Verify BVN OTP #2
+POST {{baseUrl}}{{bvnPath}}/verify
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "method": "phone",
+    "phone_number": "09020951797"
+}
+
+###
+# Fetch BVN Details #3
+# @prompt otp OTP value sent to your chosen BVN verification method
+POST {{baseUrl}}{{bvnPath}}/details
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "otp": {{otp}}
+}
