@@ -1,4 +1,4 @@
-import { BVN_CACHE_KEY, VALKEY_URL } from "@/config";
+import { VALKEY_URL } from "@/config";
 import { RedisClient } from "bun";
 
 let cache: RedisClient | null = null;
@@ -14,6 +14,6 @@ export default function cacheSingleton(url: string = VALKEY_URL) {
     return cache;
 }
 
-export function getBvnCacheKey(userId: string) {
-    return `${BVN_CACHE_KEY}:${userId}`
+export function getCacheKey(label: string, userId: string) {
+    return `${label}:${userId}`
 }
