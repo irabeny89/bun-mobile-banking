@@ -1,7 +1,7 @@
 /// Service handle business logic, decoupled from Elysia controller
 import { genOTP } from "@/utils/otp";
 import { AuthModel } from "./model";
-import cacheSingleton from "@/utils/cache";
+import cacheSingleton, { getCacheKey } from "@/utils/cache";
 import { OTP_TTL, REGISTER_CACHE_KEY, REFRESH_TOKEN_TTL, REFRESH_TOKEN_CACHE_KEY, MFA_OTP_CACHE_KEY, SECRET_1, ACCESS_TOKEN_TTL, SECRET_2 } from "@/config";
 import { emailQueue } from "@/utils/email";
 import pino from "pino";
@@ -21,7 +21,7 @@ export abstract class AuthService {
         const tokenPayload: CommonSchema.TokenPayloadT = { id, email, userType }
         const otp = await genOTP();
         logger.debug({ otp }, "AuthService:: caching generated MFA OTP")
-        const cacheKey = `${MFA_OTP_CACHE_KEY}:${otp}`;
+        const cacheKey = getCacheKey(MFA_OTP_CACHE_KEY, otp);
         await cache.set(cacheKey, JSON.stringify(tokenPayload))
         await cache.expire(cacheKey, OTP_TTL)
         logger.info("AuthService:: MFA OTP email queued")
@@ -37,7 +37,7 @@ export abstract class AuthService {
      * @returns user MFA OTP data or null if otp is invalid
      */
     static async getMfaOtpCachedData(otp: string) {
-        const cacheKey = `${MFA_OTP_CACHE_KEY}:${otp}`;
+        const cacheKey = getCacheKey(MFA_OTP_CACHE_KEY, otp);
         const cachedData = await cache.get(cacheKey);
         if (!cachedData) return null;
         return JSON.parse(cachedData) as CommonSchema.TokenPayloadT;
@@ -84,15 +84,16 @@ export abstract class AuthService {
      * @param userId user id
      */
     static async cacheRefreshToken(token: string, userId: string) {
-        await cache.set(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`, token)
-        await cache.expire(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`, +REFRESH_TOKEN_TTL)
+        const cacheKey = getCacheKey(REFRESH_TOKEN_CACHE_KEY, userId)
+        await cache.set(cacheKey, token)
+        await cache.expire(cacheKey, +REFRESH_TOKEN_TTL)
     }
     /**
      * Remove refresh token from cache
      * @param userId user id
      */
     static async removeRefreshToken(userId: string) {
-        await cache.del(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`)
+        await cache.del(getCacheKey(REFRESH_TOKEN_CACHE_KEY, userId))
     }
     /**
      * Check if refresh token exists in cache
@@ -100,17 +101,17 @@ export abstract class AuthService {
      * @returns true if refresh token exists, false otherwise
      */
     static async refreshTokenExists(userId: string) {
-        const token = await cache.exists(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`)
+        const token = await cache.exists(getCacheKey(REFRESH_TOKEN_CACHE_KEY, userId))
         return !!token
     }
     static async getRefreshToken(userId: string) {
-        const token = await cache.get(`${REFRESH_TOKEN_CACHE_KEY}:${userId}`)
+        const token = await cache.get(getCacheKey(REFRESH_TOKEN_CACHE_KEY, userId))
         return token
     }
     static async register(body: AuthModel.RegisterBodyT, logger: pino.Logger) {
         const otp = await genOTP()
         logger.debug({ otp }, "AuthService:: OTP generated")
-        const cacheKey = `${REGISTER_CACHE_KEY}:${otp}`;
+        const cacheKey = getCacheKey(REGISTER_CACHE_KEY, otp);
         await cache.set(cacheKey, JSON.stringify(body))
         await cache.expire(cacheKey, OTP_TTL)
         logger.info("AuthService:: user registration data cached")
@@ -128,7 +129,7 @@ export abstract class AuthService {
      * @returns user registration data or null if otp is invalid
      */
     static async getUserRegisterData(otp: string) {
-        const cacheKey = `${REGISTER_CACHE_KEY}:${otp}`;
+        const cacheKey = getCacheKey(REGISTER_CACHE_KEY, otp);
         const cachedData = await cache.get(cacheKey);
         if (!cachedData) return null;
         return JSON.parse(cachedData) as AuthModel.RegisterBodyT;
