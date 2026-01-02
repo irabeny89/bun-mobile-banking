@@ -39,22 +39,29 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                 throw error
             }
         })
-        .post("/tier2", async ({ user, body: { bvnOtp: _, imageFile, ...rest }, logger, bvn }) => {
+        .post("/tier2", async ({
+            user,
+            body: { bvnOtp: _, imageFile, ...rest },
+            logger,
+            bvn
+        }) => {
             const { url, path } = getUploadLocation(
                 STORAGE.govtIdPath,
                 user!.userType,
                 user!.id,
                 imageFile.type.split("/")[1]
             )
-            await fileStore
-                .file(path)
-                .write(encrypt(Buffer.from(await imageFile.arrayBuffer())))
-            await kycQueue.add("tier_2_update", {
-                userId: user!.id,
-                ...rest,
-                bvn: bvn!,
-                imageUrl: url
-            })
+            await Promise.all([
+                fileStore
+                    .file(path)
+                    .write(encrypt(Buffer.from(await imageFile.arrayBuffer()))),
+                kycQueue.add("tier_2_update", {
+                    userId: user!.id,
+                    ...rest,
+                    bvn: bvn!,
+                    imageUrl: url
+                })
+            ])
             logger!.info("tier2Verify:: User KYC db data insertion queued")
             return {
                 type: "success" as const,
