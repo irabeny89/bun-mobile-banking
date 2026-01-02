@@ -200,19 +200,26 @@ export namespace KycModel {
     })
     export type Tier3DataT = typeof tier3DataSchema.static;
 
-    export const postTier1BodySchema = t.Pick(tier1DataSchema, [
-        "passportPhoto",
-        "firstName",
-        "middleName",
-        "lastName",
-        "phone",
-        "gender",
-        "dob",
-        "nin",
-        "street",
-        "city",
-        "state",
-    ])
+    export const postTier1BodySchema = t.Intersect([
+        t.Object({
+            passportPhoto: t.File({
+                description: "Passport photo must be a valid image file e.g jpeg, png, jpg",
+                maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+                type: IMAGE_UPLOAD.mimeType
+            })
+        }),
+        t.Pick(tier1DataSchema, [
+            "firstName",
+            "middleName",
+            "lastName",
+            "phone",
+            "gender",
+            "dob",
+            "nin",
+            "street",
+            "city",
+            "state",
+        ])])
     export type PostTier1BodyT = typeof postTier1BodySchema.static;
 
     export const postTier2BodySchema = t.Intersect([

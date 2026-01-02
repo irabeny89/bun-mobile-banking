@@ -224,7 +224,9 @@ export class KycService {
      * @param userId user id
      * @param data tier 1 data
      */
-    static async createKyc(userId: string, data: KycModel.PostTier1BodyT) {
+    static async createKyc(userId: string, data: Omit<
+        KycModel.PostTier1BodyT, "passportPhoto"
+    > & Record<"passportPhoto", string>) {
         const tier1Data = encrypt(Buffer.from(JSON.stringify(data)));
         await sql`
             INSERT INTO kyc (user_id, tier1_data, tier1_status)

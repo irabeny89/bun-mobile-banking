@@ -6,6 +6,9 @@ import pinoLogger from "@/utils/pino-logger";
 import { ERROR_RESPONSE_CODES } from "@/types";
 import { KycService } from "../service";
 import { kycQueue } from "@/utils/kyc-queue";
+import { fileStore, getUploadLocation } from "@/utils/storage";
+import { STORAGE } from "@/config";
+import { encrypt } from "@/utils/encryption";
 
 export const tier1Verify = new Elysia({ name: "tier1-verify" })
     .use(userMacro)
@@ -16,9 +19,19 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
     })
     .resolve(({ store }) => ({ logger: pinoLogger(store) }))
     .post("/tier1", async ({ user, body, logger }) => {
+        const { url, path } = getUploadLocation(
+            STORAGE.passportPhotoPath, 
+            user!.userType, 
+            user!.id,
+            body.passportPhoto.type.split("/")[1]
+        )
+        await fileStore
+            .file(path)
+            .write(encrypt(Buffer.from(await body.passportPhoto.arrayBuffer())))
         await kycQueue.add("tier_1_insert", {
             userId: user!.id,
-            ...body
+            ...body,
+            passportPhoto: url
         })
         logger.info("tier1Verify:: User KYC db data insertion queued")
         return {
@@ -67,6 +80,7 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
             description: "Verify tier 1 data",
             summary: "Verify tier 1 data"
         },
+        parse: "formdata",
         body: "tier1VerifyBody",
         response: {
             200: "tier1VerifySuccess",

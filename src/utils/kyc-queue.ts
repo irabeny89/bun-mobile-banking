@@ -10,7 +10,7 @@ type KycJobT = "bvn_lookup" | "tier_1_insert" | "tier_2_update" | "tier_3_update
 type BvnLookupDataT = Record<"userId", string> & MonoInitiateLookupBvnArgs
 type Tier1DataT = {
     userId: string;
-} & KycModel.PostTier1BodyT
+} & Omit<KycModel.PostTier1BodyT, "passportPhoto"> & Record<"passportPhoto", string>
 type Tier2DataT = Record<"userId", string> & KycModel.Tier2DataT
 type Tier3DataT = Record<"userId" | "storagePath", string> & KycModel.PostTier3BodyT
 type KycJobDataT = Tier1DataT | Tier2DataT | Tier3DataT | BvnLookupDataT
