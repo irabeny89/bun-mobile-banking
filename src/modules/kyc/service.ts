@@ -145,9 +145,9 @@ export class KycService {
         if (result.status !== "success" || !metadata.is_recent) throw new Error(dojahErrMsg)
         const tier1Data = await this.getTier1Data(userId)
         if (!tier1Data) throw new Error(tierDataErrMsg)
-        if (tier1Data.street !== address_info.street) throw new Error(streetErrMsg)
-        if (tier1Data.city !== address_info.city) throw new Error(cityErrMsg)
-        if (tier1Data.state !== address_info.state) throw new Error(stateErrMsg)
+        if (tier1Data.street.toLowerCase() !== address_info.street.toLowerCase()) throw new Error(streetErrMsg)
+        if (tier1Data.city.toLowerCase() !== address_info.city.toLowerCase()) throw new Error(cityErrMsg)
+        if (tier1Data.state.toLowerCase() !== address_info.state.toLowerCase()) throw new Error(stateErrMsg)
     }
     static async handleDojahVinLookup(vin: string) {
         const vinErrMsg = "Verification failed - VIN lookup failed"
@@ -214,8 +214,8 @@ export class KycService {
             first_name: tier1Data.firstName,
             last_name: tier1Data.lastName
         })
-        if (!res.ok) throw new Error(driverLicenseVerifyErrMsg, { 
-            cause: await res.json() 
+        if (!res.ok) throw new Error(driverLicenseVerifyErrMsg, {
+            cause: await res.json()
         })
         //* no error means verification completed successfully
     }
