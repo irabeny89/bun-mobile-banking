@@ -215,7 +215,14 @@ export namespace KycModel {
     ])
     export type PostTier1BodyT = typeof postTier1BodySchema.static;
 
-    export const postTier2BodySchema = t.Omit(tier2DataSchema, ["bvn"])
+    export const postTier2BodySchema = t.Intersect([
+        t.Omit(tier2DataSchema, ["bvn"]),
+        t.Object({
+            bvnOtp: t.String({
+                description: "OTP sent to you to authorize BVN access",
+            })
+        })
+    ])
     export type PostTier2BodyT = typeof postTier2BodySchema.static;
 
     export const postTier3BodySchema = tier3DataSchema

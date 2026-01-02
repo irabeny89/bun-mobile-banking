@@ -1,16 +1,18 @@
 @baseUrl = https://api.withmono.com
-@lookupPath = /v3/lookup/nin
+@ninPath = /v3/lookup/nin
 @bvnPath = /v2/lookup/bvn
+@passportPath = /v3/lookup/passport
+@driverLicensePath = /v3/lookup/driver_license
 
 ###
 # NIN lookup
-POST {{baseUrl}}{{lookupPath}}
+POST {{baseUrl}}{{ninPath}}
 mono-sec-key: {{monoLookupSecretKey}}
 Content-Type: application/json
 accept: application/json
 
 {
-    "nin": "12345678901"
+    "nin": "{{monoNin}}"
 }
 
 ###
@@ -21,29 +23,57 @@ Content-Type: application/json
 accept: application/json
 
 {
-    "bvn": "12345678901"
+    "bvn": "{{monoBvn}}"
 }
 
 ###
 # Verify BVN OTP #2
 POST {{baseUrl}}{{bvnPath}}/verify
+x-session-id: JaTDzVjQtNt2lXf389lb
 mono-sec-key: {{monoLookupSecretKey}}
 Content-Type: application/json
 accept: application/json
 
 {
     "method": "phone",
-    "phone_number": "09020951797"
+    "phone_number": "{{monoAlternatePhone}}"
 }
 
 ###
 # Fetch BVN Details #3
-# @prompt otp OTP value sent to your chosen BVN verification method
 POST {{baseUrl}}{{bvnPath}}/details
+x-session-id: JaTDzVjQtNt2lXf389lb
 mono-sec-key: {{monoLookupSecretKey}}
 Content-Type: application/json
 accept: application/json
 
 {
-    "otp": {{otp}}
+    "otp": "{{monoOtp}}"
+}
+
+###
+# Lookup passport
+POST {{baseUrl}}{{passportPath}}
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "passport_number": "{{monoIntlPassportNumber}}",
+    "last_name": "{{monoIntlPassportLastName}}",
+    "date_of_birth": "{{monoIntlPassportDob}}"
+}
+
+###
+# Lookup driver's license
+POST {{baseUrl}}{{driverLicensePath}}
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+  "license_number": "{{monoDriverLicenseNumber}}",
+  "date_of_birth": "{{monoDriverLicenseDob}}",
+  "first_name": "{{monoDriverLicenseFirstName}}",
+  "last_name": "{{monoDriverLicenseLastName}}"
 }

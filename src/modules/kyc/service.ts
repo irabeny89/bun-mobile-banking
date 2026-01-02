@@ -1,12 +1,14 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
-import { DOJAH, IS_PROD_ENV, MONO, STORAGE } from "@/config";
-import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs, MonoInitiateLookupBvnArgs, MonoLookupNinArgs, MonoLookupNinResponse, MonoVerifyBvnOtpArgs } from "@/types";
+import { DOJAH, IS_PROD_ENV, MONO, MONO_BVN_SESSION_ID_CACHE_KEY, STORAGE } from "@/config";
+import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs, DojahVinLookupResponse, MonoBvnDetailsArgs, MonoBvnDetailsResponseData, MonoInitiateLookupBvnArgs, MonoLookupDriverLicenseArgs, MonoLookupNinArgs, MonoLookupNinResponse, MonoLookupPassportArgs, MonoResponse, MonoVerifyBvnOtpArgs } from "@/types";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { fileStore, getUploadLocation } from "@/utils/storage";
 import { CommonSchema } from "@/share/schema";
+import cacheSingleton, { getCacheKey } from "@/utils/cache";
 
 const sql = dbSingleton();
+const cache = cacheSingleton();
 export class KycService {
     static async monoLookupNin({ nin }: MonoLookupNinArgs) {
         return fetch(`${MONO.baseUrl}${MONO.lookupNinPath}`, {
@@ -22,8 +24,29 @@ export class KycService {
             body: JSON.stringify(args)
         });
     }
-    static async monoVerifyBvnOtp(args: MonoVerifyBvnOtpArgs) {
+    static async monoVerifyBvnOtp(sessionId: string, args: MonoVerifyBvnOtpArgs) {
         return fetch(`${MONO.baseUrl}${MONO.lookupBvnPath}/verify`, {
+            headers: { ...MONO.headers, "x-session-id": sessionId },
+            method: "POST",
+            body: JSON.stringify(args)
+        });
+    }
+    static async monoFetchBvnDetails(sessionId: string, args: MonoBvnDetailsArgs) {
+        return fetch(`${MONO.baseUrl}${MONO.lookupBvnPath}/details`, {
+            headers: { ...MONO.headers, "x-session-id": sessionId },
+            method: "POST",
+            body: JSON.stringify(args)
+        });
+    }
+    static async monoLookupPassport(args: MonoLookupPassportArgs) {
+        return fetch(`${MONO.baseUrl}${MONO.lookupPassportPath}`, {
+            headers: MONO.headers,
+            method: "POST",
+            body: JSON.stringify(args)
+        });
+    }
+    static async monoLookupDriverLicense(args: MonoLookupDriverLicenseArgs) {
+        return fetch(`${MONO.baseUrl}${MONO.lookupDriverLicensePath}`, {
             headers: MONO.headers,
             method: "POST",
             body: JSON.stringify(args)
@@ -86,7 +109,7 @@ export class KycService {
     }
     static async livenessCheck(liveSelfie: File) {
         const livenessErrMsg = "Verification failed - Liveness check failed"
-        const res = await KycService.dojahVerifySelfie({
+        const res = await this.dojahVerifySelfie({
             image: Buffer.from(await liveSelfie.arrayBuffer()).toString("base64")
         })
         if (!res.ok) throw new Error(livenessErrMsg, { cause: await res.json() })
@@ -126,6 +149,14 @@ export class KycService {
         if (tier1Data.city !== address_info.city) throw new Error(cityErrMsg)
         if (tier1Data.state !== address_info.state) throw new Error(stateErrMsg)
     }
+    static async handleDojahVinLookup(vin: string) {
+        const vinErrMsg = "Verification failed - VIN lookup failed"
+        const vinMismatchErrMsg = "Verification failed - VIN mismatch"
+        const res = await KycService.dojahLookupVin({ vin })
+        if (!res.ok) throw new Error(vinErrMsg, { cause: await res.json() })
+        const data = await res.json() as DojahVinLookupResponse
+        if (data.entity.voter_identification_number !== vin) throw new Error(vinMismatchErrMsg)
+    }
     static async verifyTier1Nin(userId: string, body: KycModel.PostTier1BodyT) {
         const tier1StatusErrMsg = "Verification failed - Tier 1 status already verified"
         const ninLookupErrMsg = "Verification failed - NIN lookup failed"
@@ -144,6 +175,49 @@ export class KycService {
         const formattedLookupDate = date.format(new Date(lookup.birthdate))
         const formattedBodyDate = date.format(body.dob)
         if (formattedBodyDate !== formattedLookupDate) throw new Error(dobMismatchErrMsg)
+    }
+    static async handleBvnVerify(userId: string, bvnOtp: string) {
+        const bvnDetailsErrMsg = "Verification failed - BVN details fetch failed"
+        const watchlistedErrMsg = "Verification failed - User is watchlisted"
+        const sessionId = await cache.get(getCacheKey(MONO_BVN_SESSION_ID_CACHE_KEY, userId))
+        if (!sessionId) throw new Error(bvnDetailsErrMsg, { cause: "Expired session id" })
+        const response = await this.monoFetchBvnDetails(sessionId, { otp: bvnOtp })
+        if (!response.ok) throw new Error(bvnDetailsErrMsg, {
+            cause: await response.json()
+        })
+        const { data, status, message } = await response.json() as MonoResponse<MonoBvnDetailsResponseData>
+        if (status === "failed") throw new Error(bvnDetailsErrMsg, { cause: message })
+        if (data.watch_listed) throw new Error(watchlistedErrMsg, { cause: message })
+        return data
+    }
+    static async handlePassportVerifyWithMono(userId: string, passport_number: string) {
+        const passportVerifyErrMsg = "Verification failed - Passport verification failed"
+        const tier1DataErrMsg = "Verification failed - Tier 1 data not found"
+        const tier1Data = await this.getTier1Data(userId)
+        if (!tier1Data) throw new Error(tier1DataErrMsg)
+        const res = await this.monoLookupPassport({
+            passport_number,
+            date_of_birth: tier1Data.dob.toISOString().split("T")[0],
+            last_name: tier1Data.lastName
+        })
+        if (!res.ok) throw new Error(passportVerifyErrMsg, { cause: await res.json() })
+        //* no error means verification completed successfully
+    }
+    static async handleDriverLicenseVerifyWithMono(userId: string, license_number: string) {
+        const driverLicenseVerifyErrMsg = "Verification failed - Driver license verification failed"
+        const tier1DataErrMsg = "Verification failed - Tier 1 data not found"
+        const tier1Data = await this.getTier1Data(userId)
+        if (!tier1Data) throw new Error(tier1DataErrMsg)
+        const res = await this.monoLookupDriverLicense({
+            license_number,
+            date_of_birth: tier1Data.dob.toISOString().split("T")[0],
+            first_name: tier1Data.firstName,
+            last_name: tier1Data.lastName
+        })
+        if (!res.ok) throw new Error(driverLicenseVerifyErrMsg, { 
+            cause: await res.json() 
+        })
+        //* no error means verification completed successfully
     }
     /**
      * Create a new kyc record in the database with encrypted tier 1 data.

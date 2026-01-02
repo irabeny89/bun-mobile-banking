@@ -110,6 +110,48 @@ export type MonoBvnDetailsResponseData = {
 	photoId: string;
 }
 
+export type MonoLookupPassportArgs = {
+	passport_number: string;
+	last_name: string;
+	/** YYYY-MM-DD e.g 1996-05-06 */
+	date_of_birth: string;
+}
+
+export type MonoLookupPassportResponseData = {
+	first_name: string
+    last_name: string
+    middle_name: string
+    dob: string
+    mobile: string
+    photo: string | null
+    signature: string | null
+    passport_number: string
+    gender: string
+    issued_at: string
+    issued_date: string
+    expiry_date: string
+    document_type: string
+}
+
+export type MonoLookupDriverLicenseArgs = {
+	license_number: string;
+	date_of_birth: string;
+	first_name: string;
+	last_name: string;
+}
+
+export type MonoLookupDriverLicenseResponseData = {
+	gender: string;
+	photo: string | null;
+	license_no: string;
+	first_name: string;
+	last_name: string;
+	middle_name: string;
+	issued_date: string;
+	expiry_date: string;
+	state_of_issue: string;
+	birth_date: string;
+}
 
 export type MonoLookupNinArgs = {
 	nin: string;

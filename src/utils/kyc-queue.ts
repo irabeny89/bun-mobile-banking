@@ -1,9 +1,10 @@
-import { VALKEY_URL } from "@/config";
+import { MONO_BVN_SESSION_ID_CACHE_KEY, MONO_BVN_SESSION_ID_TTL, VALKEY_URL } from "@/config";
 import { KycModel } from "@/modules/kyc/model";
 import { KycService } from "@/modules/kyc/service";
 import { Queue, Worker } from "bullmq";
 import { fileStore } from "./storage";
 import { MonoInitiateLookupBvnArgs, MonoInitiateLookupBvnResponseData, MonoResponse, MonoVerifyBvnOtpResponseData } from "@/types";
+import cacheSingleton, { getCacheKey } from "./cache";
 
 type KycJobT = "bvn_lookup" | "tier_1_insert" | "tier_2_update" | "tier_3_update";
 type BvnLookupDataT = Record<"userId", string> & MonoInitiateLookupBvnArgs
@@ -14,6 +15,7 @@ type Tier2DataT = Record<"userId", string> & KycModel.Tier2DataT
 type Tier3DataT = Record<"userId" | "storagePath", string> & KycModel.PostTier3BodyT
 type KycJobDataT = Tier1DataT | Tier2DataT | Tier3DataT | BvnLookupDataT
 
+const cache = cacheSingleton()
 const KYC_QUEUE_NAME = "kyc-insertion" as const;
 export const kycQueue = new Queue<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME)
 const worker = new Worker<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME, async (job) => {
@@ -45,11 +47,14 @@ const worker = new Worker<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME, async (
                 cause: await initBvnLookupRes.json()
             })
         }
-        const { status: initBvnLookupStatus } = await initBvnLookupRes.json() as MonoResponse<MonoInitiateLookupBvnResponseData>
+        const { status: initBvnLookupStatus, data: { session_id } } = await initBvnLookupRes.json() as MonoResponse<MonoInitiateLookupBvnResponseData>
         if (initBvnLookupStatus === "failed") throw new Error("Failed to initiate bvn lookup")
         const tier1Data = await KycService.getTier1Data(userId)
         if (!tier1Data) throw new Error("Failed to get tier 1 data")
-        const verifyBvnOtpResponse = await KycService.monoVerifyBvnOtp({
+        const cacheKey = getCacheKey(MONO_BVN_SESSION_ID_CACHE_KEY, userId)
+        await cache.set(cacheKey, session_id)
+        await cache.expire(cacheKey, +MONO_BVN_SESSION_ID_TTL)
+        const verifyBvnOtpResponse = await KycService.monoVerifyBvnOtp(session_id, {
             method: "phone",
             phone_number: tier1Data.phone
         })
