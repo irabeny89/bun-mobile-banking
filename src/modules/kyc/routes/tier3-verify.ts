@@ -39,7 +39,7 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
         }
     }, {
         async beforeHandle({ user, logger, set, body }) {
-            // currently Dojah supports utility bill verification
+            // currently supports utility bill verification
             if (body.proofType !== "utility bill") {
                 logger.info("tier3Verify:: Proof type is not supported");
                 set.status = 400;
@@ -79,8 +79,8 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
             }
             try {
                 await Promise.all([
-                    KycService.livenessCheck(body.liveSelfie),
-                    KycService.verifyUtilityBill(body.addressProof, user.id, user.userType)
+                    KycService.livenessCheckWithDojah(body.liveSelfie),
+                    KycService.verifyUtilityBillWithDojah(body.addressProof, user.id, user.userType)
                 ])
             } catch (err: any) {
                 logger.error(err, "tier3Verify:: verification failed");
@@ -104,6 +104,7 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
             description: "Verify tier 3 data using address proof",
             summary: "Verify tier 3 data using address proof"
         },
+        parse: "formdata",
         body: "tier3VerifyBody",
         response: {
             200: "tier3VerifySuccess",

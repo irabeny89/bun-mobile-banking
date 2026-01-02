@@ -4,7 +4,7 @@ import { tier1Verify } from "./routes/tier1-verify";
 import { tier2Status } from "./routes/tier2-status";
 import { tier2Verify } from "./routes/tier2-verify";
 import { tier3Status } from "./routes/tier3-status";
-import { tier3Verify } from "./routes/tier3-verify";
+// import { tier3Verify } from "./routes/tier3-verify";
 import { tier2BvnInitiate } from "./routes/tier2-bvn-initiate";
 
 export const kyc = new Elysia({
@@ -19,5 +19,5 @@ export const kyc = new Elysia({
     .use(tier2Status)
     .use(tier2Verify)
     .use(tier3Status)
-    .use(tier3Verify)
+    // .use(tier3Verify)  // external service not available
     .use(tier2BvnInitiate)

@@ -207,7 +207,34 @@ export namespace KycModel {
     ])
     export type PostTier2BodyT = typeof postTier2BodySchema.static;
 
-    export const postTier3BodySchema = tier3DataSchema
+    export const postTier3BodySchema = t.Intersect(
+        [
+            t.Pick(tier3DataSchema, ["proofType"]),
+            t.Object({
+                addressProof: t.File({
+                    description: "Address proof must be a valid image file e.g jpeg, png, jpg",
+                    maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+                    type: IMAGE_UPLOAD.mimeType
+                }),
+                liveSelfie: t.File({
+                    description: "Live selfie must be a valid image file e.g jpeg, png, jpg",
+                    maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+                    type: IMAGE_UPLOAD.mimeType
+                }),
+                meterNumber: t.String({
+                    description: "Meter number must be a valid number",
+                    pattern: "^\\d+$",
+                    minLength: 1,
+                    maxLength: 128,
+                    examples: ["12345678901"]
+                }),
+                discoCode: t.UnionEnum(["ABUJA", "EKO", "IKEJA", "IBADAN", "ENUGU", "PH", "JOS", "KADUNA", "KANO", "BH", "PROTOGY", "PHISBOND", "ACCESSPOWER", "YOLA", "ABIA", "ADAMAWA", "AKWA IBOM", "ANAMBRA", "BAUCHI", "BAYELSA", "BENUE", "BORNO", "CROSS RIVER", "DELTA", "EBONYI", "EDO", "EKITI", "GOMBE", "IMO", "JIGAWA", "KATSINA", "KEBBI", "KOGI", "KWARA", "LAGOS", "NASSARAWA", "NIGER", "OGUN", "ONDO", "OSUN", "OYO", "PLATEAU", "RIVERS", "SOKOTO", "TARABA", "YOBE", "ZAMFARA", "FCT"], {
+                    description: "Disco code must be a valid disco code",
+                    examples: ["IKEJA"]
+                })
+            })
+        ]
+    )
     export type PostTier3BodyT = typeof postTier3BodySchema.static;
 
     export const dbData = t.Intersect([

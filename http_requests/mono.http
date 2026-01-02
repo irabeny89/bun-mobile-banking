@@ -3,6 +3,7 @@
 @bvnPath = /v2/lookup/bvn
 @passportPath = /v3/lookup/passport
 @driverLicensePath = /v3/lookup/driver_license
+@addressPath = /v3/lookup/address
 
 ###
 # NIN lookup
@@ -76,4 +77,17 @@ accept: application/json
   "date_of_birth": "{{monoDriverLicenseDob}}",
   "first_name": "{{monoDriverLicenseFirstName}}",
   "last_name": "{{monoDriverLicenseLastName}}"
+}
+
+###
+# Lookup address
+POST {{baseUrl}}{{addressPath}}
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "meter_number": "{{monoMeterNumber}}",
+    "address": "{{monoAddress}}",
+    "disco_code": "IKEJA"
 }

@@ -60,6 +60,7 @@ export type MonoResponse<T = null> = {
 	timestamp: string;
 	data: T
 }
+export type MonoDiscoCode = "ABUJA" | "EKO" | "IKEJA" | "IBADAN" | "ENUGU" | "PH" | "JOS" | "KADUNA" | "KANO" | "BH" | "PROTOGY" | "PHISBOND" | "ACCESSPOWER" | "YOLA" | "ABIA" | "ADAMAWA" | "AKWA IBOM" | "ANAMBRA" | "BAUCHI" | "BAYELSA" | "BENUE" | "BORNO" | "CROSS RIVER" | "DELTA" | "EBONYI" | "EDO" | "EKITI" | "GOMBE" | "IMO" | "JIGAWA" | "KATSINA" | "KEBBI" | "KOGI" | "KWARA" | "LAGOS" | "NASSARAWA" | "NIGER" | "OGUN" | "ONDO" | "OSUN" | "OYO" | "PLATEAU" | "RIVERS" | "SOKOTO" | "TARABA" | "YOBE" | "ZAMFARA" | "FCT"
 
 export type MonoLookupBvnOtpMethods = "email" | "phone" | "phone_1" | "alternate_phone"
 
@@ -119,18 +120,18 @@ export type MonoLookupPassportArgs = {
 
 export type MonoLookupPassportResponseData = {
 	first_name: string
-    last_name: string
-    middle_name: string
-    dob: string
-    mobile: string
-    photo: string | null
-    signature: string | null
-    passport_number: string
-    gender: string
-    issued_at: string
-    issued_date: string
-    expiry_date: string
-    document_type: string
+	last_name: string
+	middle_name: string
+	dob: string
+	mobile: string
+	photo: string | null
+	signature: string | null
+	passport_number: string
+	gender: string
+	issued_at: string
+	issued_date: string
+	expiry_date: string
+	document_type: string
 }
 
 export type MonoLookupDriverLicenseArgs = {
@@ -151,6 +152,20 @@ export type MonoLookupDriverLicenseResponseData = {
 	expiry_date: string;
 	state_of_issue: string;
 	birth_date: string;
+}
+
+export type MonoLookupAddressArgs = {
+	meter_number: string,
+	address: string,
+	disco_code: MonoDiscoCode
+}
+
+export type MonoLookupAddressResponseData = {
+	verified: true,
+	house_address: string,
+	house_owner: string,
+	confidence_level: 1 | 0,
+	disco_code: MonoDiscoCode
 }
 
 export type MonoLookupNinArgs = {

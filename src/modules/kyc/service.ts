@@ -107,7 +107,7 @@ export class KycService {
             body: JSON.stringify(data)
         });
     }
-    static async livenessCheck(liveSelfie: File) {
+    static async livenessCheckWithDojah(liveSelfie: File) {
         const livenessErrMsg = "Verification failed - Liveness check failed"
         const res = await this.dojahVerifySelfie({
             image: Buffer.from(await liveSelfie.arrayBuffer()).toString("base64")
@@ -118,7 +118,7 @@ export class KycService {
             throw new Error(livenessErrMsg)
         }
     }
-    static async verifyUtilityBill(addressProofFile: File, userId: string, userType: CommonSchema.UserType) {
+    static async verifyUtilityBillWithDojah(addressProofFile: File, userId: string, userType: CommonSchema.UserType) {
         const dojahErrMsg = "Service temporarily unavailable";
         const tierDataErrMsg = "Verification failed - Tier 1 data not found";
         const streetErrMsg = "Verification failed - Street name mismatch";
