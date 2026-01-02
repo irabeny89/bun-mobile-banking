@@ -6,6 +6,9 @@ import pinoLogger from "@/utils/pino-logger";
 import { ERROR_RESPONSE_CODES } from "@/types";
 import { KycService } from "../service";
 import { kycQueue } from "@/utils/kyc-queue";
+import { fileStore, getUploadLocation } from "@/utils/storage";
+import { STORAGE } from "@/config";
+import { encrypt } from "@/utils/encryption";
 
 export const tier2Verify = new Elysia({ name: "tier2-verify" })
     .use(userMacro)
@@ -36,11 +39,21 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                 throw error
             }
         })
-        .post("/tier2", async ({ user, body: { bvnOtp: _, ...rest }, logger, bvn }) => {
+        .post("/tier2", async ({ user, body: { bvnOtp: _, imageFile, ...rest }, logger, bvn }) => {
+            const { url, path } = getUploadLocation(
+                STORAGE.govtIdPath,
+                user!.userType,
+                user!.id,
+                imageFile.type.split("/")[1]
+            )
+            await fileStore
+                .file(path)
+                .write(encrypt(Buffer.from(await imageFile.arrayBuffer())))
             await kycQueue.add("tier_2_update", {
                 userId: user!.id,
                 ...rest,
                 bvn: bvn!,
+                imageUrl: url
             })
             logger!.info("tier2Verify:: User KYC db data insertion queued")
             return {
@@ -102,6 +115,7 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                 description: "Verify tier 2 data",
                 summary: "Verify tier 2 data"
             },
+            parse: "formdata",
             body: "tier2VerifyBody",
             response: {
                 200: "tier2VerifySuccess",

@@ -86,10 +86,8 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | **GET** | `/tier1` | Get Tier 1 KYC data and status. |
-| **POST** | `/tier1/upload/passport-photo` | Upload tier 1 passport photo. |
 | **POST** | `/tier1` | Verify Tier 1 KYC documents. |
 | **GET** | `/tier2` | Get Tier 2 KYC data and status. |
-| **POST** | `/tier2/upload/govt-id` | Upload tier 2 government ID e.g voters' ID, etc |
 | **POST** | `/tier2/bvn/initiate` | Initiate BVN verification |
 | **POST** | `/tier2/bvn/approve-otp` | Verify BVN OTP |
 | **POST** | `/tier2` | Verify Tier 2 KYC documents. |

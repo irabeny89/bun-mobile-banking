@@ -38,36 +38,6 @@ export namespace KycModel {
     export const tier3SuccessSchema = successSchemaFactory(tier3ResponseDataSchema)
     export type Tier3SuccessT = typeof tier3SuccessSchema.static;
 
-    export const uploadSuccessSchema = t.Object({
-        message: t.String(),
-        url: t.String({ format: "uri" })
-    })
-    export type UploadSuccessT = typeof uploadSuccessSchema.static
-
-    export const uploadPassportBodySchema = t.Object({
-        passportPhoto: t.File({
-            description: "Passport photo must be a valid file",
-            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
-            type: IMAGE_UPLOAD.mimeType
-        })
-    })
-    export type UploadPassportBodyT = typeof uploadPassportBodySchema.static
-
-    export const uploadPassportSuccessSchema = successSchemaFactory(uploadSuccessSchema)
-    export type UploadPassportSuccessT = typeof uploadPassportSuccessSchema.static
-
-    export const uploadGovtIdBodySchema = t.Object({
-        govtId: t.File({
-            description: "Government ID must be a valid file",
-            maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
-            type: IMAGE_UPLOAD.mimeType
-        })
-    })
-    export type UploadGovtIdBodyT = typeof uploadGovtIdBodySchema.static
-
-    export const uploadGovtIdSuccessSchema = successSchemaFactory(uploadSuccessSchema)
-    export type UploadGovtIdSuccessT = typeof uploadGovtIdSuccessSchema.static
-
     export const tier1DataSchema = t.Object({
         passportPhoto: t.String({
             description: "Passport photo URL",
@@ -223,10 +193,15 @@ export namespace KycModel {
     export type PostTier1BodyT = typeof postTier1BodySchema.static;
 
     export const postTier2BodySchema = t.Intersect([
-        t.Omit(tier2DataSchema, ["bvn"]),
+        t.Omit(tier2DataSchema, ["bvn", "imageUrl"]),
         t.Object({
             bvnOtp: t.String({
                 description: "OTP sent to you to authorize BVN access",
+            }),
+            imageFile: t.File({
+                description: "Image file must be a valid image file e.g jpeg, png, jpg",
+                maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+                type: IMAGE_UPLOAD.mimeType
             })
         })
     ])
