@@ -38,20 +38,64 @@ Authorization: Bearer {{accessToken}}
 # Verify tier 1
 POST {{baseUrl}}/api/v1/kyc/tier1
 Authorization: Bearer {{accessToken}}
-Content-Type: application/json
+Content-Type: multipart/form-data; boundary={{formBoundary}}
 
-{
-  "passportPhoto": "http://localhost:3900/bun-mobile-banking/kyc/passport-photos/individual-019b6cda-1d16-789c-9595-2809ecf7c707.jpeg",
-  "firstName": "Samuel",
-  "middleName": "Nomo",
-  "lastName": "Olamide",
-  "gender": "m",
-  "dob": "01-06-2020",
-  "nin": "12345678901",
-  "street": "123 Main St",
-  "city": "Ikeja",
-  "state": "Lagos"
-}
+--{{formBoundary}}
+Content-Disposition: form-data; name="passportPhoto"; filename="sample.jpeg"
+Content-Type: image/jpeg
+
+< ../files/sample.jpeg
+--{{formBoundary}}
+Content-Disposition: form-data; name="firstName"
+Content-Type: text/plain
+
+{{monoDriverLicenseFirstName}}
+--{{formBoundary}}
+Content-Disposition: form-data; name="middleName"
+Content-Type: text/plain
+
+Nomo
+--{{formBoundary}}
+Content-Disposition: form-data; name="lastName"
+Content-Type: text/plain
+
+{{monoDriverLicenseLastName}}
+--{{formBoundary}}
+Content-Disposition: form-data; name="phone"
+Content-Type: text/plain
+
+{{monoAlternatePhone}}
+--{{formBoundary}}
+Content-Disposition: form-data; name="gender"
+Content-Type: text/plain
+
+m
+--{{formBoundary}}
+Content-Disposition: form-data; name="dob"
+Content-Type: text/plain
+
+{{monoBirthDate}}
+--{{formBoundary}}
+Content-Disposition: form-data; name="nin"
+Content-Type: text/plain
+
+{{monoNin}}
+--{{formBoundary}}
+Content-Disposition: form-data; name="street"
+Content-Type: text/plain
+
+8 Professor Gabriel Olusanya St, Lekki Phase I 106104
+--{{formBoundary}}
+Content-Disposition: form-data; name="city"
+Content-Type: text/plain
+
+Lekki
+--{{formBoundary}}
+Content-Disposition: form-data; name="state"
+Content-Type: text/plain
+
+Lagos
+--{{formBoundary}}--
 
 ###
 # Get tier 2 status
@@ -59,16 +103,42 @@ GET {{baseUrl}}/api/v1/kyc/tier2
 Authorization: Bearer {{accessToken}}
 
 ###
-# Verify tier 2
-POST {{baseUrl}}/api/v1/kyc/tier2
+# Initiate BVN verification
+POST {{baseUrl}}/api/v1/kyc/tier2/bvn/initiate
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "idType": "voter's ID card",
-  "govtId": "12345678901",
-  "idUrl": "http://localhost:3900/bun-mobile-banking/kyc/govt-id/individual-019b6cda-1d16-789c-9595-2809ecf7c707.jpeg"
+  "bvn": "{{monoBvn}}"
 }
+
+###
+# Verify tier 2
+POST {{baseUrl}}/api/v1/kyc/tier2
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary={{formBoundary}}
+
+--{{formBoundary}}
+Content-Disposition: form-data; name="idType"
+Content-Type: text/plain
+
+driver's license
+--{{formBoundary}}
+Content-Disposition: form-data; name="govtId"
+Content-Type: text/plain
+
+{{monoDriverLicenseNumber}}
+--{{formBoundary}}
+Content-Disposition: form-data; name="bvnOtp"
+Content-Type: text/plain
+
+{{monoOtp}}
+--{{formBoundary}}
+Content-Disposition: form-data; name="imageFile"; filename="sample.jpeg"
+Content-Type: image/jpeg
+
+< ../files/sample.jpeg
+--{{formBoundary}}--
 
 ###
 # Get tier 3 status

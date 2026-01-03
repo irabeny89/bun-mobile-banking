@@ -36,6 +36,10 @@ declare module "bun" {
 	}
 }
 
+export type PrettyReplace<T, K extends keyof T, V> = {
+	[P in keyof T]: P extends K ? V : T[P];
+} & {};
+
 export enum CACHE_GET_VALUE {
 	Set = "set",
 	Hit = "hit"

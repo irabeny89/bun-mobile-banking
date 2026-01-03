@@ -30,7 +30,7 @@ accept: application/json
 ###
 # Verify BVN OTP #2
 POST {{baseUrl}}{{bvnPath}}/verify
-x-session-id: JaTDzVjQtNt2lXf389lb
+x-session-id: o37OLL7m4FiTlUaE6hrZ
 mono-sec-key: {{monoLookupSecretKey}}
 Content-Type: application/json
 accept: application/json
@@ -43,7 +43,7 @@ accept: application/json
 ###
 # Fetch BVN Details #3
 POST {{baseUrl}}{{bvnPath}}/details
-x-session-id: JaTDzVjQtNt2lXf389lb
+x-session-id: o37OLL7m4FiTlUaE6hrZ
 mono-sec-key: {{monoLookupSecretKey}}
 Content-Type: application/json
 accept: application/json

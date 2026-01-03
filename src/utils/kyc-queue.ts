@@ -3,7 +3,7 @@ import { KycModel } from "@/modules/kyc/model";
 import { KycService } from "@/modules/kyc/service";
 import { Queue, Worker } from "bullmq";
 import { fileStore } from "./storage";
-import { MonoInitiateLookupBvnArgs, MonoInitiateLookupBvnResponseData, MonoResponse, MonoVerifyBvnOtpResponseData } from "@/types";
+import { MonoInitiateLookupBvnArgs, MonoInitiateLookupBvnResponseData, MonoResponse } from "@/types";
 import cacheSingleton, { getCacheKey } from "./cache";
 
 type KycJobT = "bvn_lookup" | "tier_1_insert" | "tier_2_update" | "tier_3_update";
@@ -40,31 +40,29 @@ const worker = new Worker<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME, async (
     }
     if (job.name === "bvn_lookup") {
         console.info("kycQueue.worker.bvn_lookup:: job started")
+        const tier1DataErrMsg = "Failed to get tier 1 data"
         const { userId, ...rest } = job.data as BvnLookupDataT
         const initBvnLookupRes = await KycService.monoInitiateBvnLookup(rest)
         if (!initBvnLookupRes.ok) {
-            throw new Error("Failed to initiate bvn lookup", {
-                cause: await initBvnLookupRes.json()
-            })
+            const errData = await initBvnLookupRes.json()
+            throw new Error(errData.message)
         }
-        const { status: initBvnLookupStatus, data: { session_id } } = await initBvnLookupRes.json() as MonoResponse<MonoInitiateLookupBvnResponseData>
-        if (initBvnLookupStatus === "failed") throw new Error("Failed to initiate bvn lookup")
         const tier1Data = await KycService.getTier1Data(userId)
-        if (!tier1Data) throw new Error("Failed to get tier 1 data")
-        const cacheKey = getCacheKey(MONO_BVN_SESSION_ID_CACHE_KEY, userId)
-        await cache.set(cacheKey, session_id)
-        await cache.expire(cacheKey, +MONO_BVN_SESSION_ID_TTL)
+        if (!tier1Data) throw new Error(tier1DataErrMsg)
+        const { data: { session_id } } = await initBvnLookupRes.json() as MonoResponse<
+            MonoInitiateLookupBvnResponseData
+        >
         const verifyBvnOtpResponse = await KycService.monoVerifyBvnOtp(session_id, {
             method: "phone",
             phone_number: tier1Data.phone
         })
         if (!verifyBvnOtpResponse.ok) {
-            throw new Error("Failed to verify bvn otp", {
-                cause: await verifyBvnOtpResponse.json()
-            })
+            const errData = await verifyBvnOtpResponse.json()
+            throw new Error(errData.message)
         }
-        const { status: verifyBvnOtpStatus } = await verifyBvnOtpResponse.json() as MonoResponse<MonoVerifyBvnOtpResponseData>
-        if (verifyBvnOtpStatus === "failed") throw new Error("Failed to verify bvn otp")
+        const cacheKey = getCacheKey(MONO_BVN_SESSION_ID_CACHE_KEY, userId)
+        await cache.set(cacheKey, session_id)
+        await cache.expire(cacheKey, +MONO_BVN_SESSION_ID_TTL)
         //* at this point OTP has been sent to the user's phone
         //* this OTP will be used to fetch BVN details
     }

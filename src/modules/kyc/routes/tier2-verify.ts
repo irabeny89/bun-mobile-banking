@@ -18,14 +18,48 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
         error: CommonSchema.errorSchema,
     })
     .guard({ body: "tier2VerifyBody", user: ["individual"] }, app => app
-        .resolve(async ({ store, body, set, user }) => {
+        .resolve(async ({ store }) => {
             const logger = pinoLogger(store)
+            return { logger }
+        })
+        .post("/tier2", async ({
+            user,
+            body: { bvnOtp, imageFile, ...rest },
+            logger,
+            set
+        }) => {
             try {
-                const { bvn } = await KycService.handleBvnVerify(user!.id, body.bvnOtp)
-                return { logger, bvn }
+                logger!.info("tier2Verify:: Verifying BVN")
+                const { bvn } = await KycService.handleBvnVerify(user!.id, bvnOtp)
+                logger!.info("tier2Verify:: BVN verified successfully")
+                const { url, path } = getUploadLocation(
+                    STORAGE.govtIdPath,
+                    user!.userType,
+                    user!.id,
+                    imageFile.type.split("/")[1]
+                )
+                await Promise.all([
+                    fileStore
+                    .file(path)
+                    .write(encrypt(Buffer.from(await imageFile.arrayBuffer()))),
+                    kycQueue.add("tier_2_update", {
+                        userId: user!.id,
+                        ...rest,
+                        bvn: bvn!,
+                        imageUrl: url
+                    })
+                ])
+                logger!.info("tier2Verify:: User KYC db data insertion queued")
+                return {
+                    type: "success" as const,
+                    data: {
+                        currentTier: "tier_2" as const,
+                        tier2Status: "pending" as const
+                    }
+                }
             } catch (error: any) {
                 if ((error.message as string).startsWith("Verification failed")) {
-                    logger.error(error, `tier2Verify:: ${error.message}`)
+                    logger.error(error, "tier2Verify:: BVN verification failed")
                     set.status = 400
                     return {
                         type: "error",
@@ -37,38 +71,6 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                     }
                 }
                 throw error
-            }
-        })
-        .post("/tier2", async ({
-            user,
-            body: { bvnOtp: _, imageFile, ...rest },
-            logger,
-            bvn
-        }) => {
-            const { url, path } = getUploadLocation(
-                STORAGE.govtIdPath,
-                user!.userType,
-                user!.id,
-                imageFile.type.split("/")[1]
-            )
-            await Promise.all([
-                fileStore
-                    .file(path)
-                    .write(encrypt(Buffer.from(await imageFile.arrayBuffer()))),
-                kycQueue.add("tier_2_update", {
-                    userId: user!.id,
-                    ...rest,
-                    bvn: bvn!,
-                    imageUrl: url
-                })
-            ])
-            logger!.info("tier2Verify:: User KYC db data insertion queued")
-            return {
-                type: "success" as const,
-                data: {
-                    currentTier: "tier_2" as const,
-                    tier2Status: "pending" as const
-                }
             }
         }, {
             async beforeHandle({ user, logger, set, body }) {
@@ -110,11 +112,24 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                         }
                     }
                 }
-                if (body.idType === "driver's license") await KycService
-                    .handleDriverLicenseVerifyWithMono(user.id, body.govtId)
-                if (body.idType === "international passport") await KycService
-                    .handlePassportVerifyWithMono(user.id, body.govtId)
-                logger!.info("tier2Verify.beforeHandle:: Tier 2 id verification completed successfully");
+                try {
+                    if (body.idType === "driver's license") await KycService
+                        .handleDriverLicenseVerifyWithMono(user.id, body.govtId)
+                    if (body.idType === "international passport") await KycService
+                        .handlePassportVerifyWithMono(user.id, body.govtId)
+                } catch (error: any) {
+                    logger!.error(error, "tier2Verify.beforeHandle:: Tier 2 ID verification failed");
+                    set.status = 400;
+                    return {
+                        type: "error" as const,
+                        error: {
+                            message: error.message,
+                            code: ERROR_RESPONSE_CODES.BAD_REQUEST,
+                            details: []
+                        }
+                    }
+                }
+                logger!.info("tier2Verify.beforeHandle:: Tier 2 ID verification completed successfully");
             },
             user: ["individual"],
             detail: {

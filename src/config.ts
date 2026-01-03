@@ -37,6 +37,25 @@ export const MONO = {
         "Accept": "application/json",
         "Content-Type": "application/json",
         "mono-sec-key": process.env.MONO_LOOKUP_SECRET_KEY
+    },
+    sandbox: {
+        driverLicense: {
+            licenseNumber: process.env.MONO_SANDBOX_DRIVER_LICENSE_NUMBER ?? "AAD232082122",
+            dateOfBirth: process.env.MONO_SANDBOX_DRIVER_LICENSE_DATE_OF_BIRTH ?? "1999-12-21",
+            firstName: process.env.MONO_SANDBOX_DRIVER_LICENSE_FIRST_NAME ?? "Samuel",
+            lastName: process.env.MONO_SANDBOX_DRIVER_LICENSE_LAST_NAME ?? "Olamide",
+        },
+        intlPassport: {
+            passportNumber: process.env.MONO_SANDBOX_INTL_PASSPORT_NUMBER ?? "A00400000",
+            lastName: process.env.MONO_SANDBOX_INTL_PASSPORT_LAST_NAME ?? "test",
+            dateOfBirth: process.env.MONO_SANDBOX_INTL_PASSPORT_DATE_OF_BIRTH ?? "1980-02-12",
+        },
+        nin: process.env.MONO_SANDBOX_NIN ?? "12345678901",
+        bvn: {
+            bvn: process.env.MONO_SANDBOX_BVN ?? "12345678901",
+            otp: process.env.MONO_SANDBOX_BVN_OTP ?? "123456",
+            alternatePhone: process.env.MONO_SANDBOX_BVN_ALTERNATE_PHONE ?? "09066662020"
+        }
     }
 }
 export const DOJAH = {

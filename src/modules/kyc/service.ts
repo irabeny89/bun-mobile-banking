@@ -1,7 +1,7 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
 import { DOJAH, IS_PROD_ENV, MONO, MONO_BVN_SESSION_ID_CACHE_KEY, STORAGE } from "@/config";
-import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs, DojahVinLookupResponse, MonoBvnDetailsArgs, MonoBvnDetailsResponseData, MonoInitiateLookupBvnArgs, MonoLookupDriverLicenseArgs, MonoLookupNinArgs, MonoLookupNinResponse, MonoLookupPassportArgs, MonoResponse, MonoVerifyBvnOtpArgs } from "@/types";
+import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs, DojahVinLookupResponse, MonoBvnDetailsArgs, MonoBvnDetailsResponseData, MonoInitiateLookupBvnArgs, MonoLookupDriverLicenseArgs, MonoLookupNinArgs, MonoLookupNinResponse, MonoLookupPassportArgs, MonoResponse, MonoVerifyBvnOtpArgs, PrettyReplace } from "@/types";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { fileStore, getUploadLocation } from "@/utils/storage";
 import { CommonSchema } from "@/share/schema";
@@ -10,46 +10,131 @@ import cacheSingleton, { getCacheKey } from "@/utils/cache";
 const sql = dbSingleton();
 const cache = cacheSingleton();
 export class KycService {
+    /**
+     * Lookup NIN
+     * 
+     * N.B - sandbox values are used when `IS_PROD_ENV` is false
+     * 
+     * @param param0 NIN to lookup
+     * @returns Mono response
+     */
     static async monoLookupNin({ nin }: MonoLookupNinArgs) {
+        const lookupArgs: MonoLookupNinArgs = IS_PROD_ENV
+            ? { nin }
+            : { nin: MONO.sandbox.nin }
         return fetch(`${MONO.baseUrl}${MONO.lookupNinPath}`, {
             headers: MONO.headers,
             method: "POST",
-            body: JSON.stringify({ nin })
+            body: JSON.stringify(lookupArgs)
         });
     }
+
+    /**
+     * Initiate BVN lookup
+     * 
+     * N.B - sandbox values are used when `IS_PROD_ENV` is false
+     * 
+     * @param args object with BVN to lookup
+     * @returns Mono response
+     */
     static async monoInitiateBvnLookup(args: MonoInitiateLookupBvnArgs) {
+        const lookupArgs: MonoInitiateLookupBvnArgs = IS_PROD_ENV
+            ? args
+            : { bvn: MONO.sandbox.bvn.bvn }
         return fetch(`${MONO.baseUrl}${MONO.lookupBvnPath}/initiate`, {
             headers: MONO.headers,
             method: "POST",
-            body: JSON.stringify(args)
+            body: JSON.stringify(lookupArgs)
         });
     }
+
+    /**
+     * Verify BVN OTP by setting methods to authorize BVN data lookup
+     * 
+     * N.B - sandbox values are used when `IS_PROD_ENV` is false
+     * 
+     * @param sessionId Session ID
+     * @param args object with method and phone number to verify BVN OTP
+     * @returns Mono response
+     */
     static async monoVerifyBvnOtp(sessionId: string, args: MonoVerifyBvnOtpArgs) {
+        const verifyArgs: MonoVerifyBvnOtpArgs = IS_PROD_ENV
+            ? args
+            : {
+                method: "alternate_phone",
+                phone_number: MONO.sandbox.bvn.alternatePhone,
+            }
         return fetch(`${MONO.baseUrl}${MONO.lookupBvnPath}/verify`, {
             headers: { ...MONO.headers, "x-session-id": sessionId },
             method: "POST",
-            body: JSON.stringify(args)
+            body: JSON.stringify(verifyArgs)
         });
     }
+
+    /**
+     * Fetch BVN details
+     * 
+     * N.B - sandbox values are used when `IS_PROD_ENV` is false
+     * 
+     * @param sessionId Session ID
+     * @param args object with OTP to fetch BVN details
+     * @returns Mono response
+     */
     static async monoFetchBvnDetails(sessionId: string, args: MonoBvnDetailsArgs) {
+        const detailsArgs: MonoBvnDetailsArgs = IS_PROD_ENV
+            ? args
+            : { otp: MONO.sandbox.bvn.otp }
         return fetch(`${MONO.baseUrl}${MONO.lookupBvnPath}/details`, {
             headers: { ...MONO.headers, "x-session-id": sessionId },
             method: "POST",
-            body: JSON.stringify(args)
+            body: JSON.stringify(detailsArgs)
         });
     }
+
+    /**
+     * Lookup international passport
+     * 
+     * N.B - sandbox values are used when `IS_PROD_ENV` is false
+     * 
+     * @param args object with passport number, last name and date of birth to lookup passport
+     * @returns Mono response
+     */
     static async monoLookupPassport(args: MonoLookupPassportArgs) {
+        const lookupArgs: MonoLookupPassportArgs = IS_PROD_ENV
+            ? args
+            : {
+                passport_number: MONO.sandbox.intlPassport.passportNumber,
+                last_name: MONO.sandbox.intlPassport.lastName,
+                date_of_birth: MONO.sandbox.driverLicense.dateOfBirth,
+            }
         return fetch(`${MONO.baseUrl}${MONO.lookupPassportPath}`, {
             headers: MONO.headers,
             method: "POST",
-            body: JSON.stringify(args)
+            body: JSON.stringify(lookupArgs)
         });
     }
+
+    /**
+     * Lookup driver license
+     * 
+     * N.B - sandbox values are used when `IS_PROD_ENV` is false
+     * 
+     * @param args object with license number, first name, last name and date of birth to lookup driver license
+     * @returns Mono response
+     */
     static async monoLookupDriverLicense(args: MonoLookupDriverLicenseArgs) {
+        const lookupArgs: MonoLookupDriverLicenseArgs = IS_PROD_ENV
+            ? args
+            : {
+                license_number: MONO.sandbox.driverLicense.licenseNumber,
+                first_name: MONO.sandbox.driverLicense.firstName,
+                last_name: MONO.sandbox.driverLicense.lastName,
+                date_of_birth: MONO.sandbox.driverLicense.dateOfBirth,
+            }
         return fetch(`${MONO.baseUrl}${MONO.lookupDriverLicensePath}`, {
             headers: MONO.headers,
             method: "POST",
-            body: JSON.stringify(args)
+            body: JSON.stringify(lookupArgs)
         });
     }
     /**
@@ -173,50 +258,52 @@ export class KycService {
         }
         const date = new Intl.DateTimeFormat()
         const formattedLookupDate = date.format(new Date(lookup.birthdate))
-        const formattedBodyDate = date.format(body.dob)
+        const formattedBodyDate = date.format(new Date(body.dob))
         if (formattedBodyDate !== formattedLookupDate) throw new Error(dobMismatchErrMsg)
     }
     static async handleBvnVerify(userId: string, bvnOtp: string) {
-        const bvnDetailsErrMsg = "Verification failed - BVN details fetch failed"
+        const bvnDetailsErrMsg = "Verification failed - expired session id"
         const watchlistedErrMsg = "Verification failed - User is watchlisted"
         const sessionId = await cache.get(getCacheKey(MONO_BVN_SESSION_ID_CACHE_KEY, userId))
-        if (!sessionId) throw new Error(bvnDetailsErrMsg, { cause: "Expired session id" })
+        if (!sessionId) throw new Error(bvnDetailsErrMsg)
         const response = await this.monoFetchBvnDetails(sessionId, { otp: bvnOtp })
-        if (!response.ok) throw new Error(bvnDetailsErrMsg, {
-            cause: await response.json()
-        })
-        const { data, status, message } = await response.json() as MonoResponse<MonoBvnDetailsResponseData>
-        if (status === "failed") throw new Error(bvnDetailsErrMsg, { cause: message })
-        if (data.watch_listed) throw new Error(watchlistedErrMsg, { cause: message })
+        if (!response.ok) {
+            const errData = await response.json()
+            throw new Error(`${bvnDetailsErrMsg}, ${errData.message}`)
+        }
+        const { data } = await response.json() as MonoResponse<MonoBvnDetailsResponseData>
+        if (data.watch_listed) throw new Error(watchlistedErrMsg)
         return data
     }
     static async handlePassportVerifyWithMono(userId: string, passport_number: string) {
-        const passportVerifyErrMsg = "Verification failed - Passport verification failed"
         const tier1DataErrMsg = "Verification failed - Tier 1 data not found"
         const tier1Data = await this.getTier1Data(userId)
         if (!tier1Data) throw new Error(tier1DataErrMsg)
         const res = await this.monoLookupPassport({
             passport_number,
-            date_of_birth: tier1Data.dob.toISOString().split("T")[0],
+            date_of_birth: tier1Data.dob.split("T")[0],
             last_name: tier1Data.lastName
         })
-        if (!res.ok) throw new Error(passportVerifyErrMsg, { cause: await res.json() })
+        if (!res.ok) {
+            const errData = await res.json()
+            throw new Error(errData.message)
+        }
         //* no error means verification completed successfully
     }
     static async handleDriverLicenseVerifyWithMono(userId: string, license_number: string) {
-        const driverLicenseVerifyErrMsg = "Verification failed - Driver license verification failed"
         const tier1DataErrMsg = "Verification failed - Tier 1 data not found"
         const tier1Data = await this.getTier1Data(userId)
         if (!tier1Data) throw new Error(tier1DataErrMsg)
         const res = await this.monoLookupDriverLicense({
             license_number,
-            date_of_birth: tier1Data.dob.toISOString().split("T")[0],
+            date_of_birth: new Date(tier1Data.dob).toISOString().split("T")[0],
             first_name: tier1Data.firstName,
             last_name: tier1Data.lastName
         })
-        if (!res.ok) throw new Error(driverLicenseVerifyErrMsg, {
-            cause: await res.json()
-        })
+        if (!res.ok) {
+            const errData = await res.json()
+            throw new Error(errData.message)
+        }
         //* no error means verification completed successfully
     }
     /**
@@ -305,7 +392,9 @@ export class KycService {
      * @param userId user id
      * @returns decrypted json object
      */
-    static async getTier1Data(userId: string): Promise<KycModel.PostTier1BodyT | null> {
+    static async getTier1Data(userId: string): Promise<
+        PrettyReplace<KycModel.PostTier1BodyT, "dob", string> | null
+    > {
         const kyc: { tier1Data: string }[] = await sql`
             SELECT tier1_data as "tier1Data"
             FROM kyc
