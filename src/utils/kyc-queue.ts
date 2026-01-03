@@ -3,7 +3,7 @@ import { KycModel } from "@/modules/kyc/model";
 import { KycService } from "@/modules/kyc/service";
 import { Queue, Worker } from "bullmq";
 import { fileStore } from "./storage";
-import { MonoInitiateLookupBvnArgs, MonoInitiateLookupBvnResponseData, MonoResponse } from "@/types";
+import { MonoInitiateLookupBvnArgs, MonoInitiateLookupBvnResponseData, MonoResponse } from "@/types/mono.type";
 import cacheSingleton, { getCacheKey } from "./cache";
 
 type KycJobT = "bvn_lookup" | "tier_1_insert" | "tier_2_update" | "tier_3_update";

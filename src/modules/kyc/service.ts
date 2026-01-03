@@ -1,7 +1,8 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
 import { DOJAH, IS_PROD_ENV, MONO, MONO_BVN_SESSION_ID_CACHE_KEY, STORAGE } from "@/config";
-import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs, DojahVinLookupResponse, MonoBvnDetailsArgs, MonoBvnDetailsResponseData, MonoInitiateLookupBvnArgs, MonoLookupDriverLicenseArgs, MonoLookupNinArgs, MonoLookupNinResponse, MonoLookupPassportArgs, MonoResponse, MonoVerifyBvnOtpArgs, PrettyReplace } from "@/types";
+import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs, DojahVinLookupResponse, PrettyReplace } from "@/types";
+import { MonoBvnDetailsArgs, MonoBvnDetailsResponseData, MonoInitiateLookupBvnArgs, MonoLookupDriverLicenseArgs, MonoLookupNinArgs, MonoLookupNinResponseData, MonoLookupPassportArgs, MonoResponse, MonoVerifyBvnOtpArgs } from "@/types/mono.type"
 import { decrypt, encrypt } from "@/utils/encryption";
 import { fileStore, getUploadLocation } from "@/utils/storage";
 import { CommonSchema } from "@/share/schema";
@@ -249,7 +250,7 @@ export class KycService {
         const nameMismatchErrMsg = "Verification failed - Name mismatch"
         const dobMismatchErrMsg = "Verification failed - Date of birth mismatch"
 
-        const [ tier1Status, ninHashExists ] = await Promise.all([
+        const [tier1Status, ninHashExists] = await Promise.all([
             this.getTier1Status(userId),
             this.ninHashExists(body.nin)
         ])
@@ -257,7 +258,7 @@ export class KycService {
         if (ninHashExists) throw new Error(ninHashExistsErrMsg)
         const res = await this.monoLookupNin({ nin: body.nin })
         if (!res.ok) throw new Error(ninLookupErrMsg, { cause: await res.json() })
-        const { data: lookup } = await res.json() as MonoLookupNinResponse
+        const { data: lookup } = await res.json() as MonoResponse<MonoLookupNinResponseData>
         if (lookup.firstname !== body.firstName || lookup.surname !== body.lastName) {
             throw new Error(nameMismatchErrMsg)
         }
