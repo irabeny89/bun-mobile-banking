@@ -21,12 +21,12 @@ export const me = new Elysia({ name: "me-individual" })
     .get("/me", async ({ logger, set, user }) => {
         if (!user) {
             logger.info("me:: user not found")
-            set.status = 404
+            set.status = 401
             return {
                 type: "error" as const,
                 error: {
-                    message: "User not found, login or register.",
-                    code: ERROR_RESPONSE_CODES.NOT_FOUND,
+                    message: "Register or login to continue",
+                    code: ERROR_RESPONSE_CODES.UNAUTHORIZED,
                     details: []
                 }
             }
@@ -42,7 +42,6 @@ export const me = new Elysia({ name: "me-individual" })
         response: {
             200: "meSuccess",
             401: "error",
-            404: "error",
         },
         user: ["individual"]
     })

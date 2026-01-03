@@ -16,13 +16,13 @@ export const mfa = new Elysia({ name: "mfa-individual" })
     .resolve(({ store }) => ({ logger: pinoLogger(store) }))
     .post("/mfa", async ({ logger, user, body, set }) => {
         if (!user) {
-            set.status = 404
+            set.status = 401
             return {
                 type: "error",
                 error: {
                     details: [],
-                    message: "User not found",
-                    code: ERROR_RESPONSE_CODES.NOT_FOUND
+                    message: "Register or login to continue",
+                    code: ERROR_RESPONSE_CODES.UNAUTHORIZED
                 }
             }
         }
@@ -41,8 +41,7 @@ export const mfa = new Elysia({ name: "mfa-individual" })
         body: "mfa",
         response: {
             200: "mfaSuccess",
-            400: "error",
-            500: "error"
+            401: "error"
         },
         user: ["individual"]
     })

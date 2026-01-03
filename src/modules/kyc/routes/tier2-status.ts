@@ -21,12 +21,12 @@ export const tier2Status = new Elysia({ name: "tier2-status" })
     .get("/tier2", async ({ user, logger, set }) => {
         if (!user) {
             logger.error("User not found")
-            set.status = 404
+            set.status = 401
             return {
                 type: "error" as const,
                 error: {
-                    message: "User not found",
-                    code: ERROR_RESPONSE_CODES.NOT_FOUND,
+                    message: "Register or login to continue",
+                    code: ERROR_RESPONSE_CODES.UNAUTHORIZED,
                     details: []
                 }
             }
@@ -61,6 +61,7 @@ export const tier2Status = new Elysia({ name: "tier2-status" })
         },
         response: {
             200: "tier2StatusSuccess",
+            401: "error",
             404: "error",
         }
     })

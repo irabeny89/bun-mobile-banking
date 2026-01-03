@@ -17,12 +17,12 @@ export const tier2BvnInitiate = new Elysia({ name: "tier2-bvn-initiate" })
     .post("/tier2/bvn/initiate", async ({ body, user, logger, set }) => {
         if (!user) {
             logger.info("tier2Verify:: User not found");
-            set.status = 400;
+            set.status = 401;
             return {
                 type: "error" as const,
                 error: {
-                    message: "User not found",
-                    code: ERROR_RESPONSE_CODES.BAD_REQUEST,
+                    message: "Register or login to continue",
+                    code: ERROR_RESPONSE_CODES.UNAUTHORIZED,
                     details: []
                 }
             }
@@ -44,6 +44,6 @@ export const tier2BvnInitiate = new Elysia({ name: "tier2-bvn-initiate" })
         body: "tier2InitiateBvnLookupBody",
         response: {
             200: "tier2BvnInitiateBvnLookupSuccess",
-            400: "error"
+            401: "error"
         }
     })

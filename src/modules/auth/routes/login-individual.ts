@@ -22,10 +22,10 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
         .post("/login/individual", async ({ logger, set, user, body }) => {
             if (!user) {
                 logger.info("loginIndividual:: no user found")
-                set.status = 400
+                set.status = 401
                 return {
                     type: "error" as const,
-                    error: { message: "No user found", code: ERROR_RESPONSE_CODES.NOT_FOUND, details: [] }
+                    error: { message: "Register or login to continue", code: ERROR_RESPONSE_CODES.UNAUTHORIZED, details: [] }
                 }
             }
             logger.info("loginIndividual:: comparing plain and hashed password")
@@ -74,5 +74,6 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
             response: {
                 200: "loginSuccess",
                 400: "error",
+                401: "error"
             },
         }))

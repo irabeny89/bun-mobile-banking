@@ -89,12 +89,12 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                 }
                 if (!user) {
                     logger!.info("tier2Verify:: User not found");
-                    set.status = 400;
+                    set.status = 401;
                     return {
                         type: "error" as const,
                         error: {
-                            message: "User not found",
-                            code: ERROR_RESPONSE_CODES.BAD_REQUEST,
+                            message: "Register or login to continue",
+                            code: ERROR_RESPONSE_CODES.UNAUTHORIZED,
                             details: []
                         }
                     }
@@ -142,6 +142,7 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
             response: {
                 200: "tier2VerifySuccess",
                 400: "error",
+                401: "error"
             }
         })
     )

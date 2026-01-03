@@ -37,12 +37,12 @@ export const forgotPasswordIndividual = new Elysia({
             beforeHandle: async ({ user, logger, set }) => {
                 if (!user) {
                     logger.info("forgotPasswordIndividual:: user not found")
-                    set.status = 404
+                    set.status = 401
                     return {
                         type: "error" as const,
                         error: {
-                            message: "User not found",
-                            code: ERROR_RESPONSE_CODES.NOT_FOUND,
+                            message: "Register or login to continue",
+                            code: ERROR_RESPONSE_CODES.UNAUTHORIZED,
                             details: []
                         }
                     }
@@ -56,7 +56,7 @@ export const forgotPasswordIndividual = new Elysia({
             body: "forgotPasswordIndividual",
             response: {
                 200: "forgotPasswordIndividualSuccess",
-                404: "error"
+                401: "error"
             },
         })
     )

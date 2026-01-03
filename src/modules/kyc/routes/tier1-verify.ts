@@ -45,12 +45,12 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
         async beforeHandle({ user, logger, set, body }) {
             if (!user) {
                 logger.info("tier1Verify.beforeHandle:: User not found");
-                set.status = 400;
+                set.status = 401;
                 return {
                     type: "error" as const,
                     error: {
-                        message: "User not found",
-                        code: ERROR_RESPONSE_CODES.BAD_REQUEST,
+                        message: "Register or login to continue",
+                        code: ERROR_RESPONSE_CODES.UNAUTHORIZED,
                         details: []
                     }
                 }
@@ -85,5 +85,6 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
         response: {
             200: "tier1VerifySuccess",
             400: "error",
+            401: "error"
         },
     })
