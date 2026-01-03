@@ -332,8 +332,6 @@ export class KycService {
         const kyc = await sql`
             SELECT EXISTS(SELECT 1 FROM kyc WHERE nin_hash = ${hash})
         `
-        // TODO: remove this
-        console.debug(kyc)
         return kyc[0].exists as boolean
     }
     static async bvnHashExists(bvn: string) {
