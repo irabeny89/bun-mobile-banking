@@ -1,0 +1,3 @@
+@accountInitiatePath = /v2/accounts/initiate
+
+@accountAuthorizePath = /v2/accounts/auth

@@ -2,33 +2,13 @@
 
 @baseUrl = http://localhost:3000
 @formBoundary = formDataBoundary
-
-###
-# Upload passport photo
-POST {{baseUrl}}/api/v1/kyc/tier1/upload/passport
-Authorization: Bearer {{accessToken}}
-Content-Type: multipart/form-data; boundary={{formBoundary}}
-
---{{formBoundary}}
-Content-Disposition: form-data; name="passportPhoto"; filename="sample.jpeg"
-Content-Type: image/jpeg
-
-< ../files/sample.jpeg
---{{formBoundary}}--
-
-###
-# Upload government ID
-POST {{baseUrl}}/api/v1/kyc/tier2/upload/govt-id
-Authorization: Bearer {{accessToken}}
-Content-Type: multipart/form-data; boundary={{formBoundary}}
-
---{{formBoundary}}
-Content-Disposition: form-data; name="govtId"; filename="sample.jpeg"
-Content-Type: image/jpeg
-
-< ../files/sample.jpeg
---{{formBoundary}}--
-
+@bvn = 12345678901
+@nin = 12345678901
+@driverLicenseNumber = AAD232082122
+@driverLicenseDob = 1999-12-21
+@driverLicenseFirstName = Samuel
+@driverLicenseLastName = Olamide
+@otp = 123456
 ###
 # Get tier 1 status
 GET {{baseUrl}}/api/v1/kyc/tier1
@@ -49,22 +29,22 @@ Content-Type: image/jpeg
 Content-Disposition: form-data; name="firstName"
 Content-Type: text/plain
 
-{{monoDriverLicenseFirstName}}
+Ernest
 --{{formBoundary}}
 Content-Disposition: form-data; name="middleName"
 Content-Type: text/plain
 
-Nomo
+Ojewolo
 --{{formBoundary}}
 Content-Disposition: form-data; name="lastName"
 Content-Type: text/plain
 
-{{monoDriverLicenseLastName}}
+Irabor
 --{{formBoundary}}
 Content-Disposition: form-data; name="phone"
 Content-Type: text/plain
 
-{{monoAlternatePhone}}
+09020951797
 --{{formBoundary}}
 Content-Disposition: form-data; name="gender"
 Content-Type: text/plain
@@ -74,12 +54,12 @@ m
 Content-Disposition: form-data; name="dob"
 Content-Type: text/plain
 
-{{monoBirthDate}}
+1989-02-16
 --{{formBoundary}}
 Content-Disposition: form-data; name="nin"
 Content-Type: text/plain
 
-{{monoNin}}
+{{nin}}
 --{{formBoundary}}
 Content-Disposition: form-data; name="street"
 Content-Type: text/plain
@@ -109,7 +89,7 @@ Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "bvn": "{{monoBvn}}"
+  "bvn": "{{bvn}}"
 }
 
 ###
@@ -127,12 +107,12 @@ driver's license
 Content-Disposition: form-data; name="govtId"
 Content-Type: text/plain
 
-{{monoDriverLicenseNumber}}
+{{driverLicenseNumber}}
 --{{formBoundary}}
 Content-Disposition: form-data; name="bvnOtp"
 Content-Type: text/plain
 
-{{monoOtp}}
+{{otp}}
 --{{formBoundary}}
 Content-Disposition: form-data; name="imageFile"; filename="sample.jpeg"
 Content-Type: image/jpeg

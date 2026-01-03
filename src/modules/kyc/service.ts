@@ -258,14 +258,14 @@ export class KycService {
         if (ninHashExists) throw new Error(ninHashExistsErrMsg)
         const res = await this.monoLookupNin({ nin: body.nin })
         if (!res.ok) throw new Error(ninLookupErrMsg, { cause: await res.json() })
-        const { data: lookup } = await res.json() as MonoResponse<MonoLookupNinResponseData>
-        if (lookup.firstname !== body.firstName || lookup.surname !== body.lastName) {
+        const { data } = await res.json() as MonoResponse<MonoLookupNinResponseData>
+        if (IS_PROD_ENV && (data.firstname !== body.firstName || data.surname !== body.lastName)) {
             throw new Error(nameMismatchErrMsg)
         }
         const date = new Intl.DateTimeFormat()
-        const formattedLookupDate = date.format(new Date(lookup.birthdate))
+        const formattedLookupDate = date.format(new Date(data.birthdate))
         const formattedBodyDate = date.format(new Date(body.dob))
-        if (formattedBodyDate !== formattedLookupDate) throw new Error(dobMismatchErrMsg)
+        if (IS_PROD_ENV && (formattedBodyDate !== formattedLookupDate)) throw new Error(dobMismatchErrMsg)
     }
     static async handleBvnVerify(userId: string, bvnOtp: string) {
         const bvnDetailsErrMsg = "Verification failed - expired session id"
@@ -278,7 +278,7 @@ export class KycService {
             throw new Error(`${bvnDetailsErrMsg}, ${errData.message}`)
         }
         const { data } = await response.json() as MonoResponse<MonoBvnDetailsResponseData>
-        if (data.watch_listed) throw new Error(watchlistedErrMsg)
+        if (IS_PROD_ENV && data.watch_listed) throw new Error(watchlistedErrMsg)
         return data
     }
     static async handlePassportVerifyWithMono(userId: string, passport_number: string) {

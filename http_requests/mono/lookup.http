@@ -1,0 +1,107 @@
+@ninPath = /v3/lookup/nin
+@bvnPath = /v2/lookup/bvn
+@passportPath = /v3/lookup/passport
+@driverLicensePath = /v3/lookup/driver_license
+@addressPath = /v3/lookup/address
+@nin = 12345678901
+@bvn = 12345678901
+@otp = 123456
+@bvnOtpMethod = alternate_phone
+@alternatePhone = 09066662020
+@passportNumber = A00400000
+@passportLastName = test
+@passportDob = 1980-02-12
+@driverLicenseNumber = AAD232082122
+@driverLicenseDob = 1999-12-21
+@driverLicenseFirstName = Samuel
+@driverLicenseLastName = Olamide
+@meterNumber = 55055820431
+@address = 8 Professor Gabriel Olusanya St, Lekki Phase I 106104, Lekki, Lagos
+@discoCode = IKEJA
+
+###
+# NIN lookup
+POST {{monoBaseUrl}}{{ninPath}}
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "nin": "{{nin}}"
+}
+
+###
+# Initiate BVN lookup #1
+POST {{monoBaseUrl}}{{bvnPath}}/initiate
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "bvn": "{{bvn}}"
+}
+
+###
+# Verify BVN OTP #2
+POST {{monoBaseUrl}}{{bvnPath}}/verify
+x-session-id: o37OLL7m4FiTlUaE6hrZ
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "method": "{{bvnOtpMethod}}",
+    "phone_number": "{{alternatePhone}}"
+}
+
+###
+# Fetch BVN Details #3
+POST {{monoBaseUrl}}{{bvnPath}}/details
+x-session-id: o37OLL7m4FiTlUaE6hrZ
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "otp": "{{otp}}"
+}
+
+###
+# Lookup passport
+POST {{monoBaseUrl}}{{passportPath}}
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "passport_number": "{{passportNumber}}",
+    "last_name": "{{passportLastName}}",
+    "date_of_birth": "{{passportDob}}"
+}
+
+###
+# Lookup driver's license
+POST {{monoBaseUrl}}{{driverLicensePath}}
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+  "license_number": "{{driverLicenseNumber}}",
+  "date_of_birth": "{{driverLicenseDob}}",
+  "first_name": "{{driverLicenseFirstName}}",
+  "last_name": "{{driverLicenseLastName}}"
+}
+
+###
+# Lookup address
+POST {{monoBaseUrl}}{{addressPath}}
+mono-sec-key: {{monoLookupSecretKey}}
+Content-Type: application/json
+accept: application/json
+
+{
+    "meter_number": "{{meterNumber}}",
+    "address": "{{address}}",
+    "disco_code": "{{discoCode}}"
+}
