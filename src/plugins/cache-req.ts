@@ -1,7 +1,7 @@
 import Elysia from "elysia";
 import cacheSingleton from "../utils/cache";
 import { CACHE_GET } from "../config";
-import { CACHE_GET_VALUE } from "../types";
+import { CACHE_GET_VALUE } from "@/types";
 import pinoLogger from "../utils/pino-logger";
 
 export const cacheReq = new Elysia({ name: "cache-request" })
