@@ -244,12 +244,17 @@ export class KycService {
     }
     static async verifyTier1Nin(userId: string, body: KycModel.PostTier1BodyT) {
         const tier1StatusErrMsg = "Verification failed - Tier 1 status already verified"
+        const ninHashExistsErrMsg = "Verification failed - NIN already verified"
         const ninLookupErrMsg = "Verification failed - NIN lookup failed"
         const nameMismatchErrMsg = "Verification failed - Name mismatch"
         const dobMismatchErrMsg = "Verification failed - Date of birth mismatch"
 
-        const tier1Status = await this.getTier1Status(userId)
+        const [ tier1Status, ninHashExists ] = await Promise.all([
+            this.getTier1Status(userId),
+            this.ninHashExists(body.nin)
+        ])
         if (tier1Status) throw new Error(tier1StatusErrMsg)
+        if (ninHashExists) throw new Error(ninHashExistsErrMsg)
         const res = await this.monoLookupNin({ nin: body.nin })
         if (!res.ok) throw new Error(ninLookupErrMsg, { cause: await res.json() })
         const { data: lookup } = await res.json() as MonoLookupNinResponse
@@ -315,10 +320,27 @@ export class KycService {
         KycModel.PostTier1BodyT, "passportPhoto"
     > & Record<"passportPhoto", string>) {
         const tier1Data = encrypt(Buffer.from(JSON.stringify(data)));
+        const ninHash = await Bun.password.hash(data.nin)
         await sql`
-            INSERT INTO kyc (user_id, tier1_data, tier1_status)
-            VALUES (${userId}, ${tier1Data}, 'success')
+            INSERT INTO kyc (user_id, tier1_data, nin_hash, tier1_status)
+            VALUES (${userId}, ${tier1Data}, ${ninHash}, 'success')
         `
+    }
+    static async ninHashExists(nin: string) {
+        const hash = await Bun.password.hash(nin)
+        const kyc = await sql`
+            SELECT EXISTS(SELECT 1 FROM kyc WHERE nin_hash = ${hash})
+        `
+        // TODO: remove this
+        console.debug(kyc)
+        return kyc[0].exists as boolean
+    }
+    static async bvnHashExists(bvn: string) {
+        const hash = await Bun.password.hash(bvn)
+        const kyc = await sql`
+            SELECT EXISTS(SELECT 1 FROM kyc WHERE bvn_hash = ${hash})
+        `
+        return kyc[0].exists as boolean
     }
     /**
      * Get the tier 1 status of a user.
@@ -326,25 +348,33 @@ export class KycService {
      * @returns tier 1 status
      */
     static async getTier1Status(userId: string) {
-        const kyc: Pick<KycModel.DbDataT, "currentTier" | "tier1Status">[] = await sql`
-            SELECT current_tier as "currentTier", tier1_status as "tier1Status"
+        const kyc: Pick<KycModel.DbDataT, "currentTier" | "tier1Status" | "ninHash">[] = await sql`
+            SELECT 
+                current_tier as "currentTier", 
+                tier1_status as "tier1Status",
+                nin_hash as "ninHash"
             FROM kyc
             WHERE user_id = ${userId}
         `
         return kyc[0] ? {
             currentTier: kyc[0].currentTier,
             tier1Status: kyc[0].tier1Status,
+            ninHash: kyc[0].ninHash
         } : null;
     }
     static async getTier2Status(userId: string) {
-        const kyc: Pick<KycModel.DbDataT, "currentTier" | "tier2Status">[] = await sql`
-            SELECT current_tier as "currentTier", tier2_status as "tier2Status"
+        const kyc: Pick<KycModel.DbDataT, "currentTier" | "tier2Status" | "bvnHash">[] = await sql`
+            SELECT 
+                current_tier as "currentTier", 
+                tier2_status as "tier2Status",
+                bvn_hash as "bvnHash"
             FROM kyc
             WHERE user_id = ${userId}
         `
         return kyc[0] ? {
             currentTier: kyc[0].currentTier,
             tier2Status: kyc[0].tier2Status,
+            bvnHash: kyc[0].bvnHash
         } : null;
     }
     static async getTier3Status(userId: string) {
@@ -360,11 +390,13 @@ export class KycService {
     }
     static async updateTier2(userId: string, data: KycModel.Tier2DataT) {
         const tier2Data = encrypt(Buffer.from(JSON.stringify(data)));
+        const bvnHash = await Bun.password.hash(data.bvn)
         await sql`
             UPDATE kyc
             SET 
                 tier2_data = ${tier2Data}, 
                 tier2_status = 'success',
+                bvn_hash = ${bvnHash},
                 current_tier = 'tier_2'
             WHERE user_id = ${userId}
         `

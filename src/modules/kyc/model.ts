@@ -248,6 +248,8 @@ export namespace KycModel {
             tier1Status: tierStatusSchema,
             tier2Status: tierStatusSchema,
             tier3Status: tierStatusSchema,
+            ninHash: t.String(),
+            bvnHash: t.Nullable(t.String()),
         }),
     ])
     export type DbDataT = typeof dbData.static

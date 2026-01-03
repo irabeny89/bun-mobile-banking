@@ -5,6 +5,7 @@ import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import { ERROR_RESPONSE_CODES } from "@/types";
 import { kycQueue } from "@/utils/kyc-queue";
+import { KycService } from "../service";
 
 export const tier2BvnInitiate = new Elysia({ name: "tier2-bvn-initiate" })
     .use(userMacro)
@@ -35,6 +36,20 @@ export const tier2BvnInitiate = new Elysia({ name: "tier2-bvn-initiate" })
             }
         }
     }, {
+        async beforeHandle({ body, set, logger }) {
+            if (await KycService.bvnHashExists(body.bvn)) {
+                logger.info("tier2Verify:: BVN already exists");
+                set.status = 400;
+                return {
+                    type: "error" as const,
+                    error: {
+                        message: "BVN already exists",
+                        code: ERROR_RESPONSE_CODES.BAD_REQUEST,
+                        details: []
+                    }
+                }
+            }
+        },
         detail: {
             tags: ["KYC", "Individual User"],
             description: "Initiate BVN verification",
@@ -44,6 +59,7 @@ export const tier2BvnInitiate = new Elysia({ name: "tier2-bvn-initiate" })
         body: "tier2InitiateBvnLookupBody",
         response: {
             200: "tier2BvnInitiateBvnLookupSuccess",
-            401: "error"
+            400: "error",
+            401: "error",
         }
     })
