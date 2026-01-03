@@ -89,7 +89,6 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **POST** | `/tier1` | Verify Tier 1 KYC documents. |
 | **GET** | `/tier2` | Get Tier 2 KYC data and status. |
 | **POST** | `/tier2/bvn/initiate` | Initiate BVN verification |
-| **POST** | `/tier2/bvn/approve-otp` | Verify BVN OTP |
 | **POST** | `/tier2` | Verify Tier 2 KYC documents. |
 | **GET** | `/tier3` | Get Tier 3 KYC data and status. |
 | **POST** | `/tier3` | Verify Tier 3 KYC documents. |
