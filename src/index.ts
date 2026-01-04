@@ -7,7 +7,7 @@ import { errorHandler } from "./plugins/onerror.plugin";
 import { auth } from "./modules/auth";
 import { systemStatus } from "./plugins/system-status.plugin";
 import { individualUser } from "./modules/Individual_user";
-import { healthcheck } from "./plugins/heathcheck.plugin";
+import { healthcheck } from "./plugins/healthcheck.plugin";
 import { cacheReq } from "./plugins/cache-req";
 import { logger } from "./plugins/logger.plugin";
 import { rateLimitPlugin } from "./plugins/rate-limit.plugin";
