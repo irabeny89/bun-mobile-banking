@@ -164,3 +164,30 @@ export type MonoLookupNinResponseData = {
     tracking_id: string;
     central_iD: string;
 };
+
+export type MonoConnectAuthAccountLinkingArgs = {
+    customer: {
+        name: string,
+        email: string
+    },
+    /** store any metadata you want to pass to the callback url or webhook */
+    meta: {
+        /** 10 characters */
+        ref: string
+    },
+    scope: "auth",
+    redirect_url: string
+}
+
+export type MonoConnectAuthAccountLinkingResponseData = {
+    mono_url: string,
+    customer: string,
+    meta: {
+        ref: string
+    },
+    scope: "auth",
+    institution: {},
+    redirect_url: string,
+    is_multi: boolean,
+    created_at: string
+}

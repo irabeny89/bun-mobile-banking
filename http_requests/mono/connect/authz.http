@@ -1,3 +1,32 @@
 @accountInitiatePath = /v2/accounts/initiate
+@accountId = 695a7f39fbc7fac1166afa45
 
-@accountAuthorizePath = /v2/accounts/auth
+# Initiate account linking
+POST {{monoBaseUrl}}{{accountInitiatePath}}
+Accept: application/json
+mono-sec-key: {{monoConnectSecretKey}}
+Content-Type: application/json
+
+{
+    "customer": {
+        "name": "Ernest Irabor",
+        "email": "irabeny89@gmail.com"
+    },
+    "meta": { "ref": "99008877TEST"},
+    "scope": "auth",
+    "redirect_url": "https://mono.co"
+}
+
+###
+# Re-authorize a previously linked account
+POST {{monoBaseUrl}}{{accountInitiatePath}}
+Accept: application/json
+mono-sec-key: {{monoConnectSecretKey}}
+Content-Type: application/json
+
+{
+    "meta": { "ref": "099777"},
+    "scope": "reauth",
+    "account": "{{accountId}}",
+    "redirect_url": "https://mono.co"
+}
