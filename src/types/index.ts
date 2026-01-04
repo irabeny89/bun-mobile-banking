@@ -1,3 +1,5 @@
+import { TSchema } from "elysia";
+
 declare module "bun" {
 	/**
 	 * Environment variable type definitions for Bun.
@@ -21,6 +23,7 @@ declare module "bun" {
 		MONO_CONNECT_SECRET_KEY: string;
 		MONO_LOOKUP_PUBLIC_KEY: string;
 		MONO_LOOKUP_SECRET_KEY: string;
+		MONO_WEBHOOK_SECRET: string;
 		DOJAH_APPID: string;
 		DOJAH_SECRET: string;
 		STORAGE_BUCKET: string;
@@ -39,6 +42,9 @@ declare module "bun" {
 export type PrettyReplace<T, K extends keyof T, V> = {
 	[P in keyof T]: P extends K ? V : T[P];
 } & {};
+
+export type TPropertyKey = string | number;
+export type TProperties = Record<TPropertyKey, TSchema>;
 
 export enum CACHE_GET_VALUE {
 	Set = "set",

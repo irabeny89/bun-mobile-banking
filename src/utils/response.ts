@@ -1,7 +1,5 @@
+import { TProperties } from "@/types";
 import { type TSchema, t } from "elysia";
-
-type TPropertyKey = string | number;
-type TProperties = Record<TPropertyKey, TSchema>;
 
 /**
  * HTTP success response schema factory for creating schema for data or with pagination.

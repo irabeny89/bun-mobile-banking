@@ -14,6 +14,7 @@ import { rateLimitPlugin } from "./plugins/rate-limit.plugin";
 import { apiDocs } from "./plugins/api-docs.plugin";
 import { kyc } from "./modules/kyc";
 import { PORT } from "./config";
+import { webhook } from "./modules/webhook";
 
 export const app = new Elysia({
   name: pkg.name,
@@ -37,6 +38,7 @@ export const app = new Elysia({
     .use(auth)
     .use(individualUser)
     .use(kyc)
+    .use(webhook)
   )
   .listen(PORT);
   

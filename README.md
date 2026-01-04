@@ -79,9 +79,17 @@ bun run dev
 Open <http://localhost:3000/> with your browser to see the result.
 Query `/openapi` endpoint to see OpenAPI documentation.
 
+To create a tunnel to your localhost, run:
+
+```bash
+bun run tunnel
+```
+
+> Check the [`script`](package.json#L6) field in [package.json](package.json) for more commands.
+
 ### File Storage
 
-In development, the file storage is managed with [garage](https://garagehq.deuxfleurs.fr/), a rust based selfhost AWS S3 compatible container image. The garage config file is in [storage/garage.toml](storage/garage.toml) along with the data and metadata in the [storage/data](storage/data) and [storage/meta](storage/meta) directories.
+In development, the file storage is managed with [garage](https://garagehq.deuxfleurs.fr/), a rust based self-host AWS S3 compatible container image. The garage config file is in [storage/garage.toml](storage/garage.toml) along with the data and metadata in the [storage/data](storage/data) and [storage/meta](storage/meta) directories.
 
 To run garage, use the following command:
 
@@ -96,7 +104,7 @@ podman run \
   dxflrs/garage:v2.1.0
 ```
 
-> Note: You dont have to run the single command above. You can use the [scripts/app-pod.sh](scripts/app-pod.sh) script to run the garage container along with the app pod. Example:
+> Note: You don't have to run the single command above. You can use the [scripts/app-pod.sh](scripts/app-pod.sh) script to run the garage container along with the app pod. Example:
 
 ```bash
 ./scripts/app-pod.sh .env

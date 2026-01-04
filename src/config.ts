@@ -24,6 +24,7 @@ export const IMAGE_UPLOAD = {
     mimeType: ["image/jpeg", "image/jpg", "image/png"]
 }
 export const MONO = {
+    webhookSecret: process.env.MONO_WEBHOOK_SECRET,
     connectPublicKey: process.env.MONO_CONNECT_PUBLIC_KEY,
     connectSecretKey: process.env.MONO_CONNECT_SECRET_KEY,
     lookupPublicKey: process.env.MONO_LOOKUP_PUBLIC_KEY,

@@ -8,6 +8,7 @@
     "lint:tests": "tsc --noEmit tests/**/*.ts",
     "dev": "bun run --watch src/index.ts",
     "email": "email dev --dir src/emails",
+    "tunnel": "export $(cat .env.development | xargs) && ssh -R 80:localhost:$PORT localhost.run",
     "maildev": "podman run -p 1080:1080 -p 1025:1025 maildev/maildev",
     "mig8:new": "bun scripts/create-migration-file.ts",
     "mig8:file": "bun scripts/sqlmig8.ts",

@@ -61,4 +61,11 @@ export namespace CommonSchema {
         error: "Password must be between 8 and 128 characters",
     })
     export type PasswordT = typeof passwordSchema.static;
+
+    export const monoAccountConnectMetaSchema = t.Object({
+        ref: t.String({ description: "Generated account reference" }),
+        userId: t.String({ description: "User ID" }),
+        userType: userTypeSchema,
+    })
+    export type MonoAccountConnectMetaT = typeof monoAccountConnectMetaSchema.static
 }
