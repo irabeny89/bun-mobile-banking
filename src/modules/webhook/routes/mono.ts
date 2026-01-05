@@ -1,12 +1,12 @@
 import { MONO } from "@/config";
 import pinoLogger from "@/utils/pino-logger";
-import Elysia from "elysia";
+import Elysia, { t } from "elysia";
 import { WebhookModel } from "../model";
 import { WebhookService } from "../service";
 
 export const monoWebhook = new Elysia({ name: "mono-webhook" })
     .model({
-        accountConnectedBody: WebhookModel.MonoAccountConnectedBodySchema
+        monoWebhookBody: t.Union([WebhookModel.monoAccountConnectedBodySchema, WebhookModel.monoAccountUpdatedBodySchema])
     })
     .resolve(({ store }) => {
         const logger = pinoLogger(store)
@@ -17,7 +17,12 @@ export const monoWebhook = new Elysia({ name: "mono-webhook" })
     .post("/mono", async ({ body, logger }) => {
         if (body.event === "mono.events.account_connected") {
             logger.info("Mono account connected")
-            await WebhookService.handleMonoAccountConnected(body.data)
+            await WebhookService.handleMonoAccountConnected(body.data as WebhookModel.MonoAccountConnectedBodyType["data"])
+            return "ok"
+        }
+        if (body.event === "mono.events.account_updated") {
+            logger.info("Mono account updated")
+            await WebhookService.handleMonoAccountUpdated(body.data as WebhookModel.MonoAccountUpdatedBodyType["data"])
             return "ok"
         }
     }, {
@@ -29,5 +34,5 @@ export const monoWebhook = new Elysia({ name: "mono-webhook" })
                 return "Unauthorized"
             }
         },
-        body: "accountConnectedBody"
+        body: "monoWebhookBody"
     })

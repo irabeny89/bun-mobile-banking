@@ -137,3 +137,8 @@ bun mig8:file src/migrations/123456789-create-user-table.sql
 # step 4: OR IF there is an existing folder with sql migration files
 bun mig8:dir src/migrations
 ```
+
+## Reference
+
+- [Mono](https://mono.co/) - Identity Verification, Financial Data, etc.
+- [Garage](https://garagehq.deuxfleurs.fr/) - Local File Storage
