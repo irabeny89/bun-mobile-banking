@@ -6,7 +6,11 @@ import { WebhookService } from "../service";
 
 export const monoWebhook = new Elysia({ name: "mono-webhook" })
     .model({
-        monoWebhookBody: t.Union([WebhookModel.monoAccountConnectedBodySchema, WebhookModel.monoAccountUpdatedBodySchema])
+        monoWebhookBody: t.Union([
+            WebhookModel.monoAccountConnectedBodySchema,
+            WebhookModel.monoAccountUpdatedBodySchema,
+            WebhookModel.monoAccountUnlinkedBodySchema
+        ])
     })
     .resolve(({ store }) => {
         const logger = pinoLogger(store)
@@ -15,15 +19,17 @@ export const monoWebhook = new Elysia({ name: "mono-webhook" })
         }
     })
     .post("/mono", async ({ body, logger }) => {
-        if (body.event === "mono.events.account_connected") {
-            logger.info("Mono account connected")
-            await WebhookService.handleMonoAccountConnected(body.data as WebhookModel.MonoAccountConnectedBodyType["data"])
+        const template = {
+            "mono.events.account_connected": WebhookService.handleMonoAccountConnected,
+            "mono.events.account_updated": WebhookService.handleMonoAccountUpdated,
+            "mono.events.account_unlinked": WebhookService.handleMonoAccountUnlinked,
+        }
+        if (body.event in template) {
+            await template[body.event](body.data as any)
             return "ok"
         }
-        if (body.event === "mono.events.account_updated") {
-            logger.info("Mono account updated")
-            await WebhookService.handleMonoAccountUpdated(body.data as WebhookModel.MonoAccountUpdatedBodyType["data"])
-            return "ok"
+        else {
+            logger.info(`Mono account unknown event ${body.event}`)
         }
     }, {
         beforeHandle({ headers, body, set, logger }) {

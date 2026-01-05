@@ -32,4 +32,7 @@ export class AccountService {
             WHERE mono_account_id = ${data.account._id}
         `
     }
+    static async deleteAccount(data: WebhookModel.MonoAccountUnlinkedBodyType["data"]) {
+        return db`DELETE FROM accounts WHERE mono_account_id = ${data.account.id}`
+    }
 }

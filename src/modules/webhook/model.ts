@@ -7,8 +7,8 @@ export namespace WebhookModel {
         return t.Object({
             event: t.UnionEnum([
                 "mono.events.account_connected",
-                "mono.events.account_connected.failed",
-                "mono.events.account_updated"
+                "mono.events.account_updated",
+                "mono.events.account_unlinked"
             ], {
                 description: "Event type",
             }),
@@ -49,4 +49,11 @@ export namespace WebhookModel {
         })
     }))
     export type MonoAccountUpdatedBodyType = typeof monoAccountUpdatedBodySchema.static
+
+    export const monoAccountUnlinkedBodySchema = monoWebhookBodyFactory(t.Object({
+        account: t.Object({
+            id: t.String({ description: "Account ID" }),
+        })
+    }))
+    export type MonoAccountUnlinkedBodyType = typeof monoAccountUnlinkedBodySchema.static
 }

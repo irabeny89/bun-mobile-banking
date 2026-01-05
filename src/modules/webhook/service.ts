@@ -8,4 +8,7 @@ export class WebhookService {
     static async handleMonoAccountUpdated(data: WebhookModel.MonoAccountUpdatedBodyType["data"]) {
         await AccountService.updateAccount(data)
     }
+    static async handleMonoAccountUnlinked(data: WebhookModel.MonoAccountUnlinkedBodyType["data"]) {
+        await AccountService.deleteAccount(data)
+    }
 }
