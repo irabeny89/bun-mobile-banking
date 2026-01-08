@@ -1,12 +1,58 @@
 import dbSingleton from "@/utils/db";
 import { WebhookModel } from "../webhook/model";
-import { MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingArgs, MonoConnectAuthAccountLinkingResponseData, MonoResponse } from "@/types/mono.type";
-import { MONO } from "@/config";
-import { KycService } from "../kyc/service";
-import { generateRef } from "@/utils/ref-gen";
+import { MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingArgs, MonoConnectReauthAccountLinkingArgs } from "@/types/mono.type";
+import { MONO, VALKEY_URL } from "@/config";
+import { AccountModel } from "./model";
+import { Queue, Worker } from "bullmq";
 
+type JobName = "update-institution" | "update-mfa"
+type UpdateInstitutionJobData = {
+	userId: string,
+	reference: string,
+	institutionId: string,
+	institutionAuthMethod: string,
+}
+type UpdateMfaJobData = {
+	userId: string,
+	reference: string,
+	mfa: boolean
+}
+type JobData = UpdateInstitutionJobData | UpdateMfaJobData
+
+const queueName = "account-update" as const
 const db = dbSingleton()
+const worker = new Worker<JobData, unknown, JobName>(queueName, async (job) => {
+	console.info("accountQueue.worker:: job started")
+	if (job.name === "update-institution") {
+		console.info("accountQueue.worker:: updating institution")
+		const {
+			userId,
+			reference,
+			institutionId,
+			institutionAuthMethod
+		} = job.data as UpdateInstitutionJobData
+		await db`
+			UPDATE individual_accounts
+			SET
+				institution_id = ${institutionId},
+				institution_auth_method = ${institutionAuthMethod}
+			WHERE mono_reference = ${reference}
+			AND user_id = ${userId}
+		`
+	}
+	if (job.name === "update-mfa") {
+		console.info("accountQueue.worker:: updating mfa")
+		const { userId, reference, mfa } = job.data as UpdateMfaJobData
+		await db`
+			UPDATE individual_accounts
+			SET mfa = ${mfa}
+			WHERE mono_reference = ${reference}
+			AND user_id = ${userId}
+		`
+	}
+}, { connection: { url: VALKEY_URL } })
 export class AccountService {
+	static queue = new Queue<JobData, unknown, JobName>(queueName)
 	/**
 	 * Use this endpoint to initiate account linking on the Mono Connect widget.
 	 * @param body Customer details and redirect URL
@@ -31,9 +77,21 @@ export class AccountService {
 			body: JSON.stringify(body)
 		})
 	}
+	/**
+	 * Use this endpoint to re-authorize a previously linked account
+	 * @param body Account ID and redirect URL
+	 * @returns Mono URL to re-authorize account
+	 */
+	static async monoReauthorizeAccount(body: MonoConnectReauthAccountLinkingArgs) {
+		return fetch(`${MONO.baseUrl}${MONO.accountExchangeTokenPath}`, {
+			headers: MONO.connectHeaders,
+			method: "POST",
+			body: JSON.stringify(body)
+		})
+	}
 	static async createAccount(data: WebhookModel.MonoAccountConnectedBodyType["data"]) {
-		return db`INSERT INTO accounts (
-            individual_user_id,
+		return db`INSERT INTO individual_accounts (
+            user_id,
             mono_account_id,
             mono_customer_id,
             mono_reference
@@ -46,7 +104,7 @@ export class AccountService {
 	}
 	static async updateAccount(data: WebhookModel.MonoAccountUpdatedBodyType["data"]) {
 		return db`
-            UPDATE accounts 
+            UPDATE individual_accounts 
             SET account_number = ${data.account.accountNumber},
                 account_name = ${data.account.name},
                 account_type = ${data.account.type},
@@ -55,24 +113,36 @@ export class AccountService {
                 institution_name = ${data.account.institution.name},
                 institution_bank_code = ${data.account.institution.bankCode},
                 institution_type = ${data.account.institution.type},
-                mono_auth_method = ${data.meta.auth_method},
+                institution_auth_method = ${data.meta.auth_method},
                 mono_data_status = ${data.meta.data_status}
             WHERE mono_account_id = ${data.account._id}
         `
 	}
 	static async deleteAccount(data: WebhookModel.MonoAccountUnlinkedBodyType["data"]) {
-		return db`DELETE FROM accounts WHERE mono_account_id = ${data.account.id}`
+		return db`DELETE FROM individual_accounts WHERE mono_account_id = ${data.account.id}`
 	}
 	static async getAccount(userId: string) {
-		return db`SELECT * FROM accounts WHERE individual_user_id = ${userId}`
+		const res: AccountModel.AccountT[] = await db`
+			SELECT * FROM individual_accounts WHERE user_id = ${userId}
+		`
+		return res && res.length ? res[0] : null
 	}
 	static async getAccountByMonoAccountId(monoAccountId: string) {
-		return db`SELECT * FROM accounts WHERE mono_account_id = ${monoAccountId}`
+		const res: AccountModel.AccountT[] = await db`
+			SELECT * FROM individual_accounts WHERE mono_account_id = ${monoAccountId}
+		`
+		return res && res.length ? res[0] : null
 	}
 	static async getAccountByMonoCustomerId(monoCustomerId: string) {
-		return db`SELECT * FROM accounts WHERE mono_customer_id = ${monoCustomerId}`
+		const res: AccountModel.AccountT[] = await db`
+			SELECT * FROM individual_accounts WHERE mono_customer_id = ${monoCustomerId}
+		`
+		return res && res.length ? res[0] : null
 	}
 	static async getAccountByMonoReference(monoReference: string) {
-		return db`SELECT * FROM accounts WHERE mono_reference = ${monoReference}`
+		const res: AccountModel.AccountT[] = await db`
+			SELECT * FROM individual_accounts WHERE mono_reference = ${monoReference}
+		`
+		return res && res.length ? res[0] : null
 	}
 }

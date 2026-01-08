@@ -1,6 +1,7 @@
 import Elysia from "elysia";
 import { connect } from "./routes/connect";
 import { exchange } from "./routes/exchange";
+import { reconnect } from "./routes/reconnect";
 
 export const account = new Elysia({
     name: "account",
@@ -11,3 +12,4 @@ export const account = new Elysia({
 })
     .use(connect)
     .use(exchange)
+    .use(reconnect)

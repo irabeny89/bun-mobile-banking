@@ -71,7 +71,12 @@ export const connect = new Elysia({ name: "connect" })
                 }
             }
         }
-        const { data: { mono_url } } = await res.json() as MonoResponse<MonoConnectAuthAccountLinkingResponseData>
+        const { data: { mono_url, is_multi, meta } } = await res.json() as MonoResponse<MonoConnectAuthAccountLinkingResponseData>
+        await AccountService.queue.add("update-mfa", {
+            userId: user.id,
+            mfa: is_multi,
+            reference: meta.ref
+        })
         return {
             type: "success" as const,
             data: {

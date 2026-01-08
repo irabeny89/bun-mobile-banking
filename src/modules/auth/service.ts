@@ -3,7 +3,7 @@ import { genOTP } from "@/utils/otp";
 import { AuthModel } from "./model";
 import cacheSingleton, { getCacheKey } from "@/utils/cache";
 import { OTP_TTL, REGISTER_CACHE_KEY, REFRESH_TOKEN_TTL, REFRESH_TOKEN_CACHE_KEY, MFA_OTP_CACHE_KEY, SECRET_1, ACCESS_TOKEN_TTL, SECRET_2 } from "@/config";
-import { emailQueue } from "@/utils/email";
+import { emailQueue } from "@/utils/email-queue";
 import pino from "pino";
 import { CommonSchema } from "@/share/schema";
 import { sign, verify } from "jsonwebtoken";

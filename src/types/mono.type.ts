@@ -175,7 +175,7 @@ export type MonoConnectAuthAccountLinkingArgs = {
         /** 10 characters */
         ref: string
     },
-    scope: "auth",
+    scope: "auth" | "reauth",
     redirect_url: string
 }
 
@@ -185,8 +185,11 @@ export type MonoConnectAuthAccountLinkingResponseData = {
     meta: {
         ref: string
     },
-    scope: "auth",
-    institution: {},
+    scope: "auth" | "reauth",
+    institution: {
+        id: string;
+        auth_method: string
+    },
     redirect_url: string,
     is_multi: boolean,
     created_at: string
@@ -199,3 +202,9 @@ export type MonoConnectAuthAccountExchangeTokenArgs = {
 export type MonoConnectAuthAccountExchangeTokenResponseData = {
     id: string;
 }
+
+export type MonoConnectReauthAccountLinkingArgs = {
+    account: string,
+} & Omit<MonoConnectAuthAccountLinkingArgs, "customer">
+
+export type MonoConnectReauthAccountLinkingResponseData = MonoConnectAuthAccountLinkingResponseData
