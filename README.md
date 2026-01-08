@@ -76,14 +76,29 @@ To start the development server run:
 bun run dev
 ```
 
-Open <http://localhost:3000/> with your browser to see the result.
-Query `/openapi` endpoint to see OpenAPI documentation.
+### OpenAPI Documentation
+
+Open <http://localhost:3000/openapi> to see OpenAPI documentation.
+
+### Tunnel
 
 To create a tunnel to your localhost, run:
 
 ```bash
 bun run tunnel
 ```
+
+### Mono External API
+
+We use Mono's external API to get user's bank account details and to link the account to the user's profile.
+
+To test Mono Connect using the connect SDK for authorization code and exchange for account ID, run:
+
+```bash
+bun run mono:connect
+```
+
+> To get the Mono API key, visit [Mono](https://mono.co/).
 
 > Check the [`script`](package.json#L6) field in [package.json](package.json) for more commands.
 
@@ -107,9 +122,9 @@ podman run \
 > Note: You don't have to run the single command above. You can use the [scripts/app-pod.sh](scripts/app-pod.sh) script to run the garage container along with the app pod. Example:
 
 ```bash
-./scripts/app-pod.sh .env
+./scripts/app-pod.sh .env.development
 # OR run script from package.json
-bun run pod:app .env
+bun run pod:app .env.development
 ```
 
 > Note: For further configuration(layout, bucket, etc.) visit [garage docs](https://garagehq.deuxfleurs.fr/documentation/quick-start/).

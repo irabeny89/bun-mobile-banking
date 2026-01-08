@@ -15,6 +15,7 @@
     "email": "email dev --dir src/emails",
     "tunnel": "export $(cat .env.development | xargs) && ssh -R 80:localhost:$PORT localhost.run",
     "maildev": "podman run -p 1080:1080 -p 1025:1025 maildev/maildev",
+    "mono:connect": "bun run http_requests/mono/connect/index.html",
     "pod:app": "./scripts/app-pod.sh",
     "pod:app:dev": "./scripts/app-pod.sh .env.development",
     "kube:play": "./scripts/kube-play.sh",
