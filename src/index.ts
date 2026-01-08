@@ -15,6 +15,7 @@ import { apiDocs } from "./plugins/api-docs.plugin";
 import { kyc } from "./modules/kyc";
 import { PORT } from "./config";
 import { webhook } from "./modules/webhook";
+import { account } from "./modules/account";
 
 export const app = new Elysia({
   name: pkg.name,
@@ -38,6 +39,7 @@ export const app = new Elysia({
     .use(auth)
     .use(individualUser)
     .use(kyc)
+    .use(account)
     .use(webhook)
   )
   .listen(PORT);

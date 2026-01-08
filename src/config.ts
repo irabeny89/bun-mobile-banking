@@ -24,6 +24,7 @@ export const IMAGE_UPLOAD = {
     mimeType: ["image/jpeg", "image/jpg", "image/png"]
 }
 export const MONO = {
+    accountRefPrefix: process.env.MONO_ACCOUNT_REF_PREFIX ?? "ACC",
     webhookSecret: process.env.MONO_WEBHOOK_SECRET,
     connectPublicKey: process.env.MONO_CONNECT_PUBLIC_KEY,
     connectSecretKey: process.env.MONO_CONNECT_SECRET_KEY,
@@ -34,10 +35,16 @@ export const MONO = {
     lookupBvnPath: process.env.MONO_LOOKUP_BVN_PATH ?? "/v3/lookup/bvn",
     lookupPassportPath: process.env.MONO_LOOKUP_PASSPORT_PATH ?? "/v3/lookup/passport",
     lookupDriverLicensePath: process.env.MONO_LOOKUP_DRIVER_LICENSE_PATH ?? "/v3/lookup/driver_license",
-    headers: {
+    accountInitiatePath: process.env.MONO_CONNECT_AUTH_ACCOUNT_LINKING_PATH ?? "/v2/accounts/initiate",
+    lookupHeaders: {
         "Accept": "application/json",
         "Content-Type": "application/json",
         "mono-sec-key": process.env.MONO_LOOKUP_SECRET_KEY
+    },
+    connectHeaders: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "mono-sec-key": process.env.MONO_CONNECT_SECRET_KEY
     },
     sandbox: {
         driverLicense: {

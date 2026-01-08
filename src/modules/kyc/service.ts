@@ -24,7 +24,7 @@ export class KycService {
             ? { nin }
             : { nin: MONO.sandbox.nin }
         return fetch(`${MONO.baseUrl}${MONO.lookupNinPath}`, {
-            headers: MONO.headers,
+            headers: MONO.lookupHeaders,
             method: "POST",
             body: JSON.stringify(lookupArgs)
         });
@@ -43,7 +43,7 @@ export class KycService {
             ? args
             : { bvn: MONO.sandbox.bvn.bvn }
         return fetch(`${MONO.baseUrl}${MONO.lookupBvnPath}/initiate`, {
-            headers: MONO.headers,
+            headers: MONO.lookupHeaders,
             method: "POST",
             body: JSON.stringify(lookupArgs)
         });
@@ -66,7 +66,7 @@ export class KycService {
                 phone_number: MONO.sandbox.bvn.alternatePhone,
             }
         return fetch(`${MONO.baseUrl}${MONO.lookupBvnPath}/verify`, {
-            headers: { ...MONO.headers, "x-session-id": sessionId },
+            headers: { ...MONO.lookupHeaders, "x-session-id": sessionId },
             method: "POST",
             body: JSON.stringify(verifyArgs)
         });
@@ -86,7 +86,7 @@ export class KycService {
             ? args
             : { otp: MONO.sandbox.bvn.otp }
         return fetch(`${MONO.baseUrl}${MONO.lookupBvnPath}/details`, {
-            headers: { ...MONO.headers, "x-session-id": sessionId },
+            headers: { ...MONO.lookupHeaders, "x-session-id": sessionId },
             method: "POST",
             body: JSON.stringify(detailsArgs)
         });
@@ -109,7 +109,7 @@ export class KycService {
                 date_of_birth: MONO.sandbox.driverLicense.dateOfBirth,
             }
         return fetch(`${MONO.baseUrl}${MONO.lookupPassportPath}`, {
-            headers: MONO.headers,
+            headers: MONO.lookupHeaders,
             method: "POST",
             body: JSON.stringify(lookupArgs)
         });
@@ -133,7 +133,7 @@ export class KycService {
                 date_of_birth: MONO.sandbox.driverLicense.dateOfBirth,
             }
         return fetch(`${MONO.baseUrl}${MONO.lookupDriverLicensePath}`, {
-            headers: MONO.headers,
+            headers: MONO.lookupHeaders,
             method: "POST",
             body: JSON.stringify(lookupArgs)
         });
