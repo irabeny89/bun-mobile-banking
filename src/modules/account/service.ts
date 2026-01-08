@@ -1,14 +1,31 @@
 import dbSingleton from "@/utils/db";
 import { WebhookModel } from "../webhook/model";
-import { MonoConnectAuthAccountLinkingArgs, MonoConnectAuthAccountLinkingResponseData, MonoResponse } from "@/types/mono.type";
+import { MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingArgs, MonoConnectAuthAccountLinkingResponseData, MonoResponse } from "@/types/mono.type";
 import { MONO } from "@/config";
 import { KycService } from "../kyc/service";
 import { generateRef } from "@/utils/ref-gen";
 
 const db = dbSingleton()
 export class AccountService {
+	/**
+	 * Use this endpoint to initiate account linking on the Mono Connect widget.
+	 * @param body Customer details and redirect URL
+	 * @returns Mono URL to initiate account linking
+	 */
 	static async monoInitiateAccountLinking(body: MonoConnectAuthAccountLinkingArgs) {
 		return fetch(`${MONO.baseUrl}${MONO.accountInitiatePath}`, {
+			headers: MONO.connectHeaders,
+			method: "POST",
+			body: JSON.stringify(body)
+		})
+	}
+	/**
+	 * Use this endpoint to request an account ID (that identifies the authenticated account) after successful enrolment on the Mono Connect widget.
+	 * @param body Code returned from Mono Connect
+	 * @returns Account ID in response data
+	 */
+	static async monoExchangeToken(body: MonoConnectAuthAccountExchangeTokenArgs) {
+		return fetch(`${MONO.baseUrl}${MONO.accountExchangeTokenPath}`, {
 			headers: MONO.connectHeaders,
 			method: "POST",
 			body: JSON.stringify(body)
@@ -57,27 +74,5 @@ export class AccountService {
 	}
 	static async getAccountByMonoReference(monoReference: string) {
 		return db`SELECT * FROM accounts WHERE mono_reference = ${monoReference}`
-	}
-	static async getConnectUrl(userId: string, userEmail: string) {
-		const data = await KycService.getTier1Data(userId)
-		if (!data) {
-			throw new Error("Account linking failed - Failed to get tier 1 data")
-		}
-		const res = await this.monoInitiateAccountLinking({
-			customer: {
-				name: `${data.firstName} ${data.lastName}`,
-				email: userEmail
-			},
-			meta: {
-				ref: generateRef(MONO.accountRefPrefix)
-			},
-			scope: "auth",
-			redirect_url: "/"
-		})
-		if (!res.ok) {
-			throw new Error("Account linking failed - Failed to initiate account linking")
-		}
-		const { data: { mono_url } } = await res.json() as MonoResponse<MonoConnectAuthAccountLinkingResponseData>
-		return mono_url
 	}
 }

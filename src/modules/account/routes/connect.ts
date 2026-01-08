@@ -5,6 +5,10 @@ import { AccountModel } from "../model";
 import { CommonSchema } from "@/share/schema";
 import { ERROR_RESPONSE_CODES } from "@/types";
 import { AccountService } from "../service";
+import { MONO } from "@/config";
+import { KycService } from "@/modules/kyc/service";
+import { MonoResponse, MonoConnectAuthAccountLinkingResponseData } from "@/types/mono.type";
+import { generateRef } from "@/utils/ref-gen";
 
 export const connect = new Elysia({ name: "connect" })
     .use(userMacro)
@@ -31,29 +35,49 @@ export const connect = new Elysia({ name: "connect" })
                 }
             }
         }
-        try {
-            const connectUrl = await AccountService.getConnectUrl(user.id, user.email)
+        const data = await KycService.getTier1Data(user.id)
+        if (!data) {
+            logger.error("connect:: Failed to get tier 1 data")
+            set.status = 500
             return {
-                type: "success" as const,
-                data: {
-                    message: "Click the link to connect your account",
-                    connectUrl
+                type: "error" as const,
+                error: {
+                    message: "Failed to connect to your account",
+                    code: ERROR_RESPONSE_CODES.INTERNAL_SERVER_ERROR,
+                    details: []
                 }
             }
-        } catch (error: any) {
-            if ((error.message as string).startsWith("Account linking failed")) {
-                logger.error(error, "connect:: Failed to get connect url")
-                set.status = 500
-                return {
-                    type: "error" as const,
-                    error: {
-                        message: "Failed to connect to your account",
-                        code: ERROR_RESPONSE_CODES.INTERNAL_SERVER_ERROR,
-                        details: []
-                    }
+        }
+        const res = await AccountService.monoInitiateAccountLinking({
+            customer: {
+                name: `${data.firstName} ${data.lastName}`,
+                email: user.email
+            },
+            meta: {
+                ref: generateRef(MONO.accountRefPrefix)
+            },
+            scope: "auth",
+            redirect_url: "/"
+        })
+        if (!res.ok) {
+            logger.error("connect:: Failed to initiate account linking")
+            set.status = 500
+            return {
+                type: "error" as const,
+                error: {
+                    message: "Failed to connect to your account",
+                    code: ERROR_RESPONSE_CODES.INTERNAL_SERVER_ERROR,
+                    details: []
                 }
             }
-            throw error
+        }
+        const { data: { mono_url } } = await res.json() as MonoResponse<MonoConnectAuthAccountLinkingResponseData>
+        return {
+            type: "success" as const,
+            data: {
+                message: "Click the link to connect your account",
+                connectUrl: mono_url
+            }
         }
     }, {
         user: ["individual"],
