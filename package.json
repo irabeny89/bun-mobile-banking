@@ -1,5 +1,5 @@
 {
-  "name": "bun-mobile-banking",
+  "name": "moba-mobile-banking",
   "version": "1.0.1",
   "description": "Mobile banking app for individuals and businesses.",
   "author": "Ernest Irabor <irabeny89@gmail.com>",
@@ -19,10 +19,10 @@
     "pod:app:dev": "./scripts/app-pod.sh .env.development",
     "kube:play": "./scripts/kube-play.sh",
     "kube:gen": "./scripts/pod-kube.sh",
-    "garage": "podman exec fmb-storage /garage",
-    "garage:status": "podman exec fmb-storage /garage status",
-    "psql:dev": "export $(cat .env.development | xargs) && podman exec -ti fmb-db psql -U $POSTGRES_USER -d $POSTGRES_DB",
-    "redis-cli:dev": "export $(cat .env.development | xargs) && podman exec -ti fmb-cache redis-cli"
+    "garage": "podman exec moba-storage /garage",
+    "garage:status": "podman exec moba-storage /garage status",
+    "psql:dev": "export $(cat .env.development | xargs) && podman exec -ti moba-db psql -U $POSTGRES_USER -d $POSTGRES_DB",
+    "redis-cli:dev": "export $(cat .env.development | xargs) && podman exec -ti moba-cache redis-cli"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.0",

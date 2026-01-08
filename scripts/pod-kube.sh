@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Generate kube file from podman pod
+
 # get environment variable file path from cli arguments
 ENV_FILE=${1:-".env"}
 # check if environment variable file exists
@@ -12,7 +14,7 @@ echo "Loading environment variables from $ENV_FILE"
 # load environment variables
 export $(cat $ENV_FILE | xargs)
 
-POD=${POD_NAME:-"fmb-pod"}
+POD=${POD_NAME:-"moba-pod"}
 echo "Generating kube $POD.yaml"
 podman generate kube $POD > $POD.yaml
 echo "Pod $POD.yaml generated successfully"

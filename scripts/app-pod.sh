@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Create pod from environment variables
+
 # get environment variable file path from cli arguments
 ENV_FILE=${1:-".env"}
 # load environment variables
@@ -16,11 +18,11 @@ echo "Loading environment variables from $ENV_FILE"
 # load environment variables
 export $(cat $ENV_FILE | xargs)
 
-POD=${POD_NAME:-"fmb-pod"}
+POD=${POD_NAME:-"moba-pod"}
 echo "Creating pod $POD"
 
 # database variables
-DB_CONTAINER_NAME="fmb-db"
+DB_CONTAINER_NAME="moba-db"
 # bind mount volume in host working directory
 DB_VOLUME="./postgres-data"
 DB_IMAGE="postgres:18.1-alpine3.23"
@@ -30,12 +32,12 @@ DB_NAME=${POSTGRES_DB:-"postgres"}
 DB_PORT=${POSTGRES_PORT:-"5432"}
 
 # cache variables
-CACHE_CONTAINER_NAME="fmb-cache"
+CACHE_CONTAINER_NAME="moba-cache"
 CACHE_IMAGE="valkey/valkey:9.0.0-alpine3.22"
 CACHE_PORT=${VALKEY_PORT:-"6379"}
 
 # file storage variables
-GARAGE_CONTAINER_NAME="fmb-storage"
+GARAGE_CONTAINER_NAME="moba-storage"
 GARAGE_IMAGE="dxflrs/garage:v2.1.0"
 GARAGE_PORT0=${GARAGE_PORT:-"3900"}
 GARAGE_PORT1=${GARAGE_PORT:-"3901"}
