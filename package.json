@@ -4,8 +4,8 @@
   "description": "Mobile banking app for individuals and businesses.",
   "author": "Ernest Irabor <irabeny89@gmail.com>",
   "scripts": {
-    "hook:pre-commit": "echo 'set -e\n\ncog verify --file $1\n' > .git/hooks/pre-commit",
-    "hook:pre-push": "echo 'set -e\n\nbun run lint && bun test\n' > .git/hooks/pre-push",
+    "hook:pre-commit": "echo '#!/bin/sh\nset -e\ncog verify --file $1\n' > .git/hooks/pre-commit",
+    "hook:pre-push": "echo '#!/bin/sh\nset -e\nbun run lint && bun test\n' > .git/hooks/pre-push",
     "hook:clear": "echo '' > .git/hooks/pre-commit & echo '' > .git/hooks/pre-push",
     "lint": "tsc --noEmit",
     "lint:tests": "tsc --noEmit tests/**/*.ts",
