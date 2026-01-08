@@ -191,3 +191,11 @@ export type MonoConnectAuthAccountLinkingResponseData = {
     is_multi: boolean,
     created_at: string
 }
+
+export type MonoConnectAuthAccountExchangeTokenArgs = {
+    code: string;
+}
+
+export type MonoConnectAuthAccountExchangeTokenResponseData = {
+    id: string;
+}
