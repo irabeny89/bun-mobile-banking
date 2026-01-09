@@ -106,7 +106,7 @@ export class AccountService {
 		`
 		return res && res.length ? res : []
 	}
-	static async createAccount(data: WebhookModel.MonoAccountConnectedBodyType["data"]) {
+	static async create(data: WebhookModel.MonoAccountConnectedBodyType["data"]) {
 		return db`INSERT INTO individual_accounts (
             user_id,
             mono_account_id,
@@ -119,7 +119,7 @@ export class AccountService {
             ${data.meta.ref}
         )`
 	}
-	static async updateAccount(data: WebhookModel.MonoAccountUpdatedBodyType["data"], balance: BigInt) {
+	static async update(data: WebhookModel.MonoAccountUpdatedBodyType["data"], balance: BigInt) {
 		return db`
             UPDATE individual_accounts 
             SET account_number = ${data.account.accountNumber},
@@ -135,28 +135,28 @@ export class AccountService {
             WHERE mono_account_id = ${data.account._id}
         `
 	}
-	static async deleteAccount(data: WebhookModel.MonoAccountUnlinkedBodyType["data"]) {
+	static async delete(data: WebhookModel.MonoAccountUnlinkedBodyType["data"]) {
 		return db`DELETE FROM individual_accounts WHERE mono_account_id = ${data.account.id}`
 	}
-	static async getAccount(userId: string) {
+	static async findByUserId(userId: string) {
 		const res: AccountModel.AccountT[] = await db`
 			SELECT * FROM individual_accounts WHERE user_id = ${userId}
 		`
 		return res && res.length ? res[0] : null
 	}
-	static async getAccountByMonoAccountId(monoAccountId: string) {
+	static async findAccountByMonoAccountId(monoAccountId: string) {
 		const res: AccountModel.AccountT[] = await db`
 			SELECT * FROM individual_accounts WHERE mono_account_id = ${monoAccountId}
 		`
 		return res && res.length ? res[0] : null
 	}
-	static async getAccountByMonoCustomerId(monoCustomerId: string) {
+	static async findAccountByMonoCustomerId(monoCustomerId: string) {
 		const res: AccountModel.AccountT[] = await db`
 			SELECT * FROM individual_accounts WHERE mono_customer_id = ${monoCustomerId}
 		`
 		return res && res.length ? res[0] : null
 	}
-	static async getAccountByMonoReference(monoReference: string) {
+	static async findAccountByMonoReference(monoReference: string) {
 		const res: AccountModel.AccountT[] = await db`
 			SELECT * FROM individual_accounts WHERE mono_reference = ${monoReference}
 		`

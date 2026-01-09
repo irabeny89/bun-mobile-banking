@@ -32,7 +32,7 @@ export const reconnect = new Elysia({ name: "reconnect" })
                 }
             }
         }
-        const account = await AccountService.getAccount(user.id)
+        const account = await AccountService.findByUserId(user.id)
         if (!account) {
             logger.error("reconnect:: Account not found")
             set.status = 500
