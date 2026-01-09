@@ -208,3 +208,11 @@ export type MonoConnectReauthAccountLinkingArgs = {
 } & Omit<MonoConnectAuthAccountLinkingArgs, "customer">
 
 export type MonoConnectReauthAccountLinkingResponseData = MonoConnectAuthAccountLinkingResponseData
+
+export type MonoAccountBalanceResponseData = {
+    id: string,
+    name: string,
+    account_number: string,
+    balance: number,
+    currency: string
+}

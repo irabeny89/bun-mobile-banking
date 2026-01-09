@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS individual_accounts (
     account_name VARCHAR(100),
     account_type VARCHAR(30),
     currency VARCHAR(10),
-    balance BIGINT,
+    balance BIGINT NOT NULL DEFAULT 0,
     institution_id VARCHAR(30),
     institution_auth_method VARCHAR(25),
     institution_name VARCHAR(100),

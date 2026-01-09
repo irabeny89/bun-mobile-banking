@@ -89,6 +89,11 @@ export class AccountService {
 			body: JSON.stringify(body)
 		})
 	}
+	static async monoAccountBalance(monoAccountId: string) {
+		return fetch(`${MONO.baseUrl}${MONO.accountPath}/${monoAccountId}/balance`, {
+			headers: MONO.connectHeaders,
+		})
+	}
 	static async createAccount(data: WebhookModel.MonoAccountConnectedBodyType["data"]) {
 		return db`INSERT INTO individual_accounts (
             user_id,
@@ -102,14 +107,14 @@ export class AccountService {
             ${data.meta.ref}
         )`
 	}
-	static async updateAccount(data: WebhookModel.MonoAccountUpdatedBodyType["data"]) {
+	static async updateAccount(data: WebhookModel.MonoAccountUpdatedBodyType["data"], balance: BigInt) {
 		return db`
             UPDATE individual_accounts 
             SET account_number = ${data.account.accountNumber},
                 account_name = ${data.account.name},
                 account_type = ${data.account.type},
                 currency = ${data.account.currency},
-                balance = ${data.account.balance},
+                balance = ${balance},
                 institution_name = ${data.account.institution.name},
                 institution_bank_code = ${data.account.institution.bankCode},
                 institution_type = ${data.account.institution.type},

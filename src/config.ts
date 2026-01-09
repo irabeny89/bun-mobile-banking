@@ -35,6 +35,7 @@ export const MONO = {
     lookupBvnPath: process.env.MONO_LOOKUP_BVN_PATH ?? "/v3/lookup/bvn",
     lookupPassportPath: process.env.MONO_LOOKUP_PASSPORT_PATH ?? "/v3/lookup/passport",
     lookupDriverLicensePath: process.env.MONO_LOOKUP_DRIVER_LICENSE_PATH ?? "/v3/lookup/driver_license",
+    accountPath: process.env.MONO_ACCOUNT_PATH ?? "/v2/accounts",
     accountInitiatePath: process.env.MONO_CONNECT_AUTH_ACCOUNT_LINKING_PATH ?? "/v2/accounts/initiate",
     accountExchangeTokenPath: process.env.MONO_CONNECT_AUTH_ACCOUNT_EXCHANGE_TOKEN_PATH ?? "/v2/accounts/auth",
     lookupHeaders: {
