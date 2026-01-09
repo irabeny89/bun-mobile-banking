@@ -19,8 +19,8 @@ User Type: Business - KYB
 
 ### 2. Account Management
 
-- [ ] Dashboard overview
-- [ ] View account balances
+- [x] Dashboard overview
+- [x] View account balances
 - [ ] View transaction history
 - [ ] Statement generation (PDF/email)
 
@@ -80,7 +80,17 @@ bun run dev
 
 Open <http://localhost:3000/openapi> to see OpenAPI documentation.
 
-### Tunnel
+### Tunnel With [Localhost.run](https://localhost.run/docs)
+
+Free tunnel for connecting your localhost apps to the internet e.g webhooks, or other web apps or share with trusted users to test your app.
+
+- domain: <https://5ea7d840767aef.lhr.life>
+- connection id is cf157c20-ed53-4e57-b692-0d1c68b57901
+- RSA key fingerprint is:
+SHA256:FV8IMJ4IYjYUTnd6on7PqbRjaZf4c1EhhEBgeUdE94I
+
+> create an account and add your key for a longer lasting domain name.
+> see https://localhost.run/docs/forever-free/ for more information.
 
 To create a tunnel to your localhost, run:
 

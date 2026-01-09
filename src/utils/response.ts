@@ -1,3 +1,4 @@
+import { CommonSchema } from "@/share/schema";
 import { TProperties } from "@/types";
 import { type TSchema, t } from "elysia";
 
@@ -15,10 +16,7 @@ export function successSchemaFactory<T extends TProperties & TSchema>(
     ? t.Object({
       type: t.Literal("success"),
       data: t.Array(dataSchema),
-      pagination: t.Object({
-        cursor: t.String(),
-        hasMore: t.Boolean(),
-      }),
+      pagination: CommonSchema.pagingResponseSchema,
     })
     : t.Object({
       type: t.Literal("success"),

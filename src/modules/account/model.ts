@@ -1,5 +1,6 @@
 import { t } from "elysia";
 import { successSchemaFactory } from "@/utils/response";
+import { CommonSchema } from "@/share/schema";
 
 export namespace AccountModel {
 	export const Account = t.Object({
@@ -50,4 +51,12 @@ export namespace AccountModel {
 		accountId: t.String()
 	}))
 	export type ReconnectSuccessT = typeof reconnectSuccessSchema.static
+
+	export const accountListQuerySchema = CommonSchema.pagingArgsSchema
+	export type AccountListQueryT = typeof accountListQuerySchema.static
+
+	export const accountListSuccessSchema = successSchemaFactory(t.Object({
+		accounts: t.Array(Account)
+	}), "paging data")
+	export type AccountListSuccessT = typeof accountListSuccessSchema.static
 }

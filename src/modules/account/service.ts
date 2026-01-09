@@ -4,6 +4,7 @@ import { MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingA
 import { MONO, VALKEY_URL } from "@/config";
 import { AccountModel } from "./model";
 import { Queue, Worker } from "bullmq";
+import { CommonSchema } from "@/share/schema";
 
 type JobName = "update-institution" | "update-mfa"
 type UpdateInstitutionJobData = {
@@ -93,6 +94,17 @@ export class AccountService {
 		return fetch(`${MONO.baseUrl}${MONO.accountPath}/${monoAccountId}/balance`, {
 			headers: MONO.connectHeaders,
 		})
+	}
+	static async findAll(userId: string, paging: CommonSchema.PagingArgsSchemaT) {
+		const res = await db`
+			SELECT *
+			FROM individual_accounts
+			WHERE user_id = ${userId}
+			AND created_at > ${paging.cursor}
+			ORDER BY created_at ASC
+			LIMIT ${paging.limit}
+		`
+		return res && res.length ? res : []
 	}
 	static async createAccount(data: WebhookModel.MonoAccountConnectedBodyType["data"]) {
 		return db`INSERT INTO individual_accounts (

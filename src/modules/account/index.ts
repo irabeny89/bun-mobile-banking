@@ -2,10 +2,11 @@ import Elysia from "elysia";
 import { connect } from "./routes/connect";
 import { exchange } from "./routes/exchange";
 import { reconnect } from "./routes/reconnect";
+import { list } from "./routes/list";
 
 export const account = new Elysia({
     name: "account",
-    prefix: "/account",
+    prefix: "/accounts",
     detail: {
         description: "Account management",
     }
@@ -13,3 +14,4 @@ export const account = new Elysia({
     .use(connect)
     .use(exchange)
     .use(reconnect)
+    .use(list)

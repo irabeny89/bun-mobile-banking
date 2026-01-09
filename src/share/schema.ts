@@ -8,6 +8,30 @@ export namespace CommonSchema {
             .Encode((value) => value.trim());
     }
 
+    export const pagingArgsSchema = t.Object({
+        cursor: t.String({
+            default: "",
+            description: "Cursor of where to start pagination. Usually using created_at of last item as cursor."
+        }),
+        limit: t.Integer({
+            default: 10,
+            minimum: 1,
+            maximum: 100,
+            description: "Limit for pagination. Default is 10, maximum is 100."
+        })
+    })
+    export type PagingArgsSchemaT = typeof pagingArgsSchema.static
+
+    export const pagingResponseSchema = t.Object({
+        cursor: t.String({
+            description: "Cursor of where to start next pagination. Usually using created_at of last item as cursor."
+        }),
+        hasMore: t.Boolean({
+            description: "Whether there are more items to fetch. If false, there are no more items to fetch."
+        }),
+      })
+    export type PagingResponseSchemaT = typeof pagingResponseSchema.static
+
     export const errorSchema = errorSchemaFactory();
     export type ErrorSchemaT = typeof errorSchema.static;
 
