@@ -28,3 +28,4 @@ FOR EACH ROW
 EXECUTE FUNCTION set_update_timestamp();
 
 CREATE INDEX IF NOT EXISTS idx_kyc_created_at ON kyc(created_at);
+CREATE INDEX IF NOT EXISTS idx_kyc_user_id ON kyc(user_id);
