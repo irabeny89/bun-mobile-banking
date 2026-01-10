@@ -37,7 +37,7 @@ export const connect = new Elysia({ name: "connect" })
         }
         const data = await KycService.getTier1Data(user.id)
         if (!data) {
-            logger.error("connect:: Failed to get tier 1 data")
+            logger.error("connect:: Failed to get KYC tier 1 data")
             set.status = 500
             return {
                 type: "error" as const,
@@ -71,12 +71,7 @@ export const connect = new Elysia({ name: "connect" })
                 }
             }
         }
-        const { data: { mono_url, is_multi, meta } } = await res.json() as MonoResponse<MonoConnectAuthAccountLinkingResponseData>
-        await AccountService.queue.add("update-mfa", {
-            userId: user.id,
-            mfa: is_multi,
-            reference: meta.ref
-        })
+        const { data: { mono_url } } = await res.json() as MonoResponse<MonoConnectAuthAccountLinkingResponseData>
         return {
             type: "success" as const,
             data: {

@@ -1,8 +1,9 @@
-export type MonoResponse<T = null> = {
+export type MonoResponse<D = null, M = null> = {
     status: "successful" | "failed";
     message: string;
     timestamp: string;
-    data: T
+    data: D
+    meta: M
 }
 export type MonoDiscoCode = "ABUJA" | "EKO" | "IKEJA" | "IBADAN" | "ENUGU" | "PH" | "JOS" | "KADUNA" | "KANO" | "BH" | "PROTOGY" | "PHISBOND" | "ACCESSPOWER" | "YOLA" | "ABIA" | "ADAMAWA" | "AKWA IBOM" | "ANAMBRA" | "BAUCHI" | "BAYELSA" | "BENUE" | "BORNO" | "CROSS RIVER" | "DELTA" | "EBONYI" | "EDO" | "EKITI" | "GOMBE" | "IMO" | "JIGAWA" | "KATSINA" | "KEBBI" | "KOGI" | "KWARA" | "LAGOS" | "NASSARAWA" | "NIGER" | "OGUN" | "ONDO" | "OSUN" | "OYO" | "PLATEAU" | "RIVERS" | "SOKOTO" | "TARABA" | "YOBE" | "ZAMFARA" | "FCT"
 
@@ -215,4 +216,21 @@ export type MonoAccountBalanceResponseData = {
     account_number: string,
     balance: number,
     currency: string
+}
+
+export type MonoAccountTransactionsResponseData = Array<{
+    id: string
+    narration: string
+    amount: number
+    type: string
+    balance: number
+    date: string
+    category: string
+}>
+
+export type MonoAccountTransactionsResponseMeta = {
+    total: number,
+    page: number,
+    previous: string | null,
+    next: string | null
 }

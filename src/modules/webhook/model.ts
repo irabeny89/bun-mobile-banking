@@ -42,7 +42,9 @@ export namespace WebhookModel {
             updated_at: t.String({ description: "Updated At" })
         }),
         meta: t.Object({
-            data_status: t.String({ description: "Data Status" }),
+            data_status: t.UnionEnum(["AVAILABLE", "PARTIAL", "UNAVAILABLE", "FAILED"], { 
+                description: "Data Status" 
+            }),
             auth_method: t.String({ description: "Auth Method" }),
             ref: t.String({ description: "Reference" }),
             retrieved_data: t.Array(t.String({ description: "Retrieved Data" }))

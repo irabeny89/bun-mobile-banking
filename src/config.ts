@@ -1,4 +1,5 @@
 export const PORT = process.env.PORT ?? "3000";
+export const DEFAULT_CURRENCY = process.env.DEFAULT_CURRENCY ?? "NGN";
 export const DEFAULT_OTP_LENGTH = 6;
 export const WORD_SEPARATOR = "-";
 export const RATE_LIMIT_DEFAULT_TTL = 3600; // 1 hour in seconds

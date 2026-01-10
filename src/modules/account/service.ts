@@ -6,41 +6,18 @@ import { AccountModel } from "./model";
 import { Queue, Worker } from "bullmq";
 import { CommonSchema } from "@/share/schema";
 
-type JobName = "update-institution" | "update-mfa"
-type UpdateInstitutionJobData = {
-	userId: string,
-	reference: string,
-	institutionId: string,
-	institutionAuthMethod: string,
-}
+type JobName = "update-mfa"
 type UpdateMfaJobData = {
 	userId: string,
 	reference: string,
 	mfa: boolean
 }
-type JobData = UpdateInstitutionJobData | UpdateMfaJobData
+type JobData = UpdateMfaJobData
 
 const queueName = "account-update" as const
 const db = dbSingleton()
 const worker = new Worker<JobData, unknown, JobName>(queueName, async (job) => {
 	console.info("accountQueue.worker:: job started")
-	if (job.name === "update-institution") {
-		console.info("accountQueue.worker:: updating institution")
-		const {
-			userId,
-			reference,
-			institutionId,
-			institutionAuthMethod
-		} = job.data as UpdateInstitutionJobData
-		await db`
-			UPDATE individual_accounts
-			SET
-				institution_id = ${institutionId},
-				institution_auth_method = ${institutionAuthMethod}
-			WHERE mono_reference = ${reference}
-			AND user_id = ${userId}
-		`
-	}
 	if (job.name === "update-mfa") {
 		console.info("accountQueue.worker:: updating mfa")
 		const { userId, reference, mfa } = job.data as UpdateMfaJobData
@@ -52,6 +29,14 @@ const worker = new Worker<JobData, unknown, JobName>(queueName, async (job) => {
 		`
 	}
 }, { connection: { url: VALKEY_URL } })
+
+worker.on("completed", () => {
+	console.info("accountQueue.worker:: job completed")
+})
+
+worker.on("failed", (_, error) => {
+	console.error(error, "accountQueue.worker:: job failed")
+})
 export class AccountService {
 	static queue = new Queue<JobData, unknown, JobName>(queueName)
 	/**
@@ -119,19 +104,10 @@ export class AccountService {
             ${data.meta.ref}
         )`
 	}
-	static async update(data: WebhookModel.MonoAccountUpdatedBodyType["data"], balance: BigInt) {
+	static async update(data: WebhookModel.MonoAccountUpdatedBodyType["data"]) {
 		return db`
             UPDATE individual_accounts 
-            SET account_number = ${data.account.accountNumber},
-                account_name = ${data.account.name},
-                account_type = ${data.account.type},
-                currency = ${data.account.currency},
-                balance = ${balance},
-                institution_name = ${data.account.institution.name},
-                institution_bank_code = ${data.account.institution.bankCode},
-                institution_type = ${data.account.institution.type},
-                institution_auth_method = ${data.meta.auth_method},
-                mono_data_status = ${data.meta.data_status}
+            SET mono_data_status = ${data.meta.data_status}
             WHERE mono_account_id = ${data.account._id}
         `
 	}
@@ -144,7 +120,7 @@ export class AccountService {
 		`
 		return res && res.length ? res[0] : null
 	}
-	static async findAccountByMonoAccountId(monoAccountId: string) {
+	static async findByMonoAccountId(monoAccountId: string) {
 		const res: AccountModel.AccountT[] = await db`
 			SELECT * FROM individual_accounts WHERE mono_account_id = ${monoAccountId}
 		`

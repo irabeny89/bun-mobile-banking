@@ -45,6 +45,10 @@ export namespace AccountModel {
 		accountId: t.String()
 	}))
 	export type ExchangeSuccessT = typeof exchangeSuccessSchema.static
+	
+	export const reconnectBodySchema = t.Object({
+		accountId: t.String()
+	})
 
 	export const reconnectSuccessSchema = successSchemaFactory(t.Object({
 		message: t.Literal("Account reconnected successfully"),
