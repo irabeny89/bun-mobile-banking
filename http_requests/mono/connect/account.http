@@ -1,0 +1,4 @@
+@accountId = 695a7f39fbc7fac1166afa45
+@accountPath = /v1/accounts
+
+{{monoBaseUrl}}{{accountPath}}/{{accountId}}/balance
