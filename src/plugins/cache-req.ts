@@ -15,6 +15,7 @@ export const cacheReq = new Elysia({ name: "cache-request" })
             await cache.set(request.url, JSON.stringify(responseValue))
             await cache.expire(request.url, CACHE_GET.ttl)
             set.headers[CACHE_GET.header] = CACHE_GET_HEADER_VALUE.Set
+            set.headers[CACHE_GET.ttlHeader] = CACHE_GET.ttl
             logger.info({ url: request.url, responseValue }, "cacheReq:: response cached")
         }
     })
@@ -26,6 +27,7 @@ export const cacheReq = new Elysia({ name: "cache-request" })
             const responseValue = JSON.parse(cached)
             store.cacheHit = true;
             set.headers[CACHE_GET.header] = CACHE_GET_HEADER_VALUE.Hit
+            set.headers[CACHE_GET.ttlHeader] = CACHE_GET.ttl
             logger.info({ url: request.url, responseValue }, "cacheReq:: returning cached response")
             return responseValue;
         }
