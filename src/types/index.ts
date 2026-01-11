@@ -46,7 +46,7 @@ export type PrettyReplace<T, K extends keyof T, V> = {
 export type TPropertyKey = string | number;
 export type TProperties = Record<TPropertyKey, TSchema>;
 
-export enum CACHE_GET_VALUE {
+export enum CACHE_GET_HEADER_VALUE {
 	Set = "set",
 	Hit = "hit"
 }

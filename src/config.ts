@@ -114,6 +114,13 @@ export const STORAGE = {
 export const CACHE_GET = {
     ttl: 10 as const, // 10s
     header: "x-cache",
+    ttlHeader: "x-cache-ttl",
+    monoAccounts: {
+        ttl: 2 * 60, // 2m
+        header: "x-mono-accounts-cache",
+        ttlHeader: "x-mono-accounts-cache-ttl",
+        key: "mono-accounts"
+    }
 }
 export const tier1Limit = {
     description: "Tier 1 - Low Value",

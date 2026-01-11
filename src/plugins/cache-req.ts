@@ -1,7 +1,7 @@
 import Elysia from "elysia";
 import cacheSingleton from "../utils/cache";
 import { CACHE_GET } from "../config";
-import { CACHE_GET_VALUE } from "@/types";
+import { CACHE_GET_HEADER_VALUE } from "@/types";
 import pinoLogger from "../utils/pino-logger";
 
 export const cacheReq = new Elysia({ name: "cache-request" })
@@ -14,7 +14,7 @@ export const cacheReq = new Elysia({ name: "cache-request" })
             logger.info("cacheReq:: caching response")
             await cache.set(request.url, JSON.stringify(responseValue))
             await cache.expire(request.url, CACHE_GET.ttl)
-            set.headers[CACHE_GET.header] = CACHE_GET_VALUE.Set
+            set.headers[CACHE_GET.header] = CACHE_GET_HEADER_VALUE.Set
             logger.info({ url: request.url, responseValue }, "cacheReq:: response cached")
         }
     })
@@ -25,7 +25,7 @@ export const cacheReq = new Elysia({ name: "cache-request" })
             logger.info("cacheReq:: cache hit")
             const responseValue = JSON.parse(cached)
             store.cacheHit = true;
-            set.headers[CACHE_GET.header] = CACHE_GET_VALUE.Hit
+            set.headers[CACHE_GET.header] = CACHE_GET_HEADER_VALUE.Hit
             logger.info({ url: request.url, responseValue }, "cacheReq:: returning cached response")
             return responseValue;
         }

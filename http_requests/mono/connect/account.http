@@ -1,4 +1,22 @@
 @accountId = 695a7f39fbc7fac1166afa45
-@accountPath = /v1/accounts
+@accountPath = /v2/accounts
 
+# Get account balance
 {{monoBaseUrl}}{{accountPath}}/{{accountId}}/balance
+Accept: application/json
+mono-sec-key: {{monoConnectSecretKey}}
+Content-Type: application/json
+
+###
+# Get accounts
+{{monoBaseUrl}}{{accountPath}}
+Accept: application/json
+mono-sec-key: {{monoConnectSecretKey}}
+Content-Type: application/json
+
+###
+# Get account details
+{{monoBaseUrl}}{{accountPath}}/{{accountId}}
+Accept: application/json
+mono-sec-key: {{monoConnectSecretKey}}
+Content-Type: application/json

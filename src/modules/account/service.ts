@@ -1,21 +1,32 @@
 import dbSingleton from "@/utils/db";
 import { WebhookModel } from "../webhook/model";
 import { MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingArgs, MonoConnectReauthAccountLinkingArgs } from "@/types/mono.type";
-import { MONO, VALKEY_URL } from "@/config";
+import { CACHE_GET, MONO, VALKEY_URL } from "@/config";
 import { AccountModel } from "./model";
 import { Queue, Worker } from "bullmq";
-import { CommonSchema } from "@/share/schema";
+import { CACHE_GET_HEADER_VALUE } from "@/types";
+import { getCacheKey } from "@/utils/cache";
+import { encrypt } from "@/utils/encryption";
+import cacheSingleton from "@/utils/cache";
 
-type JobName = "update-mfa"
+type JobName = "update-mfa" | "cache-accounts"
 type UpdateMfaJobData = {
 	userId: string,
 	reference: string,
 	mfa: boolean
 }
-type JobData = UpdateMfaJobData
+type CacheAccountsJobData = {
+	userId: string;
+	accounts: Array<
+		Record<"accountNumber", string> &
+		Omit<AccountModel.MonoAccountT, "account_number">
+	>
+}
+type JobData = UpdateMfaJobData | CacheAccountsJobData
 
 const queueName = "account-update" as const
 const db = dbSingleton()
+const cache = cacheSingleton()
 const worker = new Worker<JobData, unknown, JobName>(queueName, async (job) => {
 	console.info("accountQueue.worker:: job started")
 	if (job.name === "update-mfa") {
@@ -27,6 +38,13 @@ const worker = new Worker<JobData, unknown, JobName>(queueName, async (job) => {
 			WHERE mono_reference = ${reference}
 			AND user_id = ${userId}
 		`
+	}
+	if (job.name === "cache-accounts") {
+		console.info("accountQueue.worker:: caching accounts")
+		const { userId, accounts } = job.data as CacheAccountsJobData
+		const cacheKey = getCacheKey(CACHE_GET.monoAccounts.key, userId)
+		await cache.set(cacheKey, encrypt(Buffer.from(JSON.stringify(accounts))))
+		await cache.expire(cacheKey, CACHE_GET.monoAccounts.ttl)
 	}
 }, { connection: { url: VALKEY_URL } })
 
@@ -75,19 +93,32 @@ export class AccountService {
 			body: JSON.stringify(body)
 		})
 	}
+	/**
+	 * Use this endpoint to get the balance of an account
+	 * @param monoAccountId Account ID
+	 * @returns Account balance in response data
+	 */
 	static async monoAccountBalance(monoAccountId: string) {
 		return fetch(`${MONO.baseUrl}${MONO.accountPath}/${monoAccountId}/balance`, {
 			headers: MONO.connectHeaders,
 		})
 	}
-	static async findAll(userId: string, paging: CommonSchema.PagingArgsSchemaT) {
-		const res = await db`
+	/**
+	 * Use this endpoint to get the details of an account
+	 * @param monoAccountId Account ID
+	 * @returns Account details in response data
+	 */
+	static async monoAccountDetails(monoAccountId: string) {
+		return fetch(`${MONO.baseUrl}${MONO.accountPath}/${monoAccountId}`, {
+			headers: MONO.connectHeaders,
+		})
+	}
+	static async findAll(userId: string) {
+		const res: AccountModel.AccountT[] = await db`
 			SELECT *
 			FROM individual_accounts
 			WHERE user_id = ${userId}
-			AND created_at > ${paging.cursor}
-			ORDER BY created_at ASC
-			LIMIT ${paging.limit}
+			ORDER BY created_at DESC
 		`
 		return res && res.length ? res : []
 	}

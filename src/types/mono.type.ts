@@ -6,9 +6,10 @@ export type MonoResponse<D = null, M = null> = {
     meta: M
 }
 export type MonoDiscoCode = "ABUJA" | "EKO" | "IKEJA" | "IBADAN" | "ENUGU" | "PH" | "JOS" | "KADUNA" | "KANO" | "BH" | "PROTOGY" | "PHISBOND" | "ACCESSPOWER" | "YOLA" | "ABIA" | "ADAMAWA" | "AKWA IBOM" | "ANAMBRA" | "BAUCHI" | "BAYELSA" | "BENUE" | "BORNO" | "CROSS RIVER" | "DELTA" | "EBONYI" | "EDO" | "EKITI" | "GOMBE" | "IMO" | "JIGAWA" | "KATSINA" | "KEBBI" | "KOGI" | "KWARA" | "LAGOS" | "NASSARAWA" | "NIGER" | "OGUN" | "ONDO" | "OSUN" | "OYO" | "PLATEAU" | "RIVERS" | "SOKOTO" | "TARABA" | "YOBE" | "ZAMFARA" | "FCT"
-
 export type MonoLookupBvnOtpMethods = "email" | "phone" | "phone_1" | "alternate_phone"
-
+export type MonoDataStatus = "AVAILABLE" | "UNAVAILABLE" | "PARTIAL" | "FAILED"
+export type MonoAuthScope = "auth" | "reauth";
+export type MonoAuthMethod = "mobile_banking" | "internet_banking";
 export type MonoInitiateLookupBvnArgs = {
     bvn: string;
     scope?: "bank_accounts" | "identity";
@@ -176,7 +177,7 @@ export type MonoConnectAuthAccountLinkingArgs = {
         /** 10 characters */
         ref: string
     },
-    scope: "auth" | "reauth",
+    scope: MonoAuthScope,
     redirect_url: string
 }
 
@@ -233,4 +234,29 @@ export type MonoAccountTransactionsResponseMeta = {
     page: number,
     previous: string | null,
     next: string | null
+}
+
+export type MonoAccountDetailsResponseData = {
+    account: {
+      id: string,
+      name: string,
+      account_number: string,
+      currency: string,
+      balance: number,
+      type: string,
+      bvn: string,
+      institution: {
+        name: string,
+        bank_code: string,
+        type: string
+      }
+    },
+    customer: {
+      id: string
+    },
+    meta: {
+      data_status: MonoDataStatus,
+      auth_method: MonoAuthMethod,
+      retrieved_data: string[]
+    }
 }
