@@ -51,9 +51,9 @@ export const list = new Elysia({ name: "list-accounts" })
                     accountNumber: account_number
                 })
             }
-            set.headers[CACHE_GET.monoAccounts.header] = CACHE_GET_HEADER_VALUE.Set
-            set.headers[CACHE_GET.monoAccounts.ttlHeader] = CACHE_GET.monoAccounts.ttl
-            await AccountService.queue.add("cache-accounts", { 
+            set.headers[CACHE_GET.mono.accounts.header] = CACHE_GET_HEADER_VALUE.Set
+            set.headers[CACHE_GET.mono.accounts.ttlHeader] = CACHE_GET.mono.accounts.ttl
+            await AccountService.queue.add("cache-accounts", {
                 userId: user!.id, accounts
             })
         }
@@ -86,12 +86,12 @@ export const list = new Elysia({ name: "list-accounts" })
                     }
                 }
             }
-            const cacheKey = getCacheKey(CACHE_GET.monoAccounts.key, user.id)
+            const cacheKey = getCacheKey(CACHE_GET.mono.accounts.key, user.id)
             const cachedAccounts = await cache.get(cacheKey)
             if (cachedAccounts) {
                 logger.info(`list:: Cached accounts found for user ${user.id}`)
-                set.headers[CACHE_GET.monoAccounts.header] = CACHE_GET_HEADER_VALUE.Hit
-                set.headers[CACHE_GET.monoAccounts.ttlHeader] = CACHE_GET.monoAccounts.ttl
+                set.headers[CACHE_GET.mono.accounts.header] = CACHE_GET_HEADER_VALUE.Hit
+                set.headers[CACHE_GET.mono.accounts.ttlHeader] = CACHE_GET.mono.accounts.ttl
                 return {
                     type: "success" as const,
                     data: {
