@@ -44,6 +44,7 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
                     status: "failure",
                     details: { email: body.email, reason: "User not found" }
                 })
+                logger.info("loginIndividual:: audit log queued")
                 return {
                     type: "error" as const,
                     error: { message: "Register or login to continue", code: ERROR_RESPONSE_CODES.UNAUTHORIZED, details: [] }
@@ -58,6 +59,7 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
                     status: "failure",
                     details: { email: body.email, reason: "Invalid credentials" }
                 })
+                logger.info("loginIndividual:: audit log queued")
                 return {
                     type: "error" as const,
                     error: { message: "Invalid credentials", code: ERROR_RESPONSE_CODES.INVALID_CREDENTIALS, details: [] }
@@ -91,6 +93,7 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
                 userId: payload.id,
                 details: { email: user.email }
             })
+            logger.info("loginIndividual:: audit log queued")
             return {
                 type: "success" as const,
                 data: { accessToken, refreshToken, mfaEnabled: false, message: "Login successful" }
