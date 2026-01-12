@@ -68,7 +68,7 @@ export const reconnect = new Elysia({ name: "reconnect" })
         const { data } = await res.json() as MonoResponse<MonoConnectReauthAccountLinkingResponseData>
         await AccountService.queue.add("update-mfa", {
             userId: user.id,
-            reference: data.meta.ref,
+            accountId: body.accountId,
             mfa: data.is_multi
         })
         return {

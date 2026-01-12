@@ -11,7 +11,7 @@ import cacheSingleton from "@/utils/cache";
 type JobName = "update-mfa" | "cache-accounts" | "cache-transactions" | "update-statement";
 type UpdateMfaJobData = {
 	userId: string,
-	reference: string,
+	accountId: string,
 	mfa: boolean
 }
 type CacheAccountsJobData = {
@@ -35,12 +35,12 @@ const worker = new Worker<JobData, unknown, JobName>(queueName, async (job) => {
 	console.info("accountQueue.worker:: job started")
 	if (job.name === "update-mfa") {
 		console.info("accountQueue.worker:: updating mfa")
-		const { userId, reference, mfa } = job.data as UpdateMfaJobData
+		const { userId, accountId, mfa } = job.data as UpdateMfaJobData
 		await db`
 			UPDATE individual_accounts
 			SET mfa = ${mfa}
-			WHERE mono_reference = ${reference}
-			AND user_id = ${userId}
+			WHERE user_id = ${userId}
+			AND mono_account_id = ${accountId}
 		`
 	}
 	if (job.name === "cache-accounts") {
