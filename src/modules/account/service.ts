@@ -1,6 +1,6 @@
 import dbSingleton from "@/utils/db";
 import { WebhookModel } from "../webhook/model";
-import { MonoAccountTransactionsResponseData, MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingArgs, MonoConnectReauthAccountLinkingArgs } from "@/types/mono.type";
+import { MonoAccountStatementQueryT, MonoAccountTransactionsResponseData, MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingArgs, MonoConnectReauthAccountLinkingArgs } from "@/types/mono.type";
 import { CACHE_GET, MONO, VALKEY_URL } from "@/config";
 import { AccountModel } from "./model";
 import { Queue, Worker } from "bullmq";
@@ -123,6 +123,12 @@ export class AccountService {
 			headers: MONO.connectHeaders,
 		})
 	}
+	/**
+	 * Use this endpoint to get the transactions of an account
+	 * @param monoAccountId Account ID
+	 * @param query Query parameters
+	 * @returns Transactions in response data
+	 */
 	static async monoTransactions(monoAccountId: string, query: AccountModel.TransactionsQueryT) {
 		const searchParams = new URLSearchParams({
 			...query,
@@ -133,6 +139,33 @@ export class AccountService {
 			headers: MONO.connectHeaders,
 		})
 	}
+	/**
+	 * Use this endpoint to generate a statement for an account
+	 * @param monoAccountId Account ID
+	 * @param query Query parameters
+	 * @returns Statement in response data
+	 */
+	static async monoStatement(monoAccountId: string, query: MonoAccountStatementQueryT) {
+		return fetch(`${MONO.baseUrl}${MONO.accountPath}/${monoAccountId}/statement?period=${query.period}&output=${query.output}`, {
+			headers: MONO.connectHeaders,
+		})
+	}
+	/**
+	 * Use this endpoint to poll the status of a statement job
+	 * @param monoAccountId Account ID
+	 * @param jobId Job ID
+	 * @returns Job status in response data
+	 */
+	static async monoStatementPollPdfStatus(monoAccountId: string, jobId: string) {
+		return fetch(`${MONO.baseUrl}${MONO.accountPath}/${monoAccountId}/statement/jobs/${jobId}`, {
+			headers: MONO.connectHeaders,
+		})
+	}
+	/**
+	 * Use this endpoint to get all accounts of a user
+	 * @param userId User ID
+	 * @returns Accounts in response data
+	 */
 	static async findAll(userId: string) {
 		const res: AccountModel.AccountT[] = await db`
 			SELECT *

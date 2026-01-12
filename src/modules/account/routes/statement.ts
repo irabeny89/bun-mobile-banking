@@ -1,0 +1,74 @@
+import Elysia from "elysia";
+import { userMacro } from "@/plugins/user-macro.plugin";
+import { CommonSchema } from "@/share/schema";
+import { ERROR_RESPONSE_CODES } from "@/types";
+import pinoLogger from "@/utils/pino-logger";
+import { AccountModel } from "../model";
+import { AccountService } from "../service";
+import { MonoAccountStatementResponseData, MonoResponse } from "@/types/mono.type";
+
+export const statement = new Elysia({ name: "statement" })
+    .use(userMacro)
+    .model({
+        statementParams: AccountModel.statementParamsSchema,
+        statementQuery: AccountModel.statementQuerySchema,
+        statementSuccess: AccountModel.statementSuccessSchema,
+        error: CommonSchema.errorSchema,
+    })
+    .resolve(({ store }) => ({
+        logger: pinoLogger(store)
+    }))
+    .get("/:accountId/statement", async ({ logger, set, query, params }) => {
+        const res = query.action.type === "generate"
+            ? await AccountService.monoStatement(params.accountId, {
+                period: query.action.period,
+                output: "pdf"
+            })
+            : await AccountService.monoStatementPollPdfStatus(params.accountId, query.action.jobId)
+        if (!res.ok) {
+            const error = await res.json()
+            logger.error({ error }, "statement:: Mono statement error")
+            set.status = 500
+            return {
+                type: "error" as const,
+                error: {
+                    message: "Internal Server Error",
+                    code: ERROR_RESPONSE_CODES.INTERNAL_SERVER_ERROR,
+                    details: []
+                }
+            }
+        }
+        const { data } = await res.json() as MonoResponse<MonoAccountStatementResponseData>
+        return {
+            type: "success" as const,
+            data
+        }
+    }, {
+        detail: {
+            tags: ["Individual User", "Account"],
+            description: "Get account statement",
+            summary: "Get statement"
+        },
+        params: "statementParams",
+        query: "statementQuery",
+        user: ["individual"],
+        response: {
+            200: "statementSuccess",
+            401: "error",
+            500: "error"
+        },
+        async beforeHandle({ logger, user, set }) {
+            if (!user) {
+                logger.error("statement:: User not found")
+                set.status = 401
+                return {
+                    type: "error" as const,
+                    error: {
+                        message: "Unauthorized",
+                        code: ERROR_RESPONSE_CODES.UNAUTHORIZED,
+                        details: []
+                    }
+                }
+            }
+        }
+    })

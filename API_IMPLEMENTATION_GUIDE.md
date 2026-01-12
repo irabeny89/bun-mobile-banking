@@ -116,7 +116,7 @@ We will organize the code by **modules** (domain-driven design). Each major feat
 | **GET** | `/` | Get list of user accounts (Dashboard overview). |
 | **GET** | `/{accountId}` | Get specific account details and balance. |
 | **GET** | `/{accountId}/transactions` | Get transaction history for an account. |
-| **POST** | `/{accountId}/statement` | Request account statement (PDF/Email). |
+| **GET** | `/{accountId}/statement` | Request account statement (PDF/Email). |
 
 ### 5. Transactions & Transfers
 

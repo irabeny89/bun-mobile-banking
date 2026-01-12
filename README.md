@@ -22,7 +22,7 @@ User Type: Business - KYB
 - [x] Dashboard overview
 - [x] View account balances
 - [x] View transaction history
-- [ ] Statement generation (PDF/email)
+- [x] Statement generation (PDF/email)
 
 ### 3. Transactions
 

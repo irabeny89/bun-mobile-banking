@@ -258,3 +258,13 @@ export type MonoAccountDetailsResponseData = {
         retrieved_data: string[]
     }
 }
+
+export type MonoAccountStatementQueryT = {
+    period: "last1months" | "last2months" | "last3months" | "last4months" | "last5months" | "last6months" | "last7months" | "last8months" | "last9months" | "last10months" | "last11months" | "last12months";
+    output: "pdf" | "json";
+}
+export type MonoAccountStatementResponseData = {
+    id: string;
+    status: "BUILDING" | "BUILT";
+    path: string;
+}

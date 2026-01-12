@@ -1,5 +1,6 @@
-@accountId = 695a7f39fbc7fac1166afa45
 @accountPath = /v2/accounts
+@accountId = 695a7f39fbc7fac1166afa45
+@jobId = TAauhsWhln1GllZMHZgS
 
 # Get account balance
 {{monoBaseUrl}}{{accountPath}}/{{accountId}}/balance
@@ -30,6 +31,22 @@ Content-Type: application/json
 &type=
 &paginate=true
 &limit=10
+Accept: application/json
+mono-sec-key: {{monoConnectSecretKey}}
+Content-Type: application/json
+
+###
+# Get account statement
+{{monoBaseUrl}}{{accountPath}}/{{accountId}}/statement
+?period=last1months
+&output=pdf
+Accept: application/json
+mono-sec-key: {{monoConnectSecretKey}}
+Content-Type: application/json
+
+###
+# Poll statement job
+{{monoBaseUrl}}{{accountPath}}/{{accountId}}/statement/jobs/{{jobId}}
 Accept: application/json
 mono-sec-key: {{monoConnectSecretKey}}
 Content-Type: application/json

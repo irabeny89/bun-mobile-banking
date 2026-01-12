@@ -103,7 +103,7 @@ export namespace AccountModel {
 			description: "limit the number of transactions returned per API call",
 			examples: [10],
 		}),
-		
+
 	})
 	export type TransactionsQueryT = typeof transactionsQuerySchema.static
 
@@ -119,4 +119,55 @@ export namespace AccountModel {
 		}))
 	}))
 	export type TransactionsSuccessT = typeof transactionsSuccessSchema.static
+
+	export const statementParamsSchema = t.Object({
+		accountId: t.String({
+			description: "The ID of the account",
+			examples: ["695a7f39fbc7fac1166afa45"],
+		})
+	})
+	export type StatementParamsT = typeof statementParamsSchema.static
+
+	export const statementQuerySchema = t.Object({
+		action: t.Union([
+			t.Object({
+				type: t.Literal("generate"),
+				period: t.UnionEnum([
+					"last1months",
+					"last2months",
+					"last3months",
+					"last4months",
+					"last5months",
+					"last6months",
+					"last7months",
+					"last8months",
+					"last9months",
+					"last10months",
+					"last11months",
+					"last12months",
+				], {
+					description: "The period to consider (last1months, last2months, last3months, last4months, last5months, last6months, last7months, last8months, last9months, last10months, last11months, last12months)",
+					examples: ["last1months", "last2months", "last3months", "last4months", "last5months", "last6months", "last7months", "last8months", "last9months", "last10months", "last11months", "last12months"],
+				}),
+			}),
+			t.Object({
+				type: t.Literal("status"),
+				jobId: t.String({
+					description: "The ID in the response data of the job from calling the generate action",
+					examples: ["TAauhsWhln1GllZMHZgS"],
+				}),
+			})
+		], {
+			description: "The action to perform (generate or status)",
+			examples: ["generate", "status"],
+		}),
+	})
+	export type StatementQueryT = typeof statementQuerySchema.static
+
+	export const statementSuccessSchema = successSchemaFactory(t.Object({
+		id: t.String(),
+		status: t.UnionEnum(["BUILDING", "BUILT"]),
+		path: t.String(),
+	}))
+	export type StatementSuccessT = typeof statementSuccessSchema.static
 }
