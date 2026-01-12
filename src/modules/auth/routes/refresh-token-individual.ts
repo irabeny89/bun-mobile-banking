@@ -4,6 +4,8 @@ import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import { AuthService } from "../service";
 import { ERROR_RESPONSE_CODES } from "@/types";
+import { AuditModel } from "@/modules/audit/model";
+import { AuditService } from "@/modules/audit/service";
 
 export const refreshTokenIndividual = new Elysia({
     name: "refreshTokenIndividual"
@@ -13,17 +15,35 @@ export const refreshTokenIndividual = new Elysia({
         refreshTokenSuccess: AuthModel.refreshTokenSuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .resolve(({ store }) => {
+    .state("audit", {
+        action: "refresh_token_attempt",
+        userId: "unknown",
+        userType: "individual",
+        targetId: "unknown",
+        targetType: "auth",
+        status: "success",
+        details: {},
+        ipAddress: "unknown",
+        userAgent: "unknown",
+    } as AuditModel.CreateAuditT)
+    .resolve(({ store, server, request, headers }) => {
+        store.audit.ipAddress = server?.requestIP(request)?.address
+        store.audit.userAgent = headers["user-agent"]
         return {
             logger: pinoLogger(store),
         }
     })
-    .post("/refresh-token/individual", async ({ body, set, logger }) => {
+    .post("/refresh-token/individual", async ({ body, set, logger, store }) => {
         const jwtPayload = await AuthService.verifyToken(body.refreshToken, "refresh", "individual", logger);
         logger.debug({ jwtPayload }, "refreshTokenIndividual:: jwt payload")
         if (!jwtPayload) {
             logger.info("refreshTokenIndividual:: invalid refresh token")
             set.status = 400
+            await AuditService.queue.add("log", {
+                ...store.audit,
+                status: "failure",
+                details: { refreshToken: body.refreshToken, reason: "Invalid refresh token" }
+            })
             return {
                 type: "error",
                 error: {

@@ -5,6 +5,8 @@ import Elysia from "elysia";
 import { AuthService } from "../service";
 import { AuthModel } from "../model";
 import { ERROR_RESPONSE_CODES } from "@/types";
+import { AuditModel } from "@/modules/audit/model";
+import { AuditService } from "@/modules/audit/service";
 
 export const registerIndividualComplete = new Elysia({
     name: "registerIndividualComplete"
@@ -15,24 +17,40 @@ export const registerIndividualComplete = new Elysia({
         error: CommonSchema.errorSchema,
     })
     .guard({ body: "registerComplete" }, app => app
+        .state("audit", {
+            action: "REGISTER_COMPLETE_ATTEMPT",
+            userId: "unknown",
+            userType: "individual",
+            targetId: "unknown",
+            targetType: "auth",
+            status: "SUCCESS",
+            details: {},
+            ipAddress: "unknown",
+            userAgent: "unknown",
+        } as AuditModel.CreateAuditT)
         .resolve(async ({ body, store, status }) => {
             const logger = pinoLogger(store)
             const registerData = await AuthService.getUserRegisterData(body.otp)
             if (!registerData) {
                 logger.info("registerIndividualComplete:: invalid otp, no register data")
+                await AuditService.queue.add("log", {
+                    ...store.audit,
+                    status: "FAILURE",
+                    details: { reason: "Invalid OTP", otp: body.otp }
+                })
                 return status(400, {
                     type: "error",
-                    error: { 
-                        message: "Invalid OTP", 
-                        code: ERROR_RESPONSE_CODES.INVALID_OTP, 
-                        details: [] 
+                    error: {
+                        message: "Invalid OTP",
+                        code: ERROR_RESPONSE_CODES.INVALID_OTP,
+                        details: []
                     }
                 })
             }
             logger.info("registerIndividualComplete:: otp verified successfully")
             return { registerData, logger }
         })
-        .post("/register/individual/complete", async ({ logger, registerData }) => {
+        .post("/register/individual/complete", async ({ logger, registerData, store }) => {
             logger?.info("registerIndividualComplete:: creating individual user")
             const res = await IndividualUserService.create(registerData!)
             logger?.info("registerIndividualComplete:: individual user created successfully")
@@ -45,6 +63,11 @@ export const registerIndividualComplete = new Elysia({
             const { accessToken, refreshToken } = AuthService.createTokens(tokenPayload)
             logger?.info("registerIndividualComplete:: caching refresh token")
             await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
+            await AuditService.queue.add("log", {
+                ...store.audit,
+                userId: res.id,
+                details: { email: res.email }
+            })
             return {
                 type: "success",
                 data: { accessToken, refreshToken, message: "OTP verified successfully", }
@@ -56,17 +79,22 @@ export const registerIndividualComplete = new Elysia({
                 summary: "Register individual complete"
             },
             body: "registerComplete",
-            beforeHandle: async ({ registerData, set, logger }) => {
+            beforeHandle: async ({ registerData, set, logger, store }) => {
                 const userExist = await IndividualUserService.existByEmail(registerData.email)
                 if (userExist) {
                     logger?.info("registerIndividualUser:: user already exists")
                     set.status = 400
+                    await AuditService.queue.add("log", {
+                        ...store.audit,
+                        status: "FAILURE",
+                        details: { email: registerData.email, reason: "User already exists" }
+                    })
                     return {
                         type: "error" as const,
-                        error: { 
-                            message: "User already exists", 
-                            code: ERROR_RESPONSE_CODES.BAD_REQUEST, 
-                            details: [] 
+                        error: {
+                            message: "User already exists",
+                            code: ERROR_RESPONSE_CODES.BAD_REQUEST,
+                            details: []
                         }
                     }
                 }

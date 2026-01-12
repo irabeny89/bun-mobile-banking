@@ -6,6 +6,9 @@ import pinoLogger from "@/utils/pino-logger";
 import { AccountModel } from "../model";
 import { AccountService } from "../service";
 import { MonoAccountStatementResponseData, MonoResponse } from "@/types/mono.type";
+import { AuditModel } from "@/modules/audit/model";
+import { AuditService } from "@/modules/audit/service";
+
 
 export const statement = new Elysia({ name: "statement" })
     .use(userMacro)
@@ -15,10 +18,26 @@ export const statement = new Elysia({ name: "statement" })
         statementSuccess: AccountModel.statementSuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .resolve(({ store }) => ({
-        logger: pinoLogger(store)
+    .resolve(({ store, server, request, headers }) => ({
+        logger: pinoLogger(store),
+        audit: {
+            action: "statement_generation",
+            userId: "unknown",
+            userType: "individual",
+            targetId: "unknown",
+            targetType: "account",
+            status: "success",
+            details: {},
+            ipAddress: server?.requestIP(request)?.address || "unknown",
+            userAgent: headers["user-agent"] || "unknown",
+        } as AuditModel.CreateAuditT
     }))
-    .get("/:accountId/statement", async ({ logger, set, query, params, user }) => {
+    .get("/:accountId/statement", async ({ logger, set, query, params, user, audit }) => {
+        // Update known user details in audit object
+        if (user) {
+            audit.userId = user.id;
+        }
+        audit.targetId = params.accountId;
         const res = query.action.type === "generate"
             ? await AccountService.monoStatement(params.accountId, {
                 period: query.action.period,
@@ -29,6 +48,17 @@ export const statement = new Elysia({ name: "statement" })
             const error = await res.json()
             logger.error({ error }, "statement:: Mono statement error")
             set.status = 500
+
+            await AuditService.queue.add("log", {
+                ...audit,
+                status: "failure",
+                details: {
+                    error,
+                    accountId: params.accountId,
+                    actionType: query.action.type
+                }
+            });
+
             return {
                 type: "error" as const,
                 error: {
@@ -46,6 +76,19 @@ export const statement = new Elysia({ name: "statement" })
             accountId: params.accountId,
             userId: user!.id
         })
+
+        await AuditService.queue.add("log", {
+            ...audit,
+            // only log success for generation, status polling is noisy
+            status: query.action.type === "generate" ? "success" : "success",
+            details: {
+                statementId: data.id,
+                path: data.path,
+                accountId: params.accountId,
+                actionType: query.action.type
+            }
+        });
+
         return {
             type: "success" as const,
             data

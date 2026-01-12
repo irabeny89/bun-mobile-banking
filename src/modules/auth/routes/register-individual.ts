@@ -6,6 +6,9 @@ import { AuthModel } from "../model";
 import { AuthService } from "../service";
 import { CommonSchema } from "@/share/schema";
 import { ERROR_RESPONSE_CODES } from "@/types";
+import { AuditService } from "@/modules/audit/service";
+import { AuditModel } from "@/modules/audit/model";
+
 
 export const registerIndividual = new Elysia({ name: "registerIndividual" })
     .model({
@@ -13,15 +16,34 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
         registerSuccess: AuthModel.registerSuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .resolve(({ store }) => {
+    .state("audit", {
+        action: "REGISTER_ATTEMPT",
+        userId: "unknown",
+        userType: "individual",
+        targetId: "unknown",
+        targetType: "auth",
+        status: "SUCCESS",
+        details: {},
+        ipAddress: "unknown",
+        userAgent: "unknown",
+    } as AuditModel.CreateAuditT)
+    .resolve(({ store, server, request, headers }) => {
+        store.audit.ipAddress = server?.requestIP(request)?.address
+        store.audit.userAgent = headers["user-agent"]
         const logger = pinoLogger(store)
         return {
             logger
         }
     })
-    .post("/register/individual", async ({ body, logger }) => {
+    .post("/register/individual", async ({ body, logger, store }) => {
         logger.info("auth:: registering individual user")
         await AuthService.register(body, logger)
+        await AuditService.queue.add("log", {
+            ...store.audit,
+            status: "SUCCESS",
+            details: { email: body.email }
+        })
+
         return {
             type: "success",
             data: {
@@ -36,17 +58,22 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
             summary: "Registration individual start"
         },
         body: AuthModel.registerBodySchema,
-        beforeHandle: async ({ body, set, logger }) => {
+        beforeHandle: async ({ body, set, logger, store }) => {
             const userExist = await IndividualUserService.existByEmail(body.email)
             if (userExist) {
                 logger.info("auth:: user already exists")
                 set.status = 400
+                await AuditService.queue.add("log", {
+                    ...store.audit,
+                    status: "FAILURE",
+                    details: { email: body.email }
+                })
                 return {
                     type: "error" as const,
-                    error: { 
-                        message: "User already exists", 
-                        code: ERROR_RESPONSE_CODES.BAD_REQUEST, 
-                        details: [] 
+                    error: {
+                        message: "User already exists",
+                        code: ERROR_RESPONSE_CODES.BAD_REQUEST,
+                        details: []
                     }
                 }
             }
