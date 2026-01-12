@@ -12,6 +12,7 @@ export namespace AuditModel {
         "register_complete_attempt",
         "logout_attempt",
         "refresh_token_attempt",
+        "forgot_password_attempt",
         "statement_generation"
     ]);
     export type AuditActionT = typeof auditActionSchema.static;
