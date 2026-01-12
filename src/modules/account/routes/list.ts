@@ -30,6 +30,7 @@ export const list = new Elysia({ name: "list-accounts" })
                 dbAccounts.map(({ monoAccountId }) => AccountService
                     .monoAccountDetails(monoAccountId))
             )
+            // * for every account id update with details from mono
             for (const [index, res] of responses.entries()) {
                 if (!res.ok) {
                     const { message } = await res.json()
