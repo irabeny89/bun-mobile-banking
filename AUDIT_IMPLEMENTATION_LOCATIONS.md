@@ -11,11 +11,11 @@ These events track entry and exit from the system.
 | **Register Init** | `REGISTER_ATTEMPT` | `auth` | Email | ✅ Implemented |
 | **Register Complete** | `REGISTER_COMPLETE_ATTEMPT` | `auth` | Phone number | ✅ Implemented |
 | **Login** | `LOGIN_ATTEMPT` | `auth` | IP, User Agent, Failure Reason | ✅ Implemented |
-| **MFA Login** | `MFA_LOGIN_ATTEMPT` | `auth` | IP, User Agent | ✅ Implemented |
+| **MFA Login** | `mfa_login` | `auth` | IP, User Agent | ✅ Implemented |
 | **Refresh Token** | `REFRESH_TOKEN_ATTEMPT` | `auth` | Token ID | ✅ Implemented |
-| **Logout** | `LOGOUT_ATTEMPT` | `auth` | - | ✅ Implemented |
-| **Forgot Password** | `PASSWORD_RESET_REQUEST` | `auth` | Email | ❌ To Do |
-| **Reset Password** | `PASSWORD_RESET_COMPLETE` | `auth` | Recovery Token used | ❌ To Do |
+| **Logout** | `logout` | `auth` | - | ✅ Implemented |
+| **Forgot Password** | `password_reset` | `auth` | Email | ✅ Implemented |
+| **Reset Password** | `reset_password` | `auth` | Recovery Token | ✅ Implemented |
 
 ## 2. User & KYC Module (`src/modules/Individual_user`, `src/modules/kyc`)
 

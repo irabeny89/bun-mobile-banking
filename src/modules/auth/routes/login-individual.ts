@@ -17,7 +17,7 @@ export const loginIndividual = new Elysia({ name: "loginIndividual" })
     })
     .guard({ body: "login" }, app => app
         .state("audit", {
-            action: "login_attempt",
+            action: "login",
             userId: "unknown",
             userType: "individual",
             targetId: "unknown",

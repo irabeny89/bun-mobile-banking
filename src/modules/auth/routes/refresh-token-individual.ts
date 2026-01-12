@@ -16,7 +16,7 @@ export const refreshTokenIndividual = new Elysia({
         error: CommonSchema.errorSchema,
     })
     .state("audit", {
-        action: "refresh_token_attempt",
+        action: "refresh_token",
         userId: "unknown",
         userType: "individual",
         targetId: "unknown",
@@ -44,6 +44,7 @@ export const refreshTokenIndividual = new Elysia({
                 status: "failure",
                 details: { reason: "Invalid refresh token" }
             })
+            logger.info("refreshTokenIndividual:: audit log queued")
             return {
                 type: "error",
                 error: {
@@ -69,6 +70,7 @@ export const refreshTokenIndividual = new Elysia({
             status: "success",
             details: { reason: "Refresh token generated successfully" }
         })
+        logger.info("refreshTokenIndividual:: audit log queued")
         return {
             type: "success",
             data: { accessToken, refreshToken, message: "Refresh token generated successfully" }

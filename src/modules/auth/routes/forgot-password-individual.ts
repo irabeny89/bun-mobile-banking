@@ -18,7 +18,7 @@ export const forgotPasswordIndividual = new Elysia({
     })
     .guard({ body: "forgotPasswordIndividual" }, app => app
         .state("audit", {
-            action: "forgot_password_attempt",
+            action: "forgot_password",
             userId: "unknown",
             userType: "individual",
             targetId: "unknown",

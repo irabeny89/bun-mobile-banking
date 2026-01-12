@@ -18,12 +18,12 @@ export const registerIndividualComplete = new Elysia({
     })
     .guard({ body: "registerComplete" }, app => app
         .state("audit", {
-            action: "REGISTER_COMPLETE_ATTEMPT",
+            action: "register_complete",
             userId: "unknown",
             userType: "individual",
             targetId: "unknown",
             targetType: "auth",
-            status: "SUCCESS",
+            status: "success",
             details: {},
             ipAddress: "unknown",
             userAgent: "unknown",
@@ -35,9 +35,10 @@ export const registerIndividualComplete = new Elysia({
                 logger.info("registerIndividualComplete:: invalid otp, no register data")
                 await AuditService.queue.add("log", {
                     ...store.audit,
-                    status: "FAILURE",
+                    status: "failure",
                     details: { reason: "Invalid OTP", otp: body.otp }
                 })
+                logger.info("registerIndividualComplete:: audit log queued")
                 return status(400, {
                     type: "error",
                     error: {
@@ -68,6 +69,7 @@ export const registerIndividualComplete = new Elysia({
                 userId: res.id,
                 details: { email: res.email }
             })
+            logger.info("registerIndividualComplete:: audit log queued")
             return {
                 type: "success",
                 data: { accessToken, refreshToken, message: "OTP verified successfully", }
@@ -86,9 +88,10 @@ export const registerIndividualComplete = new Elysia({
                     set.status = 400
                     await AuditService.queue.add("log", {
                         ...store.audit,
-                        status: "FAILURE",
+                        status: "failure",
                         details: { email: registerData.email, reason: "User already exists" }
                     })
+                    logger.info("registerIndividualUser:: audit log queued")
                     return {
                         type: "error" as const,
                         error: {

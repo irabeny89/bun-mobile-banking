@@ -17,12 +17,12 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
         error: CommonSchema.errorSchema,
     })
     .state("audit", {
-        action: "REGISTER_ATTEMPT",
+        action: "register",
         userId: "unknown",
         userType: "individual",
         targetId: "unknown",
         targetType: "auth",
-        status: "SUCCESS",
+        status: "success",
         details: {},
         ipAddress: "unknown",
         userAgent: "unknown",
@@ -40,10 +40,10 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
         await AuthService.register(body, logger)
         await AuditService.queue.add("log", {
             ...store.audit,
-            status: "SUCCESS",
+            status: "success",
             details: { email: body.email }
         })
-
+        logger.info("auth:: audit log queued")
         return {
             type: "success",
             data: {
@@ -65,9 +65,10 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
                 set.status = 400
                 await AuditService.queue.add("log", {
                     ...store.audit,
-                    status: "FAILURE",
-                    details: { email: body.email }
+                    status: "failure",
+                    details: { email: body.email, reason: "User already exists" }
                 })
+                logger.info("auth:: audit log queued")
                 return {
                     type: "error" as const,
                     error: {

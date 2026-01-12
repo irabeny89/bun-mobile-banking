@@ -6,13 +6,14 @@ export namespace AuditModel {
     export type AuditStatusT = typeof auditStatusSchema.static;
 
     export const auditActionSchema = t.UnionEnum([
-        "login_attempt",
-        "mfa_login_attempt",
-        "register_attempt",
-        "register_complete_attempt",
-        "logout_attempt",
-        "refresh_token_attempt",
-        "forgot_password_attempt",
+        "login",
+        "mfa_login",
+        "register",
+        "register_complete",
+        "logout",
+        "refresh_token",
+        "forgot_password",
+        "reset-password",
         "statement_generation"
     ]);
     export type AuditActionT = typeof auditActionSchema.static;

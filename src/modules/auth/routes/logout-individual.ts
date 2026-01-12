@@ -14,15 +14,15 @@ export const logoutIndividual = new Elysia({ name: "logout-individual" })
         error: CommonSchema.errorSchema,
     })
     .state("audit", {
-                action: "LOGOUT_ATTEMPT",
-                userId: "unknown",
-                userType: "individual",
-                targetId: "unknown",
-                targetType: "auth",
-                details: {},
-                ipAddress: "unknown",
-                userAgent: "unknown",
-            } as AuditModel.CreateAuditT)
+        action: "logout",
+        userId: "unknown",
+        userType: "individual",
+        targetId: "unknown",
+        targetType: "auth",
+        details: {},
+        ipAddress: "unknown",
+        userAgent: "unknown",
+    } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
         store.audit.ipAddress = server?.requestIP(request)?.address
         store.audit.userAgent = headers["user-agent"]
@@ -37,9 +37,10 @@ export const logoutIndividual = new Elysia({ name: "logout-individual" })
             set.status = 400;
             await AuditService.queue.add("log", {
                 ...store.audit,
-                status: "FAILURE",
+                status: "failure",
                 details: { refreshToken: body.refreshToken }
             })
+            logger.info("logoutIndividual:: audit log queued")
             return {
                 type: "error" as const,
                 error: {
@@ -56,6 +57,7 @@ export const logoutIndividual = new Elysia({ name: "logout-individual" })
             userId: payload.id,
             details: { email: payload.email }
         })
+        logger.info("logoutIndividual:: audit log queued")
         return {
             type: "success" as const,
             data: { message: "Logged out successfully" }

@@ -17,12 +17,12 @@ export const loginMfaIndividual = new Elysia({
     })
     .guard({ body: "loginMfaOtp" }, app => app
         .state("audit", {
-            action: "MFA_LOGIN_ATTEMPT",
+            action: "mfa_login",
             userId: "unknown",
             userType: "individual",
             targetId: "unknown",
             targetType: "auth",
-            status: "SUCCESS",
+            status: "success",
             details: {},
             ipAddress: "unknown",
             userAgent: "unknown",
@@ -39,9 +39,10 @@ export const loginMfaIndividual = new Elysia({
                 set.status = 400
                 await AuditService.queue.add("log", {
                     ...store.audit,
-                    status: "FAILURE",
+                    status: "failure",
                     details: { reason: "Invalid OTP", otp: body.otp }
                 })
+                logger.info("loginMfaIndividual:: audit log queued")
                 return {
                     type: "error" as const,
                     error: {
@@ -60,6 +61,7 @@ export const loginMfaIndividual = new Elysia({
                 userId: payload.id,
                 details: { email: payload.email }
             })
+            logger.info("loginMfaIndividual:: audit log queued")
             return {
                 type: "success" as const,
                 data: { accessToken, refreshToken, message: "Login with MFA OTP successful" }
