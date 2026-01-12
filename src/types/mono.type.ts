@@ -3,7 +3,12 @@ export type MonoResponse<D = null, M = null> = {
     message: string;
     timestamp: string;
     data: D
-    meta: M
+    meta: {
+        total: number,
+        page: number,
+        previous: string | null,
+        next: string | null
+    }
 }
 export type MonoDiscoCode = "ABUJA" | "EKO" | "IKEJA" | "IBADAN" | "ENUGU" | "PH" | "JOS" | "KADUNA" | "KANO" | "BH" | "PROTOGY" | "PHISBOND" | "ACCESSPOWER" | "YOLA" | "ABIA" | "ADAMAWA" | "AKWA IBOM" | "ANAMBRA" | "BAUCHI" | "BAYELSA" | "BENUE" | "BORNO" | "CROSS RIVER" | "DELTA" | "EBONYI" | "EDO" | "EKITI" | "GOMBE" | "IMO" | "JIGAWA" | "KATSINA" | "KEBBI" | "KOGI" | "KWARA" | "LAGOS" | "NASSARAWA" | "NIGER" | "OGUN" | "ONDO" | "OSUN" | "OYO" | "PLATEAU" | "RIVERS" | "SOKOTO" | "TARABA" | "YOBE" | "ZAMFARA" | "FCT"
 export type MonoLookupBvnOtpMethods = "email" | "phone" | "phone_1" | "alternate_phone"
@@ -229,34 +234,27 @@ export type MonoAccountTransactionsResponseData = Array<{
     category: string
 }>
 
-export type MonoAccountTransactionsResponseMeta = {
-    total: number,
-    page: number,
-    previous: string | null,
-    next: string | null
-}
-
 export type MonoAccountDetailsResponseData = {
     account: {
-      id: string,
-      name: string,
-      account_number: string,
-      currency: string,
-      balance: number,
-      type: string,
-      bvn: string,
-      institution: {
+        id: string,
         name: string,
-        bank_code: string,
-        type: string
-      }
+        account_number: string,
+        currency: string,
+        balance: number,
+        type: string,
+        bvn: string,
+        institution: {
+            name: string,
+            bank_code: string,
+            type: string
+        }
     },
     customer: {
-      id: string
+        id: string
     },
     meta: {
-      data_status: MonoDataStatus,
-      auth_method: MonoAuthMethod,
-      retrieved_data: string[]
+        data_status: MonoDataStatus,
+        auth_method: MonoAuthMethod,
+        retrieved_data: string[]
     }
 }

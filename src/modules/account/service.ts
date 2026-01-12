@@ -1,15 +1,14 @@
 import dbSingleton from "@/utils/db";
 import { WebhookModel } from "../webhook/model";
-import { MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingArgs, MonoConnectReauthAccountLinkingArgs } from "@/types/mono.type";
+import { MonoAccountTransactionsResponseData, MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingArgs, MonoConnectReauthAccountLinkingArgs } from "@/types/mono.type";
 import { CACHE_GET, MONO, VALKEY_URL } from "@/config";
 import { AccountModel } from "./model";
 import { Queue, Worker } from "bullmq";
-import { CACHE_GET_HEADER_VALUE } from "@/types";
 import { getCacheKey } from "@/utils/cache";
 import { encrypt } from "@/utils/encryption";
 import cacheSingleton from "@/utils/cache";
 
-type JobName = "update-mfa" | "cache-accounts"
+type JobName = "update-mfa" | "cache-accounts" | "cache-transactions"
 type UpdateMfaJobData = {
 	userId: string,
 	reference: string,
@@ -22,7 +21,11 @@ type CacheAccountsJobData = {
 		Omit<AccountModel.MonoAccountT, "account_number">
 	>
 }
-type JobData = UpdateMfaJobData | CacheAccountsJobData
+type CacheTransactionsJobData = {
+	userId: string;
+	transactions: MonoAccountTransactionsResponseData
+}
+type JobData = UpdateMfaJobData | CacheAccountsJobData | CacheTransactionsJobData
 
 const queueName = "account-update" as const
 const db = dbSingleton()
@@ -42,9 +45,16 @@ const worker = new Worker<JobData, unknown, JobName>(queueName, async (job) => {
 	if (job.name === "cache-accounts") {
 		console.info("accountQueue.worker:: caching accounts")
 		const { userId, accounts } = job.data as CacheAccountsJobData
-		const cacheKey = getCacheKey(CACHE_GET.monoAccounts.key, userId)
+		const cacheKey = getCacheKey(CACHE_GET.mono.accounts.key, userId)
 		await cache.set(cacheKey, encrypt(Buffer.from(JSON.stringify(accounts))))
-		await cache.expire(cacheKey, CACHE_GET.monoAccounts.ttl)
+		await cache.expire(cacheKey, CACHE_GET.mono.accounts.ttl)
+	}
+	if (job.name === "cache-transactions") {
+		console.info("accountQueue.worker:: caching transactions")
+		const { userId, transactions } = job.data as CacheTransactionsJobData
+		const cacheKey = getCacheKey(CACHE_GET.mono.transactions.key, userId)
+		await cache.set(cacheKey, encrypt(Buffer.from(JSON.stringify(transactions))))
+		await cache.expire(cacheKey, CACHE_GET.mono.transactions.ttl)
 	}
 }, { connection: { url: VALKEY_URL } })
 
@@ -110,6 +120,16 @@ export class AccountService {
 	 */
 	static async monoAccountDetails(monoAccountId: string) {
 		return fetch(`${MONO.baseUrl}${MONO.accountPath}/${monoAccountId}`, {
+			headers: MONO.connectHeaders,
+		})
+	}
+	static async monoTransactions(monoAccountId: string, query: AccountModel.TransactionsQueryT) {
+		const searchParams = new URLSearchParams({
+			...query,
+			paginate: query.paginate.toString(),
+			limit: query.limit.toString()
+		}).toString()
+		return fetch(`${MONO.baseUrl}${MONO.accountPath}/${monoAccountId}/transactions?${searchParams}`, {
 			headers: MONO.connectHeaders,
 		})
 	}

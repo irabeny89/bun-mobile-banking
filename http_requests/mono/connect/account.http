@@ -20,3 +20,16 @@ Content-Type: application/json
 Accept: application/json
 mono-sec-key: {{monoConnectSecretKey}}
 Content-Type: application/json
+
+###
+# Get account transactions
+{{monoBaseUrl}}{{accountPath}}/{{accountId}}/transactions
+?start=28-12-2025
+&end=11-01-2026
+&narration=
+&type=
+&paginate=true
+&limit=10
+Accept: application/json
+mono-sec-key: {{monoConnectSecretKey}}
+Content-Type: application/json

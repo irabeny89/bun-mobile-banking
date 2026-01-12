@@ -1,3 +1,5 @@
+import { transactions } from "./modules/account/routes/transactions";
+
 export const PORT = process.env.PORT ?? "3000";
 export const DEFAULT_CURRENCY = process.env.DEFAULT_CURRENCY ?? "NGN";
 export const DEFAULT_OTP_LENGTH = 6;
@@ -115,11 +117,19 @@ export const CACHE_GET = {
     ttl: 10 as const, // 10s
     header: "x-cache",
     ttlHeader: "x-cache-ttl",
-    monoAccounts: {
-        ttl: 2 * 60, // 2m
-        header: "x-mono-accounts-cache",
-        ttlHeader: "x-mono-accounts-cache-ttl",
-        key: "mono-accounts"
+    mono: {
+        accounts: {
+            ttl: 2 * 60, // 2m
+            header: "x-mono-accounts-cache",
+            ttlHeader: "x-mono-accounts-cache-ttl",
+            key: "mono-accounts"
+        },
+        transactions: {
+            ttl: 2 * 60, // 2m
+            header: "x-mono-transactions-cache",
+            ttlHeader: "x-mono-transactions-cache-ttl",
+            key: "mono-transactions"
+        }
     }
 }
 export const tier1Limit = {

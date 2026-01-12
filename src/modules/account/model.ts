@@ -65,4 +65,58 @@ export namespace AccountModel {
 		accounts: t.Array(MonoAccount)
 	}))
 	export type AccountListSuccessT = typeof accountListSuccessSchema.static
+
+	export const transactionsParamsSchema = t.Object({
+		accountId: t.String({
+			description: "The ID of the account",
+			examples: ["695a7f39fbc7fac1166afa45"],
+		})
+	})
+	export type TransactionsParamsT = typeof transactionsParamsSchema.static
+
+	export const transactionsQuerySchema = t.Object({
+		start: t.String({
+			description: "the beginning date for transaction consideration",
+			examples: ["01-10-2020"],
+			pattern: "dd-MM-yyyy",
+			format: "date",
+		}),
+		end: t.String({
+			description: "the end date for transaction consideration",
+			examples: ["07-10-2020"],
+			pattern: "dd-MM-yyyy",
+			format: "date",
+		}),
+		narration: t.String({
+			description: "filters all transactions by narration",
+			examples: ["Uber"],
+		}),
+		type: t.String({
+			description: "filters transactions by debit or credit",
+			examples: ["debit", "credit"],
+		}),
+		paginate: t.Boolean({
+			description: "true or false (If you want to receive the data all at once or you want it paginated)",
+			examples: [true, false],
+		}),
+		limit: t.Number({
+			description: "limit the number of transactions returned per API call",
+			examples: [10],
+		}),
+		
+	})
+	export type TransactionsQueryT = typeof transactionsQuerySchema.static
+
+	export const transactionsSuccessSchema = successSchemaFactory(t.Object({
+		transactions: t.Array(t.Object({
+			id: t.String(),
+			narration: t.String(),
+			amount: t.Number(),
+			type: t.String(),
+			balance: t.Number(),
+			date: t.String(),
+			category: t.String(),
+		}))
+	}))
+	export type TransactionsSuccessT = typeof transactionsSuccessSchema.static
 }
