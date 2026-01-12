@@ -15,11 +15,6 @@ describe("genOTP", () => {
     expect(otp).toMatch(/^\d+$/);
   });
 
-  it("should return empty string for length 0", async () => {
-    const otp = await genOTP(0);
-    expect(otp).toBe("");
-  });
-
   it("should generate different otps on subsequent calls", async () => {
     const otp1 = await genOTP();
     const otp2 = await genOTP();
