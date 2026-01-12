@@ -42,7 +42,7 @@ export const refreshTokenIndividual = new Elysia({
             await AuditService.queue.add("log", {
                 ...store.audit,
                 status: "failure",
-                details: { refreshToken: body.refreshToken, reason: "Invalid refresh token" }
+                details: { reason: "Invalid refresh token" }
             })
             return {
                 type: "error",
@@ -64,6 +64,11 @@ export const refreshTokenIndividual = new Elysia({
         logger.info("refreshTokenIndividual:: new access and refresh tokens generated")
         await AuthService.cacheRefreshToken(refreshToken, payload.id)
         logger.info("refreshTokenIndividual:: refresh token cached")
+        await AuditService.queue.add("log", {
+            ...store.audit,
+            status: "success",
+            details: { reason: "Refresh token generated successfully" }
+        })
         return {
             type: "success",
             data: { accessToken, refreshToken, message: "Refresh token generated successfully" }
