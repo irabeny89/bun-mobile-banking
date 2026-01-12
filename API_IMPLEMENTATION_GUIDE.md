@@ -4,7 +4,7 @@ This document outlines the API endpoints required to implement the features list
 
 ## Project Structure
 
-```
+```sh
 src/
 ├── modules/
 │   ├── auth/
