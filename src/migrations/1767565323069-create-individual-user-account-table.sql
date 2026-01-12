@@ -6,6 +6,9 @@ CREATE TABLE IF NOT EXISTS individual_accounts (
     mono_reference VARCHAR(10) NOT NULL,
     mono_data_status VARCHAR(15),
     mono_reauthorize BOOLEAN NOT NULL DEFAULT FALSE,
+    mono_statement_id VARCHAR(30),
+    mono_statement_status VARCHAR(15),
+    mono_statement_path VARCHAR(255),
     mfa BOOLEAN NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

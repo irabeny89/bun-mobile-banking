@@ -1,6 +1,6 @@
 import dbSingleton from "@/utils/db";
 import { WebhookModel } from "../webhook/model";
-import { MonoAccountStatementQueryT, MonoAccountTransactionsResponseData, MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingArgs, MonoConnectReauthAccountLinkingArgs } from "@/types/mono.type";
+import { MonoAccountStatementQueryT, MonoAccountStatementResponseData, MonoAccountTransactionsResponseData, MonoConnectAuthAccountExchangeTokenArgs, MonoConnectAuthAccountLinkingArgs, MonoConnectReauthAccountLinkingArgs } from "@/types/mono.type";
 import { CACHE_GET, MONO, VALKEY_URL } from "@/config";
 import { AccountModel } from "./model";
 import { Queue, Worker } from "bullmq";
@@ -8,7 +8,7 @@ import { getCacheKey } from "@/utils/cache";
 import { encrypt } from "@/utils/encryption";
 import cacheSingleton from "@/utils/cache";
 
-type JobName = "update-mfa" | "cache-accounts" | "cache-transactions"
+type JobName = "update-mfa" | "cache-accounts" | "cache-transactions" | "update-statement";
 type UpdateMfaJobData = {
 	userId: string,
 	reference: string,
@@ -25,7 +25,8 @@ type CacheTransactionsJobData = {
 	userId: string;
 	transactions: MonoAccountTransactionsResponseData
 }
-type JobData = UpdateMfaJobData | CacheAccountsJobData | CacheTransactionsJobData
+type UpdateStatementJobData = { accountId: string, userId: string } & MonoAccountStatementResponseData
+type JobData = UpdateMfaJobData | CacheAccountsJobData | CacheTransactionsJobData | UpdateStatementJobData
 
 const queueName = "account-update" as const
 const db = dbSingleton()
@@ -55,6 +56,21 @@ const worker = new Worker<JobData, unknown, JobName>(queueName, async (job) => {
 		const cacheKey = getCacheKey(CACHE_GET.mono.transactions.key, userId)
 		await cache.set(cacheKey, encrypt(Buffer.from(JSON.stringify(transactions))))
 		await cache.expire(cacheKey, CACHE_GET.mono.transactions.ttl)
+	}
+	if (job.name === "update-statement") {
+		console.info("accountQueue.worker:: updating statement")
+		const { id, path, status, accountId, userId } = job.data as UpdateStatementJobData
+		await db`
+			UPDATE 
+				individual_accounts
+			SET 
+				mono_statement_id = ${id},
+				mono_statement_path = ${path},
+				mono_statement_status = ${status}
+			WHERE 
+				user_id = ${userId}
+				AND mono_account_id = ${accountId}
+		`
 	}
 }, { connection: { url: VALKEY_URL } })
 

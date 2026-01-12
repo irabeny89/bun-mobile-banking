@@ -18,7 +18,7 @@ export const statement = new Elysia({ name: "statement" })
     .resolve(({ store }) => ({
         logger: pinoLogger(store)
     }))
-    .get("/:accountId/statement", async ({ logger, set, query, params }) => {
+    .get("/:accountId/statement", async ({ logger, set, query, params, user }) => {
         const res = query.action.type === "generate"
             ? await AccountService.monoStatement(params.accountId, {
                 period: query.action.period,
@@ -39,6 +39,13 @@ export const statement = new Elysia({ name: "statement" })
             }
         }
         const { data } = await res.json() as MonoResponse<MonoAccountStatementResponseData>
+        await AccountService.queue.add("update-statement", {
+            id: data.id,
+            path: data.path,
+            status: data.status,
+            accountId: params.accountId,
+            userId: user!.id
+        })
         return {
             type: "success" as const,
             data
