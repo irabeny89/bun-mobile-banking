@@ -1,5 +1,3 @@
-CREATE TYPE audit_log_status AS ENUM ('success', 'failure');
-
 CREATE TABLE audit_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
@@ -10,7 +8,7 @@ CREATE TABLE audit_logs (
     details JSONB DEFAULT '{}'::jsonb,
     ip_address VARCHAR(100) DEFAULT NULL,
     user_agent TEXT DEFAULT NULL,
-    status audit_log_status NOT NULL DEFAULT 'success',
+    status VARCHAR(50) NOT NULL DEFAULT 'success',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
