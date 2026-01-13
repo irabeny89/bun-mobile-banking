@@ -18,7 +18,7 @@ export const tier2BvnInitiate = new Elysia({ name: "tier2-bvn-initiate" })
         error: CommonSchema.errorSchema,
     })
     .state("audit", {
-        action: "identity_verification_init",
+        action: "tier2_kyc_bvn_initiate",
         userId: "unknown",
         userType: "individual",
         targetId: "unknown",

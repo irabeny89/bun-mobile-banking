@@ -18,7 +18,7 @@ export namespace AuditModel {
         "tier1_kyc_submission",
         "tier2_kyc_submission",
         "tier3_kyc_submission",
-        "identity_verification_init"
+        "tier2_kyc_bvn_initiate",
     ]);
     export type AuditActionT = typeof auditActionSchema.static;
 
