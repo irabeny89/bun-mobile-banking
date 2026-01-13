@@ -94,7 +94,7 @@ Free tunnel for connecting your localhost apps to the internet e.g webhooks, or 
 SHA256:FV8IMJ4IYjYUTnd6on7PqbRjaZf4c1EhhEBgeUdE94I
 
 > create an account and add your key for a longer lasting domain name.
-> see https://localhost.run/docs/forever-free/ for more information.
+> see <https://localhost.run/docs/forever-free/> for more information.
 
 To create a tunnel to your localhost, run:
 
@@ -113,19 +113,23 @@ bun run mono:connect
 ```
 
 > To get the Mono API key, visit [Mono](https://mono.co/).
-
+>
 > Check the [`script`](package.json#L6) field in [package.json](package.json) for more commands.
 
 ### File Storage
 
-In development, the file storage is managed with [garage](https://garagehq.deuxfleurs.fr/), a rust based self-host AWS S3 compatible container image. The garage config file is in [storage/garage.toml](storage/garage.toml) along with the data and metadata in the [storage/data](storage/data) and [storage/meta](storage/meta) directories.
+In development, the file storage is managed with [garage](https://garagehq.deuxfleurs.fr/), a rust based self-host AWS S3 compatible container image.
+
+The garage config file is in [storage/garage.toml](storage/garage.toml) along with the data and metadata in the [storage/data](storage/data) and [storage/meta](storage/meta) directories.
+
+> Documentation: <https://garagehq.deuxfleurs.fr/documentation/>
 
 To run garage, use the following command:
 
 ```bash
 podman run \
   -d \
-  --name garaged \
+  --name moba-storage \
   -p 3900:3900 -p 3901:3901 -p 3902:3902 -p 3903:3903 \
   -v ./storage/garage.toml:/etc/garage.toml \
   -v ./storage/meta:/var/lib/garage/meta \
@@ -133,17 +137,51 @@ podman run \
   dxflrs/garage:v2.1.0
 ```
 
+> ***SHORTCUT***: `bun run pod:app:dev` to start the whole infrastructure
+
+#### Create Cluster Layout
+
+Check that the garage is running and retrieve the node ID to create a cluster layout:
+
+```bash
+# get the node ID and use in the next command
+bun garage status
+# use node ID to create clustered layout
+bun garage layout assign -z dc1 -c 1G <node_id>
+# apply the layout to the cluster
+bun garage layout apply --version 1
+```
+
+> ***SHORTCUT***: `bun garage:layout:setup`
+
+#### Create a Bucket and Keys
+
+After creating the cluster layout, create a bucket and keys then allow the bucket to be read and written to by the key:
+
+```bash
+bun garage bucket create moba-storage
+bun garage key create moba-storage-key
+bun garage bucket allow --read --write --owner moba-storage --key moba-storage-key
+```
+
+> ***SHORTCUT***: `bun garage:bucket:setup`
+> N.B: SAVE THE ACCESS KEY INFORMATION IN A SAFE PLACE AFTER THE ABOVE COMMAND
+
+#### NOTE
+
 > Note: You don't have to run the single command above. You can use the [scripts/app-pod.sh](scripts/app-pod.sh) script to run the garage container along with the app pod. Example:
 
 ```bash
 ./scripts/app-pod.sh .env.development
 # OR run script from package.json
 bun run pod:app .env.development
+# OR run script from package.json
+bun run pod:app:dev
 ```
 
 > Note: For further configuration(layout, bucket, etc.) visit [garage docs](https://garagehq.deuxfleurs.fr/documentation/quick-start/).
 
-In production this will be replaced with AWS S3, Cloudflare R2, or any other AWS S3 compatible storage.
+In production this might be replaced with AWS S3, Cloudflare R2, or any other AWS S3 compatible storage.
 
 ### Database Migrations
 

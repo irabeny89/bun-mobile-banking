@@ -20,10 +20,18 @@
     "pod:app:dev": "./scripts/app-pod.sh .env.development",
     "kube:play": "./scripts/kube-play.sh",
     "kube:gen": "./scripts/pod-kube.sh",
-    "garage": "podman exec moba-storage /garage",
-    "garage:status": "podman exec moba-storage /garage status",
-    "psql:dev": "export $(cat .env.development | xargs) && podman exec -ti moba-db psql -U $POSTGRES_USER -d $POSTGRES_DB",
-    "redis-cli:dev": "export $(cat .env.development | xargs) && podman exec -ti moba-cache redis-cli"
+    "garage": "export $(cat .env.development | xargs) && podman exec $STORAGE_CONTAINER_NAME /garage",
+    "garage:node-id": "bun garage status | awk 'NR==3 {print $1}'",
+    "garage:status": "bun garage status",
+    "garage:layout:create": "bun garage layout assign -z dc1 -c 1G $(bun garage:node-id)",
+    "garage:layout:apply": "bun garage layout apply --version 1",
+    "garage:layout:setup": "bun garage:layout:create && bun garage:layout:apply",
+    "garage:bucket:create": "export $(cat .env.development | xargs) && bun garage bucket create ${STORAGE_BUCKET}",
+    "garage:key:create": "export $(cat .env.development | xargs) && bun garage key create ${STORAGE_KEY_NAME}",
+    "garage:bucket:allow": "export $(cat .env.development | xargs) && bun garage bucket allow --read --write --owner ${STORAGE_BUCKET} --key ${STORAGE_KEY_NAME}",
+    "garage:bucket:setup": "bun garage:bucket:create && bun garage:key:create && bun garage:bucket:allow",
+    "psql:dev": "export $(cat .env.development | xargs) && podman exec -ti ${DATABASE_CONTAINER_NAME} psql -U $POSTGRES_USER -d $POSTGRES_DB",
+    "redis-cli:dev": "export $(cat .env.development | xargs) && podman exec -ti ${CACHE_CONTAINER_NAME} redis-cli"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.0",
