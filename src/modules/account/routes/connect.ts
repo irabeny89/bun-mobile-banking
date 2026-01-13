@@ -9,6 +9,9 @@ import { MONO } from "@/config";
 import { KycService } from "@/modules/kyc/service";
 import { MonoResponse, MonoConnectAuthAccountLinkingResponseData } from "@/types/mono.type";
 import { generateRef } from "@/utils/ref-gen";
+import { AuditModel } from "@/modules/audit/model";
+import { AuditService } from "@/modules/audit/service";
+
 
 export const connect = new Elysia({ name: "connect" })
     .use(userMacro)
@@ -16,16 +19,35 @@ export const connect = new Elysia({ name: "connect" })
         connectSuccess: AccountModel.connectSuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .resolve(({ store }) => {
+    .state("audit", {
+        action: "account_linking_init",
+        userId: "unknown",
+        userType: "individual",
+        targetId: "unknown",
+        targetType: "account",
+        status: "success",
+        details: {},
+        ipAddress: "unknown",
+        userAgent: "unknown",
+    } as AuditModel.CreateAuditT)
+    .resolve(({ store, server, request, headers }) => {
+        store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
+        store.audit.userAgent = headers["user-agent"] || "unknown"
         const logger = pinoLogger(store)
         return {
             logger
         }
     })
-    .get("/connect", async ({ user, logger, set }) => {
+    .get("/connect", async ({ user, logger, set, store }) => {
         if (!user) {
             logger.error("connect:: User not found")
             set.status = 401
+            await AuditService.queue.add("log", {
+                ...store.audit,
+                status: "failure",
+                details: { reason: "User not found" }
+            });
+            logger.info("connect:: audit log queued")
             return {
                 type: "error" as const,
                 error: {
@@ -35,10 +57,17 @@ export const connect = new Elysia({ name: "connect" })
                 }
             }
         }
+        store.audit.userId = user.id
         const data = await KycService.getTier1Data(user.id)
         if (!data) {
             logger.error("connect:: Failed to get KYC tier 1 data")
             set.status = 500
+            await AuditService.queue.add("log", {
+                ...store.audit,
+                status: "failure",
+                details: { reason: "Failed to get KYC tier 1 data" }
+            });
+            logger.info("connect:: audit log queued")
             return {
                 type: "error" as const,
                 error: {
@@ -62,6 +91,12 @@ export const connect = new Elysia({ name: "connect" })
         if (!res.ok) {
             logger.error("connect:: Failed to initiate account linking")
             set.status = 500
+            await AuditService.queue.add("log", {
+                ...store.audit,
+                status: "failure",
+                details: { reason: "Failed to initiate account linking" }
+            });
+            logger.info("connect:: audit log queued")
             return {
                 type: "error" as const,
                 error: {
@@ -72,6 +107,11 @@ export const connect = new Elysia({ name: "connect" })
             }
         }
         const { data: { mono_url } } = await res.json() as MonoResponse<MonoConnectAuthAccountLinkingResponseData>
+        await AuditService.queue.add("log", {
+            ...store.audit,
+            details: { name: `${data.firstName} ${data.lastName}`, email: user.email }
+        });
+        logger.info("connect:: audit log queued")
         return {
             type: "success" as const,
             data: {

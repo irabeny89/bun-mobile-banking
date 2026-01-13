@@ -30,7 +30,7 @@ Changes to critical information must be traceable to ensure data integrity:
 
 Logs must support anti-fraud and anti-money laundering (AML) efforts:
 
-- **Compliance Procedures**: Document identity verification steps (KYC), suspicious activity report (SAR) triggers, and watchlist screenings.
+- **Compliance Procedures**: Document identity verification steps (KYC), suspicious activity report (SAR) triggers, and watch list screenings.
 - **System Integrity**: Log starting, stopping, or pausing of logging services, as well as any failures in security controls.
 - **AI Governance (2026 Mandate)**: Under the EU AI Act, banks must maintain audit trails for high-risk AI models (like credit scoring), including training data provenance and why specific decisions were made.
 

@@ -20,6 +20,9 @@ export namespace AuditModel {
         "tier2_kyc_submission",
         "tier3_kyc_submission",
         "tier2_kyc_bvn_initiate",
+        "account_linking_init",
+        "account_linking_complete",
+        "account_linking_reconnect"
     ]);
     export type AuditActionT = typeof auditActionSchema.static;
 

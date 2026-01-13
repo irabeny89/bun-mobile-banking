@@ -34,11 +34,11 @@ These events track changes to the user's permanent record and compliance status.
 
 These events track interaction with financial accounts.
 
-| Endpoint / Action | Log Action Name | Target Type | Details to Capture |
-| :--- | :--- | :--- | :--- |
-| **Connect Mono Account** | `ACCOUNT_LINKING_INIT` | `account` | Institution Name |
-| **Link Account Success** | `ACCOUNT_LINKING_COMPLETE` | `account` | Account ID |
-| **Generate Statement** | `STATEMENT_GENERATION` | `account` | Period, Format |
+| Endpoint / Action | Log Action Name | Target Type | Details to Capture | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Connect Mono Account** | `account_linking_init` | `account` | Institution Name | ✅ Implemented |
+| **Link Account Success** | `account_linking_complete` | `account` | Account ID | ✅ Implemented |
+| **Generate Statement** | `statement_generation` | `account` | Period, Format | ✅ Implemented |
 
 ## 4. Webhook Module (`src/modules/webhook`)
 
