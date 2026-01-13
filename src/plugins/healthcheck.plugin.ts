@@ -9,15 +9,15 @@ export const healthcheck = new Elysia({ name: "healthcheck", detail: { descripti
         serverStatus: t.String(),
         dbStatus: t.String(),
         cacheStatus: t.String(),
-        storageStatus: t.String()
+        storageStatus: t.Optional(t.String())
     }))
     .get("/healthcheck", async () => {
         const db = dbSingleton()
         const cache = cacheSingleton()
-        const { dbStatus, cacheStatus, storageStatus } = await dbStatuses(db, cache)
-        return { serverStatus: "✅ online", dbStatus, cacheStatus, storageStatus }
+        const { storageStatus, ...rest } = await dbStatuses(db, cache)
+        const statuses = { serverStatus: "✅ online", ...rest }
+        return storageStatus ? { ...statuses, storageStatus } : statuses
     }, {
         response: "healthcheck",
         tags: ["Server"],
     })
-    

@@ -18,7 +18,7 @@ export const systemStatus = new Elysia({ name: "system-status" })
         console.log(`🛠️  Environment: ${NODE_ENV}`);
         console.log(`💾 Database status: ${dbStatus}`)
         console.log(`📀 Cache status: ${cacheStatus}`)
-        console.log(`🗃️  Storage status: ${storageStatus}`)
+        storageStatus && console.log(`🗃️  Storage status: ${storageStatus}`)
         console.log(`⚙️  Server: ${server?.url}`);
         console.log(`📚 API Docs: ${server?.url}openapi`);
     })
