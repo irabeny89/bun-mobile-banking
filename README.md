@@ -68,6 +68,10 @@ User Type: Business - KYB
 - [ ] In-app live chat
 - [ ] Customer service contact options
 
+### 10. Audit Logs
+
+- [x] Audit logs
+
 ## Development
 
 To start the development server run:
