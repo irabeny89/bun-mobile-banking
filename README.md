@@ -3,6 +3,29 @@
 A mobile banking application built with [Elysia](https://elysia.dev).
 User type includes individual and business.
 
+## Table of Contents
+
+- [Features](#features)
+  - [1. User Onboarding](#1-user-onboarding)
+  - [2. Account Management](#2-account-management)
+  - [3. Transactions](#3-transactions)
+  - [4. Payments & Top-ups](#4-payments--top-ups)
+  - [5. Card Management](#5-card-management)
+  - [6. Loan Management](#6-loan-management)
+  - [7. Investment](#7-investment)
+  - [8. Security](#8-security)
+  - [9. Support](#9-support)
+  - [10. Audit Logs](#10-audit-logs)
+- [Development](#development)
+  - [OpenAPI Documentation](#openapi-documentation)
+  - [Tunnel With Localhost.run](#tunnel-with-localhostrun)
+  - [Mono External API](#mono-external-api)
+  - [File Storage](#file-storage)
+    - [Create Cluster Layout](#create-cluster-layout)
+    - [Create a Bucket and Keys](#create-a-bucket-and-keys)
+  - [Database Migrations](#database-migrations)
+- [Reference](#reference)
+
 ## Features
 
 ### 1. User Onboarding
@@ -84,6 +107,8 @@ bun run dev
 
 Open <http://localhost:3000/openapi> to see OpenAPI documentation.
 
+> To better test the API install [RestClient](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension for VSCode, then you can use the [http_requests](http_requests) directory.
+
 ### Tunnel With [Localhost.run](https://localhost.run/docs)
 
 Free tunnel for connecting your localhost apps to the internet e.g webhooks, or other web apps or share with trusted users to test your app.
@@ -154,7 +179,7 @@ bun garage layout apply --version 1
 
 > ***SHORTCUT***: `bun garage:layout:setup`
 
-#### Create a Bucket and Keys
+#### Create Bucket and Keys
 
 After creating the cluster layout, create a bucket and keys then allow the bucket to be read and written to by the key:
 
