@@ -89,5 +89,10 @@ export const monoWebhook = new Elysia({ name: "mono-webhook" })
                 return "Unauthorized"
             }
         },
-        body: "monoWebhookBody"
+        body: "monoWebhookBody",
+        detail: {
+            tags: ["Webhook", "Mono"],
+            description: "Mono webhook endpoint",
+            summary: "Mono webhook"
+        }
     })

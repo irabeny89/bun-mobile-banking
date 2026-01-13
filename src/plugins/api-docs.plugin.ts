@@ -16,6 +16,12 @@ export const apiDocs = new Elysia({
         }, {
             name: "Individual User",
             description: "Individual user endpoints"
+        }, {
+            name: "Business User",
+            description: "Business user endpoints"
+        }, {
+            name: "Webhook",
+            description: "Webhook endpoints"
         }]
     }
 }))

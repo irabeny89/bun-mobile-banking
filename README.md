@@ -165,6 +165,7 @@ bun garage bucket allow --read --write --owner moba-storage --key moba-storage-k
 ```
 
 > ***SHORTCUT***: `bun garage:bucket:setup`
+>
 > N.B: SAVE THE ACCESS KEY INFORMATION IN A SAFE PLACE AFTER THE ABOVE COMMAND
 
 #### NOTE
