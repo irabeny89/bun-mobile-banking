@@ -30,6 +30,7 @@
     "garage:key:create": "export $(cat .env.development | xargs) && bun garage key create ${STORAGE_KEY_NAME}",
     "garage:bucket:allow": "export $(cat .env.development | xargs) && bun garage bucket allow --read --write --owner ${STORAGE_BUCKET} --key ${STORAGE_KEY_NAME}",
     "garage:bucket:setup": "bun garage:bucket:create && bun garage:key:create && bun garage:bucket:allow",
+    "garage:bucket:info": "export $(cat .env.development | xargs) && bun garage bucket info ${STORAGE_BUCKET}",
     "psql:dev": "export $(cat .env.development | xargs) && podman exec -ti ${DATABASE_CONTAINER_NAME} psql -U $POSTGRES_USER -d $POSTGRES_DB",
     "redis-cli:dev": "export $(cat .env.development | xargs) && podman exec -ti ${CACHE_CONTAINER_NAME} redis-cli"
   },

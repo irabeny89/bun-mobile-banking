@@ -13,11 +13,12 @@ export const systemStatus = new Elysia({ name: "system-status" })
     .onStart(async ({ server }) => {
         const db = dbSingleton()
         const cache = cacheSingleton()
-        const { dbStatus, cacheStatus } = await dbStatuses(db, cache)
+        const { dbStatus, cacheStatus, storageStatus } = await dbStatuses(db, cache)
         console.log(`🦊 ${pkg.name} v${pkg.version} server running 🚀`);
         console.log(`🛠️  Environment: ${NODE_ENV}`);
         console.log(`💾 Database status: ${dbStatus}`)
         console.log(`📀 Cache status: ${cacheStatus}`)
+        console.log(`🗃️  Storage status: ${storageStatus}`)
         console.log(`⚙️  Server: ${server?.url}`);
         console.log(`📚 API Docs: ${server?.url}openapi`);
     })
