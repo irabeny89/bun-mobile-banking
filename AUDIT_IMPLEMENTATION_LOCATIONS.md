@@ -21,14 +21,14 @@ These events track entry and exit from the system.
 
 These events track changes to the user's permanent record and compliance status.
 
-| Endpoint / Action | Log Action Name | Target Type | Details to Capture |
-| :--- | :--- | :--- | :--- |
-| **Update Profile** | `PROFILE_UPDATE` | `individual_user` | Fields changed (e.g., photo_url) |
-| **Change PIN** | `PIN_CHANGE` | `security` | Success/Failure |
-| **Submit KYC Tier 1** | `KYC_SUBMISSION` | `kyc` | Tier: 1 |
-| **Submit KYC Tier 2** | `KYC_SUBMISSION` | `kyc` | Tier: 2, Document Type |
-| **Submit KYC Tier 3** | `KYC_SUBMISSION` | `kyc` | Tier: 3, Document Type |
-| **Initiate BVN Verification** | `IDENTITY_VERIFICATION_INIT` | `kyc` | Provider (Mono/Dojah) |
+| Endpoint / Action | Log Action Name | Target Type | Details to Capture | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Update Profile** | `toggle_mfa` | `individual_user` | Fields changed (e.g., photo_url) | ✅ Implemented |
+| **Change PIN** | `PIN_CHANGE` | `security` | Success/Failure | ✅ Implemented |
+| **Submit KYC Tier 1** | `tier1_kyc_submission` | `kyc` | Tier: 1 | ✅ Implemented |
+| **Submit KYC Tier 2** | `tier2_kyc_submission` | `kyc` | Tier: 2, Document Type | ✅ Implemented |
+| **Submit KYC Tier 3** | `tier3_kyc_submission` | `kyc` | Tier: 3, Document Type | ✅ Implemented |
+| **Initiate BVN Verification** | `tier2_kyc_bvn_initiate` | `kyc` | Provider (Mono/Dojah) | ✅ Implemented |
 
 ## 3. Account Module (`src/modules/account`)
 

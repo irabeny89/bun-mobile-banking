@@ -14,6 +14,7 @@ export namespace AuditModel {
         "refresh_token",
         "forgot_password",
         "reset-password",
+        "toggle_mfa",
         "statement_generation",
         "tier1_kyc_submission",
         "tier2_kyc_submission",

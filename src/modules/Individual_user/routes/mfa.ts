@@ -5,6 +5,8 @@ import { userMacro } from "@/plugins/user-macro.plugin";
 import pinoLogger from "@/utils/pino-logger";
 import { IndividualUserService } from "../service";
 import { ERROR_RESPONSE_CODES } from "@/types";
+import { AuditModel } from "@/modules/audit/model";
+import { AuditService } from "@/modules/audit/service";
 
 export const mfa = new Elysia({ name: "mfa-individual" })
     .model({
@@ -13,8 +15,23 @@ export const mfa = new Elysia({ name: "mfa-individual" })
         error: CommonSchema.errorSchema
     })
     .use(userMacro)
-    .resolve(({ store }) => ({ logger: pinoLogger(store) }))
-    .post("/mfa", async ({ logger, user, body, set }) => {
+    .state("audit", {
+        action: "toggle_mfa",
+        userId: "unknown",
+        userType: "individual",
+        targetId: "unknown",
+        targetType: "individual_user",
+        status: "success",
+        details: {},
+        ipAddress: "unknown",
+        userAgent: "unknown",
+    } as AuditModel.CreateAuditT)
+    .resolve(({ store, server, request, headers }) => {
+        store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
+        store.audit.userAgent = headers["user-agent"] || "unknown"
+        return { logger: pinoLogger(store) }
+    })
+    .post("/mfa", async ({ logger, user, body, set, store }) => {
         if (!user) {
             set.status = 401
             return {
@@ -28,6 +45,12 @@ export const mfa = new Elysia({ name: "mfa-individual" })
         }
         logger.info(`mfa:: ${body.mfaEnabled ? "enabling" : "disabling"} MFA`);
         await IndividualUserService.setMfa(user.id, body.mfaEnabled);
+        await AuditService.queue.add("log", {
+            ...store.audit,
+            userId: user.id,
+            details: { mfaEnabled: body.mfaEnabled }
+        });
+        logger.info("mfa:: audit log queued")
         return {
             type: "success",
             data: { mfaEnabled: body.mfaEnabled }
