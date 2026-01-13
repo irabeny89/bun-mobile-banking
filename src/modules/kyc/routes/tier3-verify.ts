@@ -29,10 +29,12 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
         ipAddress: "unknown",
         userAgent: "unknown",
     } as AuditModel.CreateAuditT)
-    .resolve(({ store }) => ({ logger: pinoLogger(store) }))
-    .post("/tier3/verify", async ({ user, body, logger, store, server, request, headers }) => {
+    .resolve(({ store, server, request, headers }) => {
         store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
         store.audit.userAgent = headers["user-agent"] || "unknown"
+        return { logger: pinoLogger(store) }
+    })
+    .post("/tier3/verify", async ({ user, body, logger, store }) => {
         const { path } = getUploadLocation(
             STORAGE.utilityBillPath,
             user!.userType,
