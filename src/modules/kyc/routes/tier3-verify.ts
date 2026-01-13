@@ -8,6 +8,8 @@ import { ERROR_RESPONSE_CODES } from "@/types";
 import { KycService } from "../service";
 import { STORAGE } from "@/config";
 import { getUploadLocation } from "@/utils/storage";
+import { AuditModel } from "@/modules/audit/model";
+import { AuditService } from "@/modules/audit/service";
 
 export const tier3Verify = new Elysia({ name: "tier3-verify" })
     .use(userMacro)
@@ -16,8 +18,21 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
         tier3VerifySuccess: KycModel.tier3SuccessSchema,
         error: CommonSchema.errorSchema,
     })
+    .state("audit", {
+        action: "tier3_kyc_submission",
+        userId: "unknown",
+        userType: "individual",
+        targetId: "unknown",
+        targetType: "kyc",
+        status: "success",
+        details: {},
+        ipAddress: "unknown",
+        userAgent: "unknown",
+    } as AuditModel.CreateAuditT)
     .resolve(({ store }) => ({ logger: pinoLogger(store) }))
-    .post("/tier3/verify", async ({ user, body, logger }) => {
+    .post("/tier3/verify", async ({ user, body, logger, store, server, request, headers }) => {
+        store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
+        store.audit.userAgent = headers["user-agent"] || "unknown"
         const { path } = getUploadLocation(
             STORAGE.utilityBillPath,
             user!.userType,
@@ -30,6 +45,8 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
             ...body,
         })
         logger.info("tier3Verify:: User KYC db data insertion queued")
+        await AuditService.queue.add("log", store.audit);
+        logger.info("tier3Verify:: audit log queued")
         return {
             type: "success" as const,
             data: {
@@ -38,11 +55,18 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
             }
         }
     }, {
-        async beforeHandle({ user, logger, set, body }) {
+        async beforeHandle({ user, logger, set, body, store }) {
             // currently supports utility bill verification
             if (body.proofType !== "utility bill") {
                 logger.info("tier3Verify:: Proof type is not supported");
                 set.status = 400;
+                await AuditService.queue.add("log", {
+                    ...store.audit,
+                    userId: user!.id || "unknown",
+                    status: "failure",
+                    details: { reason: "Proof type is not supported. Use utility bill" }
+                });
+                logger.info("tier3Verify:: audit log queued")
                 return {
                     type: "error" as const,
                     error: {
@@ -55,6 +79,12 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
             if (!user) {
                 logger.info("tier3Verify:: User not found");
                 set.status = 401;
+                await AuditService.queue.add("log", {
+                    ...store.audit,
+                    status: "failure",
+                    details: { reason: "User not found" }
+                });
+                logger.info("tier3Verify:: audit log queued")
                 return {
                     type: "error" as const,
                     error: {
@@ -64,10 +94,17 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
                     }
                 }
             }
+            store.audit.userId = user.id
             const tier3Status = await KycService.getTier3Status(user.id)
             if (tier3Status && tier3Status.currentTier !== "tier_2") {
                 logger.debug(tier3Status, "tier3Verify:: Only tier 2 users can verify tier 3");
                 set.status = 400;
+                await AuditService.queue.add("log", {
+                    ...store.audit,
+                    status: "failure",
+                    details: { reason: "Only tier 2 users can verify tier 3" }
+                });
+                logger.info("tier3Verify:: audit log queued")
                 return {
                     type: "error" as const,
                     error: {
@@ -86,6 +123,12 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
                 logger.error(err, "tier3Verify:: verification failed");
                 if ((err.message as string).startsWith("Verification failed")) {
                     set.status = 400;
+                    await AuditService.queue.add("log", {
+                        ...store.audit,
+                        status: "failure",
+                        details: { reason: "Verification failed" }
+                    });
+                    logger.info("tier3Verify:: audit log queued")
                     return {
                         type: "error" as const,
                         error: {
@@ -95,6 +138,12 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
                         }
                     }
                 }
+                await AuditService.queue.add("log", {
+                    ...store.audit,
+                    status: "failure",
+                    details: { reason: "Verification failed" }
+                });
+                logger.info("tier3Verify:: audit log queued")
                 throw err
             }
         },

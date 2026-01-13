@@ -14,7 +14,11 @@ export namespace AuditModel {
         "refresh_token",
         "forgot_password",
         "reset-password",
-        "statement_generation"
+        "statement_generation",
+        "tier1_kyc_submission",
+        "tier2_kyc_submission",
+        "tier3_kyc_submission",
+        "identity_verification_init"
     ]);
     export type AuditActionT = typeof auditActionSchema.static;
 

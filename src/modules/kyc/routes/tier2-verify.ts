@@ -9,6 +9,9 @@ import { kycQueue } from "@/utils/kyc-queue";
 import { fileStore, getUploadLocation } from "@/utils/storage";
 import { STORAGE } from "@/config";
 import { encrypt } from "@/utils/encryption";
+import { AuditModel } from "@/modules/audit/model";
+import { AuditService } from "@/modules/audit/service";
+
 
 export const tier2Verify = new Elysia({ name: "tier2-verify" })
     .use(userMacro)
@@ -18,7 +21,20 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
         error: CommonSchema.errorSchema,
     })
     .guard({ body: "tier2VerifyBody", user: ["individual"] }, app => app
-        .resolve(async ({ store }) => {
+        .state("audit", {
+            action: "tier2_kyc_submission",
+            userId: "unknown",
+            userType: "individual",
+            targetId: "unknown",
+            targetType: "kyc",
+            status: "success",
+            details: {},
+            ipAddress: "unknown",
+            userAgent: "unknown",
+        } as AuditModel.CreateAuditT)
+        .resolve(async ({ store, server, request, headers }) => {
+            store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
+            store.audit.userAgent = headers["user-agent"] || "unknown"
             const logger = pinoLogger(store)
             return { logger }
         })
@@ -26,7 +42,8 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
             user,
             body: { bvnOtp, imageFile, ...rest },
             logger,
-            set
+            set,
+            store
         }) => {
             try {
                 logger!.info("tier2Verify:: Verifying BVN")
@@ -40,8 +57,8 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                 )
                 await Promise.all([
                     fileStore
-                    .file(path)
-                    .write(encrypt(Buffer.from(await imageFile.arrayBuffer()))),
+                        .file(path)
+                        .write(encrypt(Buffer.from(await imageFile.arrayBuffer()))),
                     kycQueue.add("tier_2_update", {
                         userId: user!.id,
                         ...rest,
@@ -49,6 +66,9 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                         imageUrl: url
                     })
                 ])
+                await AuditService.queue.add("log", {
+                    ...store.audit,
+                });
                 logger!.info("tier2Verify:: User KYC db data insertion queued")
                 return {
                     type: "success" as const,
@@ -61,6 +81,12 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                 if ((error.message as string).startsWith("Verification failed")) {
                     logger.error(error, "tier2Verify:: BVN verification failed")
                     set.status = 400
+                    await AuditService.queue.add("log", {
+                        ...store.audit,
+                        status: "failure",
+                        details: { tier: 2, reason: error.message }
+                    });
+                    logger.info("tier2Verify:: audit log queued")
                     return {
                         type: "error",
                         error: {
@@ -73,11 +99,18 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                 throw error
             }
         }, {
-            async beforeHandle({ user, logger, set, body }) {
+            async beforeHandle({ user, logger, set, body, store }) {
                 const supportedIdTypes = ["driver's license", "international passport"]
                 if (!supportedIdTypes.includes(body.idType)) {
                     logger!.info("tier2Verify:: ID type is not supported");
                     set.status = 400;
+                    await AuditService.queue.add("log", {
+                        ...store.audit,
+                        userId: user?.id || "unknown",
+                        status: "failure",
+                        details: { tier: 2, reason: `ID type is not supported. Use ${supportedIdTypes.join(" or ")}` }
+                    });
+                    logger.info("tier2Verify:: audit log queued")
                     return {
                         type: "error" as const,
                         error: {
@@ -90,6 +123,12 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                 if (!user) {
                     logger!.info("tier2Verify:: User not found");
                     set.status = 401;
+                    await AuditService.queue.add("log", {
+                        ...store.audit,
+                        status: "failure",
+                        details: { tier: 2, reason: "User not found" }
+                    });
+                    logger.info("tier2Verify:: audit log queued")
                     return {
                         type: "error" as const,
                         error: {
@@ -99,10 +138,17 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                         }
                     }
                 }
+                store.audit.userId = user.id
                 const tier2Status = await KycService.getTier2Status(user.id)
                 if (tier2Status && tier2Status.currentTier !== "tier_1") {
                     logger!.debug(tier2Status, "tier2Verify:: Only tier 1 users can verify tier 2");
                     set.status = 400;
+                    await AuditService.queue.add("log", {
+                        ...store.audit,
+                        status: "failure",
+                        details: { tier: 2, reason: "Only tier 1 users can verify tier 2" }
+                    });
+                    logger.info("tier2Verify:: audit log queued")
                     return {
                         type: "error" as const,
                         error: {
@@ -120,6 +166,12 @@ export const tier2Verify = new Elysia({ name: "tier2-verify" })
                 } catch (error: any) {
                     logger!.error(error, "tier2Verify.beforeHandle:: Tier 2 ID verification failed");
                     set.status = 400;
+                    await AuditService.queue.add("log", {
+                        ...store.audit,
+                        status: "failure",
+                        details: { tier: 2, reason: error.message }
+                    });
+                    logger.info("tier2Verify:: audit log queued")
                     return {
                         type: "error" as const,
                         error: {
