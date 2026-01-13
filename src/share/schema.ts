@@ -29,7 +29,7 @@ export namespace CommonSchema {
         hasMore: t.Boolean({
             description: "Whether there are more items to fetch. If false, there are no more items to fetch."
         }),
-      })
+    })
     export type PagingResponseSchemaT = typeof pagingResponseSchema.static
 
     export const errorSchema = errorSchemaFactory();
@@ -51,9 +51,9 @@ export namespace CommonSchema {
     })
     export type EmailSchemaT = typeof emailSchema.static;
 
-    export const userTypeSchema = t.UnionEnum(["individual", "business"], {
+    export const userTypeSchema = t.UnionEnum(["unknown", "individual", "business", "mono"], {
         description: "User Type",
-        examples: ["individual", "business"],
+        examples: ["unknown", "individual", "business", "mono"],
     });
     export type UserType = typeof userTypeSchema.static;
 

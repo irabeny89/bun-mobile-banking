@@ -22,7 +22,8 @@ export namespace AuditModel {
         "tier2_kyc_bvn_initiate",
         "account_linking_init",
         "account_linking_complete",
-        "account_linking_reconnect"
+        "account_linking_reconnect",
+        "webhook_received"
     ]);
     export type AuditActionT = typeof auditActionSchema.static;
 

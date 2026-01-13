@@ -44,10 +44,10 @@ These events track interaction with financial accounts.
 
 These events track external signals that modify system state.
 
-| Event | Log Action Name | Target Type | Details to Capture |
-| :--- | :--- | :--- | :--- |
-| **Mono Webhook** | `WEBHOOK_RECEIVED` | `webhook` | Provider: Mono, Event Type |
-| **Dojah Webhook** | `WEBHOOK_RECEIVED` | `webhook` | Provider: Dojah, Event Type |
+| Endpoint / Action | Log Action Name | Target Type | Details to Capture | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Mono Webhook** | `webhook_received` | `webhook` | Event Type, Payload | ✅ Implemented |
+| **Dojah Webhook** | `webhook_received` | `webhook` | Event Type, Payload | ❌ To Do |
 
 ## Implementation Pattern
 
@@ -62,7 +62,7 @@ import { AuditService } from "@/modules/audit/service";
 await AuditService.queue.add("log", {
     userId: user.id,
     userType: "individual",
-    action: "PROFILE_UPDATE",
+    action: "login",
     targetType: "individual_user", // The resource being affected
     targetId: user.id,             // ID of the resource
     status: "success",             // "success" | "failure"
