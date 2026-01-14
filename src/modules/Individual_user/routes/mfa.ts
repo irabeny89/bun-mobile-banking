@@ -15,25 +15,31 @@ export const mfa = new Elysia({ name: "mfa-individual" })
         error: CommonSchema.errorSchema
     })
     .use(userMacro)
-    .state("audit", {
-        action: "toggle_mfa",
-        userId: "unknown",
-        userType: "individual",
-        targetId: "unknown",
-        targetType: "individual_user",
-        status: "success",
-        details: {},
-        ipAddress: "unknown",
-        userAgent: "unknown",
-    } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
-        store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
-        store.audit.userAgent = headers["user-agent"] || "unknown"
-        return { logger: pinoLogger(store) }
+        return {
+            logger: pinoLogger(store),
+            audit: {
+                action: "toggle_mfa",
+                userId: "unknown",
+                userType: "individual",
+                targetId: "unknown",
+                targetType: "individual_user",
+                status: "success",
+                details: {},
+                ipAddress: server?.requestIP(request)?.address || "unknown",
+                userAgent: headers["user-agent"] || "unknown",
+            } as AuditModel.CreateAuditT
+        }
     })
-    .post("/mfa", async ({ logger, user, body, set, store }) => {
+    .post("/mfa", async ({ logger, user, body, set, audit }) => {
         if (!user) {
             set.status = 401
+            await AuditService.queue.add("log", {
+                ...audit,
+                status: "failure",
+                details: { reason: "User not found" }
+            });
+            logger.info("mfa:: audit log queued")
             return {
                 type: "error",
                 error: {
@@ -46,7 +52,7 @@ export const mfa = new Elysia({ name: "mfa-individual" })
         logger.info(`mfa:: ${body.mfaEnabled ? "enabling" : "disabling"} MFA`);
         await IndividualUserService.setMfa(user.id, body.mfaEnabled);
         await AuditService.queue.add("log", {
-            ...store.audit,
+            ...audit,
             userId: user.id,
             details: { mfaEnabled: body.mfaEnabled }
         });
