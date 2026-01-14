@@ -23,7 +23,8 @@ export namespace AuditModel {
         "account_linking_init",
         "account_linking_complete",
         "account_linking_reconnect",
-        "webhook_received"
+        "webhook_received",
+        "me"
     ]);
     export type AuditActionT = typeof auditActionSchema.static;
 
