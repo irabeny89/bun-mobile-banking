@@ -17,26 +17,23 @@ export const statement = new Elysia({ name: "statement" })
         statementSuccess: AccountModel.statementSuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .state("audit", {
-        action: "statement_generation",
-        userId: "unknown",
-        userType: "individual",
-        targetId: "unknown",
-        targetType: "account",
-        status: "success",
-        details: {},
-        ipAddress: "unknown",
-        userAgent: "unknown",
-    } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
-        store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
-        store.audit.userAgent = headers["user-agent"] || "unknown"
-        const logger = pinoLogger(store)
         return {
-            logger
+            logger: pinoLogger(store),
+            audit: {
+                action: "statement_generation",
+                userId: "unknown",
+                userType: "individual",
+                targetId: "unknown",
+                targetType: "account",
+                status: "success",
+                details: {},
+                ipAddress: server?.requestIP(request)?.address || "unknown",
+                userAgent: headers["user-agent"] || "unknown",
+            } as AuditModel.CreateAuditT
         }
     })
-    .get("/:accountId/statement", async ({ logger, set, query, params, user, store }) => {
+    .get("/:accountId/statement", async ({ logger, set, query, params, user, audit }) => {
         const res = query.action.type === "generate"
             ? await AccountService.monoStatement(params.accountId, {
                 period: query.action.period,
@@ -49,10 +46,10 @@ export const statement = new Elysia({ name: "statement" })
             set.status = 500
             // only log failure for generation, status polling is noisy
             query.action.type === "generate" && await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 status: "failure",
                 details: {
-                    ...store.audit.details,
+                    ...audit.details,
                     reason: error.message,
                 }
             });
@@ -76,9 +73,9 @@ export const statement = new Elysia({ name: "statement" })
         })
         // only log success for generation, status polling is noisy
         query.action.type === "generate" && await AuditService.queue.add("log", {
-            ...store.audit,
+            ...audit,
             details: {
-                ...store.audit.details,
+                ...audit.details,
                 statement: data
             }
         });
@@ -101,13 +98,13 @@ export const statement = new Elysia({ name: "statement" })
             401: "error",
             500: "error"
         },
-        async beforeHandle({ logger, user, set, store, params, query }) {
+        async beforeHandle({ logger, user, set, audit, params, query }) {
             if (!user) {
                 logger.error("statement:: User not found")
                 set.status = 401
                 // only log failure for generation, status polling is noisy
                 query.action.type === "generate" && await AuditService.queue.add("log", {
-                    ...store.audit,
+                    ...audit,
                     status: "failure",
                     details: { reason: "User not found" }
                 });
@@ -121,8 +118,8 @@ export const statement = new Elysia({ name: "statement" })
                     }
                 }
             }
-            store.audit.userId = user.id
-            store.audit.targetId = params.accountId
-            store.audit.details = { ...query, accountId: params.accountId }
+            audit.userId = user.id
+            audit.targetId = params.accountId
+            audit.details = { ...query, accountId: params.accountId }
         }
     })

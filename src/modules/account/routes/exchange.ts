@@ -17,31 +17,29 @@ export const exchange = new Elysia({ name: "exchange" })
         exchangeSuccess: AccountModel.exchangeSuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .state("audit", {
-        action: "account_linking_complete",
-        userId: "unknown",
-        userType: "individual",
-        targetId: "unknown",
-        targetType: "account",
-        status: "success",
-        details: {},
-        ipAddress: "unknown",
-        userAgent: "unknown",
-    } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
-        store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
-        store.audit.userAgent = headers["user-agent"] || "unknown"
         const logger = pinoLogger(store)
         return {
-            logger
+            logger,
+            audit: {
+                action: "account_linking_complete",
+                userId: "unknown",
+                userType: "individual",
+                targetId: "unknown",
+                targetType: "account",
+                status: "success",
+                details: {},
+                ipAddress: server?.requestIP(request)?.address || "unknown",
+                userAgent: headers["user-agent"] || "unknown",
+            } satisfies AuditModel.CreateAuditT
         }
     })
-    .post("/exchange", async ({ user, logger, set, body, store }) => {
+    .post("/exchange", async ({ user, logger, set, body, audit }) => {
         if (!user) {
             logger.error("exchange:: User not found")
             set.status = 401
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 status: "failure",
                 details: { reason: "User not found" }
             });
@@ -55,7 +53,7 @@ export const exchange = new Elysia({ name: "exchange" })
                 }
             }
         }
-        store.audit.userId = user.id
+        audit.userId = user.id
         const res = await AccountService.monoExchangeToken({
             code: body.connectToken,
         })
@@ -63,7 +61,7 @@ export const exchange = new Elysia({ name: "exchange" })
             logger.error("exchange:: Failed to exchange connect token")
             set.status = 500
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 status: "failure",
                 details: { reason: "Failed to exchange connect token" }
             });
@@ -79,7 +77,7 @@ export const exchange = new Elysia({ name: "exchange" })
         }
         const { data: { id } } = await res.json() as MonoResponse<MonoConnectAuthAccountExchangeTokenResponseData>
         await AuditService.queue.add("log", {
-            ...store.audit,
+            ...audit,
             targetId: id,
             details: { accountId: id }
         });

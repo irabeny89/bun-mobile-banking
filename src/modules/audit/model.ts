@@ -20,9 +20,11 @@ export namespace AuditModel {
         "tier2_kyc_submission",
         "tier3_kyc_submission",
         "tier2_kyc_bvn_initiate",
+        "list_linked_accounts",
         "account_linking_init",
         "account_linking_complete",
         "account_linking_reconnect",
+        "list_account_transactions",
         "webhook_received",
         "me"
     ]);

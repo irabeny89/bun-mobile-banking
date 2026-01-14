@@ -16,32 +16,30 @@ export const reconnect = new Elysia({ name: "reconnect" })
         reconnectSuccess: AccountModel.reconnectSuccessSchema,
         error: CommonSchema.errorSchema
     })
-    .state("audit", {
-        action: "account_linking_reconnect",
-        userId: "unknown",
-        userType: "individual",
-        targetId: "unknown",
-        targetType: "account",
-        status: "success",
-        details: {},
-        ipAddress: "unknown",
-        userAgent: "unknown",
-    } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
-        store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
-        store.audit.userAgent = headers["user-agent"] || "unknown"
         const logger = pinoLogger(store)
         return {
-            logger
+            logger,
+            audit: {
+                action: "account_linking_reconnect",
+                userId: "unknown",
+                userType: "individual",
+                targetId: "unknown",
+                targetType: "account",
+                status: "success",
+                details: {},
+                ipAddress: server?.requestIP(request)?.address || "unknown",
+                userAgent: headers["user-agent"] || "unknown",
+            } satisfies AuditModel.CreateAuditT
         }
     })
-    .post("/reconnect", async ({ user, logger, set, body, store }) => {
-        store.audit.targetId = body.accountId
+    .post("/reconnect", async ({ user, logger, set, body, audit }) => {
+        audit.targetId = body.accountId
         if (!user) {
             logger.error("reconnect:: User not found")
             set.status = 401
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 status: "failure",
                 details: { reason: "User not found" }
             })
@@ -55,13 +53,13 @@ export const reconnect = new Elysia({ name: "reconnect" })
                 }
             }
         }
-        store.audit.userId = user.id
+        audit.userId = user.id
         const account = await AccountService.findByMonoAccountId(body.accountId)
         if (!account) {
             logger.error("reconnect:: Account not found")
             set.status = 404
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 status: "failure",
                 details: { reason: "Account not found", accountId: body.accountId }
             })
@@ -86,7 +84,7 @@ export const reconnect = new Elysia({ name: "reconnect" })
             logger.error({ responseMsg: message }, "reconnect:: Mono reauthorize account failed")
             set.status = 500
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 status: "failure",
                 details: { 
                     reason: "Mono reauthorize account failed", 
@@ -111,7 +109,7 @@ export const reconnect = new Elysia({ name: "reconnect" })
             mfa: data.is_multi
         })
         await AuditService.queue.add("log", {
-            ...store.audit,
+            ...audit,
             details: { 
                 reason: "Account reconnected successfully", 
                 accountId: body.accountId,
