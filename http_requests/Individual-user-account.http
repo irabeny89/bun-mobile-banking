@@ -1,0 +1,6 @@
+# Install RestClient for VSCode to run this file 
+
+# connect account
+GET {{baseUrl}}/api/v1/accounts/connect
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json

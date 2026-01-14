@@ -1,6 +1,6 @@
 import cors from "@elysiajs/cors";
 import { serverTiming } from "@elysiajs/server-timing";
-import { Elysia } from "elysia";
+import { Elysia, file } from "elysia";
 import { elysiaXSS } from "elysia-xss";
 import pkg from "../package.json";
 import { errorHandler } from "./plugins/onerror.plugin";
@@ -35,6 +35,11 @@ export const app = new Elysia({
   .use(rateLimitPlugin)
   .use(healthcheck)
   .get("/", () => `Hello from ${pkg.name}.\n${pkg.description}`)
+  .get("/favicon.ico", () => file("public/favicon.ico"))
+  .get("/site.webmanifest", () => file("public/site.webmanifest"))
+  .get("/apple-touch-icon.png", () => file("public/apple-touch-icon.png"))
+  .get("/android-chrome-192x192.png", () => file("public/android-chrome-192x192.png"))
+  .get("/android-chrome-512x512.png", () => file("public/android-chrome-512x512.png"))
   .group("/api/v1", (app) => app
     .use(auth)
     .use(individualUser)
