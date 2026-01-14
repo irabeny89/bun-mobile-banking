@@ -16,29 +16,29 @@ export const loginMfaIndividual = new Elysia({
         error: CommonSchema.errorSchema,
     })
     .guard({ body: "loginMfaOtp" }, app => app
-        .state("audit", {
-            action: "mfa_login",
-            userId: "unknown",
-            userType: "individual",
-            targetId: "unknown",
-            targetType: "auth",
-            status: "success",
-            details: {},
-            ipAddress: "unknown",
-            userAgent: "unknown",
-        } as AuditModel.CreateAuditT)
-        .resolve(async ({ store, body }) => {
+        .resolve(async ({ store, body, server, request, headers }) => {
             return {
                 logger: pinoLogger(store),
-                payload: await AuthService.getMfaOtpCachedData(body.otp)
+                payload: await AuthService.getMfaOtpCachedData(body.otp),
+                audit: {
+                    action: "mfa_login",
+                    userId: "unknown",
+                    userType: "individual",
+                    targetId: "unknown",
+                    targetType: "auth",
+                    status: "success",
+                    details: {},
+                    ipAddress: server?.requestIP(request)?.address || "unknown",
+                    userAgent: headers["user-agent"] || "unknown",
+                } as AuditModel.CreateAuditT
             }
         })
-        .post("/login/mfa-otp/individual", async ({ logger, set, payload, store, body }) => {
+        .post("/login/mfa-otp/individual", async ({ logger, set, payload, audit, body }) => {
             if (!payload) {
                 logger.info("loginMfaIndividual:: invalid otp")
                 set.status = 400
                 await AuditService.queue.add("log", {
-                    ...store.audit,
+                    ...audit,
                     status: "failure",
                     details: { reason: "Invalid OTP", otp: body.otp }
                 })
@@ -57,7 +57,7 @@ export const loginMfaIndividual = new Elysia({
             logger.info("loginMfaIndividual:: caching refresh token")
             await AuthService.cacheRefreshToken(refreshToken, payload.id)
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 userId: payload.id,
                 details: { email: payload.email }
             })

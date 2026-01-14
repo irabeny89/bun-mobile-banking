@@ -15,32 +15,30 @@ export const refreshTokenIndividual = new Elysia({
         refreshTokenSuccess: AuthModel.refreshTokenSuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .state("audit", {
-        action: "refresh_token",
-        userId: "unknown",
-        userType: "individual",
-        targetId: "unknown",
-        targetType: "auth",
-        status: "success",
-        details: {},
-        ipAddress: "unknown",
-        userAgent: "unknown",
-    } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
-        store.audit.ipAddress = server?.requestIP(request)?.address
-        store.audit.userAgent = headers["user-agent"]
         return {
             logger: pinoLogger(store),
+            audit: {
+                action: "refresh_token",
+                userId: "unknown",
+                userType: "individual",
+                targetId: "unknown",
+                targetType: "auth",
+                status: "success",
+                details: {},
+                ipAddress: server?.requestIP(request)?.address || "unknown",
+                userAgent: headers["user-agent"] || "unknown",
+            } as AuditModel.CreateAuditT
         }
     })
-    .post("/refresh-token/individual", async ({ body, set, logger, store }) => {
+    .post("/refresh-token/individual", async ({ body, set, logger, audit }) => {
         const jwtPayload = await AuthService.verifyToken(body.refreshToken, "refresh", "individual", logger);
         logger.debug({ jwtPayload }, "refreshTokenIndividual:: jwt payload")
         if (!jwtPayload) {
             logger.info("refreshTokenIndividual:: invalid refresh token")
             set.status = 400
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 status: "failure",
                 details: { reason: "Invalid refresh token" }
             })
@@ -66,7 +64,7 @@ export const refreshTokenIndividual = new Elysia({
         await AuthService.cacheRefreshToken(refreshToken, payload.id)
         logger.info("refreshTokenIndividual:: refresh token cached")
         await AuditService.queue.add("log", {
-            ...store.audit,
+            ...audit,
             status: "success",
             details: { reason: "Refresh token generated successfully" }
         })

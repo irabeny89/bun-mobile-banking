@@ -17,32 +17,30 @@ export const forgotPasswordIndividual = new Elysia({
         error: CommonSchema.errorSchema,
     })
     .guard({ body: "forgotPasswordIndividual" }, app => app
-        .state("audit", {
-            action: "forgot_password",
-            userId: "unknown",
-            userType: "individual",
-            targetId: "unknown",
-            targetType: "auth",
-            status: "success",
-            details: {},
-            ipAddress: "unknown",
-            userAgent: "unknown",
-        } as AuditModel.CreateAuditT)
         .resolve(async ({ body, store, server, request, headers }) => {
-            store.audit.ipAddress = server?.requestIP(request)?.address
-            store.audit.userAgent = headers["user-agent"]
             return {
                 logger: pinoLogger(store),
-                user: await IndividualUserService.findByEmail(body.email)
+                user: await IndividualUserService.findByEmail(body.email),
+                audit: {
+                    action: "forgot_password",
+                    userId: "unknown",
+                    userType: "individual",
+                    targetId: "unknown",
+                    targetType: "auth",
+                    status: "success",
+                    details: {},
+                    ipAddress: server?.requestIP(request)?.address || "unknown",
+                    userAgent: headers["user-agent"] || "unknown",
+                } as AuditModel.CreateAuditT
             }
         })
-        .post("/forgot-password/individual", async ({ logger, user, store }) => {
+        .post("/forgot-password/individual", async ({ logger, user, audit }) => {
             logger.info("forgotPasswordIndividual:: removing refresh token if it exists")
             await AuthService.removeRefreshToken(user.id)
             logger.info("forgotPasswordIndividual:: sending MFA OTP")
             await AuthService.sendMfaOtp({ email: user.email, id: user.id, logger, userType: user.userType })
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 status: "success",
                 details: { reason: "Password reset request successful. Check your email for the reset code" }
             })
@@ -55,12 +53,12 @@ export const forgotPasswordIndividual = new Elysia({
                 }
             }
         }, {
-            beforeHandle: async ({ user, logger, set, store, body }) => {
+            beforeHandle: async ({ user, logger, set, audit, body }) => {
                 if (!user) {
                     logger.info("forgotPasswordIndividual:: user not found")
                     set.status = 401
                     await AuditService.queue.add("log", {
-                        ...store.audit,
+                        ...audit,
                         status: "failure",
                         details: { email: body.email, reason: "User not found" }
                     })

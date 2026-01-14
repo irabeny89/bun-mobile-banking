@@ -16,26 +16,24 @@ export const resetPasswordIndividual = new Elysia({
         error: CommonSchema.errorSchema,
     })
     .guard({ body: "resetPasswordIndividual" }, app => app
-        .state("audit", {
-            action: "reset-password",
-            userId: "unknown",
-            userType: "individual",
-            targetId: "unknown",
-            targetType: "auth",
-            status: "success",
-            details: {},
-            ipAddress: "unknown",
-            userAgent: "unknown",
-        } as AuditModel.CreateAuditT)
         .resolve(async ({ store, server, request, headers, body }) => {
-            store.audit.ipAddress = server?.requestIP(request)?.address
-            store.audit.userAgent = headers["user-agent"]
             return {
                 logger: pinoLogger(store),
-                userData: await AuthService.getMfaOtpCachedData(body.otp)
+                userData: await AuthService.getMfaOtpCachedData(body.otp),
+                audit: {
+                    action: "reset-password",
+                    userId: "unknown",
+                    userType: "individual",
+                    targetId: "unknown",
+                    targetType: "auth",
+                    status: "success",
+                    details: {},
+                    ipAddress: server?.requestIP(request)?.address || "unknown",
+                    userAgent: headers["user-agent"] || "unknown",
+                } as AuditModel.CreateAuditT
             }
         })
-        .post("/reset-password/individual", async ({ logger, body, userData, store }) => {
+        .post("/reset-password/individual", async ({ logger, body, userData, audit }) => {
             const data = userData as CommonSchema.TokenPayloadT;
             logger.info("resetPasswordIndividual:: generating access and refresh tokens")
             const tokens = AuthService.createTokens(data)
@@ -46,7 +44,7 @@ export const resetPasswordIndividual = new Elysia({
             await AuthService.resetPasswordIndividual(data.id, hashedPassword)
             logger.info("resetPasswordIndividual:: Success! returning access and refresh tokens")
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 userId: data.id,
             })
             logger.info("resetPasswordIndividual:: audit log queued")
@@ -58,12 +56,12 @@ export const resetPasswordIndividual = new Elysia({
                 }
             }
         }, {
-            beforeHandle: async ({ logger, userData, set, store }) => {
+            beforeHandle: async ({ logger, userData, set, audit }) => {
                 if (!userData) {
                     logger.info("resetPasswordIndividual:: invalid token")
                     set.status = 400;
                     await AuditService.queue.add("log", {
-                        ...store.audit,
+                        ...audit,
                         status: "failure",
                         details: {
                             reason: "Invalid token"

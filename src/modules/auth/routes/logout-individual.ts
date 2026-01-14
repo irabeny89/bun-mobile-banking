@@ -13,30 +13,29 @@ export const logoutIndividual = new Elysia({ name: "logout-individual" })
         logoutIndividualSuccess: AuthModel.logoutSuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .state("audit", {
-        action: "logout",
-        userId: "unknown",
-        userType: "individual",
-        targetId: "unknown",
-        targetType: "auth",
-        details: {},
-        ipAddress: "unknown",
-        userAgent: "unknown",
-    } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
-        store.audit.ipAddress = server?.requestIP(request)?.address
-        store.audit.userAgent = headers["user-agent"]
         return {
-            logger: pinoLogger(store)
+            logger: pinoLogger(store),
+            audit: {
+                action: "logout",
+                userId: "unknown",
+                userType: "individual",
+                targetId: "unknown",
+                targetType: "auth",
+                status: "success",
+                details: {},
+                ipAddress: server?.requestIP(request)?.address || "unknown",
+                userAgent: headers["user-agent"] || "unknown",
+            } as AuditModel.CreateAuditT
         }
     })
-    .post("/logout/individual", async ({ logger, body, set, store }) => {
+    .post("/logout/individual", async ({ logger, body, set, audit }) => {
         const payload = await AuthService.verifyToken(body.refreshToken, "refresh", "individual", logger);
         if (!payload) {
             logger.info("logoutIndividual:: invalid token")
             set.status = 400;
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 status: "failure",
                 details: { refreshToken: body.refreshToken }
             })
@@ -53,7 +52,7 @@ export const logoutIndividual = new Elysia({ name: "logout-individual" })
         await AuthService.removeRefreshToken(payload.id)
         logger.info("logoutIndividual:: auth session removed");
         await AuditService.queue.add("log", {
-            ...store.audit,
+            ...audit,
             userId: payload.id,
             details: { email: payload.email }
         })

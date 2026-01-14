@@ -28,18 +28,27 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
         userAgent: "unknown",
     } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
-        store.audit.ipAddress = server?.requestIP(request)?.address
-        store.audit.userAgent = headers["user-agent"]
         const logger = pinoLogger(store)
         return {
-            logger
+            logger,
+            audit: {
+                action: "register",
+                userId: "unknown",
+                userType: "individual",
+                targetId: "unknown",
+                targetType: "auth",
+                status: "success",
+                details: {},
+                ipAddress: server?.requestIP(request)?.address || "unknown",
+                userAgent: headers["user-agent"] || "unknown",
+            } as AuditModel.CreateAuditT
         }
     })
-    .post("/register/individual", async ({ body, logger, store }) => {
+    .post("/register/individual", async ({ body, logger, audit }) => {
         logger.info("auth:: registering individual user")
         await AuthService.register(body, logger)
         await AuditService.queue.add("log", {
-            ...store.audit,
+            ...audit,
             status: "success",
             details: { email: body.email }
         })
@@ -58,13 +67,13 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
             summary: "Registration individual start"
         },
         body: AuthModel.registerBodySchema,
-        beforeHandle: async ({ body, set, logger, store }) => {
+        beforeHandle: async ({ body, set, logger, audit }) => {
             const userExist = await IndividualUserService.existByEmail(body.email)
             if (userExist) {
                 logger.info("auth:: user already exists")
                 set.status = 400
                 await AuditService.queue.add("log", {
-                    ...store.audit,
+                    ...audit,
                     status: "failure",
                     details: { email: body.email, reason: "User already exists" }
                 })

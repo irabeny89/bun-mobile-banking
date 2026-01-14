@@ -17,24 +17,24 @@ export const registerIndividualComplete = new Elysia({
         error: CommonSchema.errorSchema,
     })
     .guard({ body: "registerComplete" }, app => app
-        .state("audit", {
-            action: "register_complete",
-            userId: "unknown",
-            userType: "individual",
-            targetId: "unknown",
-            targetType: "auth",
-            status: "success",
-            details: {},
-            ipAddress: "unknown",
-            userAgent: "unknown",
-        } as AuditModel.CreateAuditT)
-        .resolve(async ({ body, store, status }) => {
+        .resolve(async ({ body, store, status, request, headers, server }) => {
+            const audit = {
+                action: "register_complete",
+                userId: "unknown",
+                userType: "individual",
+                targetId: "unknown",
+                targetType: "auth",
+                status: "success",
+                details: {},
+                ipAddress: server?.requestIP(request)?.address || "unknown",
+                userAgent: headers["user-agent"] || "unknown",
+            } as AuditModel.CreateAuditT
             const logger = pinoLogger(store)
             const registerData = await AuthService.getUserRegisterData(body.otp)
             if (!registerData) {
                 logger.info("registerIndividualComplete:: invalid otp, no register data")
                 await AuditService.queue.add("log", {
-                    ...store.audit,
+                    ...audit,
                     status: "failure",
                     details: { reason: "Invalid OTP", otp: body.otp }
                 })
@@ -49,9 +49,13 @@ export const registerIndividualComplete = new Elysia({
                 })
             }
             logger.info("registerIndividualComplete:: otp verified successfully")
-            return { registerData, logger }
+            return {
+                registerData,
+                logger,
+                audit,
+            }
         })
-        .post("/register/individual/complete", async ({ logger, registerData, store }) => {
+        .post("/register/individual/complete", async ({ logger, registerData, audit }) => {
             logger?.info("registerIndividualComplete:: creating individual user")
             const res = await IndividualUserService.create(registerData!)
             logger?.info("registerIndividualComplete:: individual user created successfully")
@@ -65,7 +69,7 @@ export const registerIndividualComplete = new Elysia({
             logger?.info("registerIndividualComplete:: caching refresh token")
             await AuthService.cacheRefreshToken(refreshToken, tokenPayload.id)
             await AuditService.queue.add("log", {
-                ...store.audit,
+                ...audit,
                 userId: res.id,
                 details: { email: res.email }
             })
@@ -81,13 +85,13 @@ export const registerIndividualComplete = new Elysia({
                 summary: "Register individual complete"
             },
             body: "registerComplete",
-            beforeHandle: async ({ registerData, set, logger, store }) => {
+            beforeHandle: async ({ registerData, set, logger, audit }) => {
                 const userExist = await IndividualUserService.existByEmail(registerData.email)
                 if (userExist) {
                     logger?.info("registerIndividualUser:: user already exists")
                     set.status = 400
                     await AuditService.queue.add("log", {
-                        ...store.audit,
+                        ...audit,
                         status: "failure",
                         details: { email: registerData.email, reason: "User already exists" }
                     })
