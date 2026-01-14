@@ -14,28 +14,26 @@ export const monoWebhook = new Elysia({ name: "mono-webhook" })
             WebhookModel.monoAccountUnlinkedBodySchema
         ])
     })
-    .state("audit", {
-        action: "webhook_received",
-        userId: "mono",
-        userType: "mono",
-        targetId: "mono",
-        targetType: "webhook",
-        status: "success",
-        details: {},
-        ipAddress: "unknown",
-        userAgent: "unknown",
-    } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
-        store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
-        store.audit.userAgent = headers["user-agent"] || "unknown"
         const logger = pinoLogger(store)
         return {
-            logger
+            logger,
+            audit: {
+                action: "webhook_received",
+                userId: "mono",
+                userType: "mono",
+                targetId: "mono",
+                targetType: "webhook",
+                status: "success",
+                details: {},
+                ipAddress: server?.requestIP(request)?.address || "unknown",
+                userAgent: headers["user-agent"] || "unknown",
+            } as AuditModel.CreateAuditT
         }
     })
-    .post("/mono", async ({ body, logger, set, store }) => {
+    .post("/mono", async ({ body, logger, set, audit }) => {
         const data = body.data as any
-        store.audit.details = {
+        audit.details = {
             event: body.event,
             accountId: data.id || data.account._id || data.account.id
         }
@@ -49,16 +47,16 @@ export const monoWebhook = new Elysia({ name: "mono-webhook" })
                 await template[body.event](data)
                 logger.info("Mono webhook processed successfully")
                 await AuditService.log({
-                    ...store.audit,
+                    ...audit,
                     userId: body.event
                 });
                 return "ok"
             } catch (error: any) {
                 logger.error(error, "Mono webhook failed")
                 set.status = 500
-                store.audit.details.reason = error.message
+                audit.details.reason = error.message
                 await AuditService.log({
-                    ...store.audit,
+                    ...audit,
                     status: "failure"
                 });
                 return "error"
@@ -67,7 +65,7 @@ export const monoWebhook = new Elysia({ name: "mono-webhook" })
         else {
             logger.info(`Mono account unknown event ${body.event}`)
             await AuditService.log({
-                ...store.audit,
+                ...audit,
                 userId: "unknown",
                 userType: "unknown",
                 status: "failure",
@@ -76,13 +74,13 @@ export const monoWebhook = new Elysia({ name: "mono-webhook" })
             return "ok"
         }
     }, {
-        async beforeHandle({ headers, body, set, logger, store }) {
+        async beforeHandle({ headers, body, set, logger, audit }) {
             logger.debug({ headers, body }, "Mono webhook received")
             if (headers["mono-webhook-secret"] !== MONO.webhookSecret) {
                 logger.error("Mono webhook received with invalid secret")
                 set.status = 401
                 await AuditService.queue.add("log", {
-                    ...store.audit,
+                    ...audit,
                     status: "failure",
                     details: { reason: "Invalid webhook secret", event: body.event }
                 });
