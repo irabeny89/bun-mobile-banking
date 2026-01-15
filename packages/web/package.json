@@ -9,6 +9,8 @@
     "build": "bun run build.ts"
   },
   "dependencies": {
+    "@radix-ui/react-accordion": "^1.2.12",
+    "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-label": "catalog:frontend",
     "@radix-ui/react-select": "catalog:frontend",
     "@radix-ui/react-slot": "catalog:frontend",
