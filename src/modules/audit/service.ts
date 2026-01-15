@@ -2,6 +2,7 @@ import dbSingleton from "@/utils/db";
 import { AuditModel } from "./model";
 import { Queue, Worker } from "bullmq";
 import { VALKEY_URL } from "@/config";
+import { sanitize } from "@/utils/sanitize";
 
 type JobName = "log"
 type JobData = AuditModel.CreateAuditT
@@ -27,6 +28,7 @@ worker.on("failed", (_, error) => {
 export class AuditService {
     static queue = new Queue<JobData, unknown, JobName>(queueName)
     static async log(data: AuditModel.CreateAuditT) {
+        data = sanitize(data)
         await db`
                 INSERT INTO audit_logs (
                     user_id,
