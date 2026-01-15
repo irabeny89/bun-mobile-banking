@@ -7,6 +7,7 @@ import { decrypt, encrypt } from "@/utils/encryption";
 import { fileStore, getUploadLocation } from "@/utils/storage";
 import { CommonSchema } from "@/share/schema";
 import cacheSingleton, { getCacheKey } from "@/utils/cache";
+import { sanitize } from "@/utils/sanitize";
 
 const sql = dbSingleton();
 const cache = cacheSingleton();
@@ -320,6 +321,7 @@ export class KycService {
     static async createKyc(userId: string, data: Omit<
         KycModel.PostTier1BodyT, "passportPhoto"
     > & Record<"passportPhoto", string>) {
+        data = sanitize(data)
         const tier1Data = encrypt(Buffer.from(JSON.stringify(data)));
         const ninHash = await Bun.password.hash(data.nin)
         await sql`
@@ -388,6 +390,7 @@ export class KycService {
         } : null;
     }
     static async updateTier2(userId: string, data: KycModel.Tier2DataT) {
+        data = sanitize(data)
         const tier2Data = encrypt(Buffer.from(JSON.stringify(data)));
         const bvnHash = await Bun.password.hash(data.bvn)
         await sql`
@@ -401,6 +404,7 @@ export class KycService {
         `
     }
     static async updateTier3(userId: string, data: KycModel.PostTier3BodyT) {
+        data = sanitize(data)
         const addressProofUploadLocation = getUploadLocation(STORAGE.addressProofPath, "individual", userId, "enc")
         const selfieUploadLocation = getUploadLocation(STORAGE.liveSelfiePath, "individual", userId, "enc")
         const tier3Data = encrypt(Buffer.from(JSON.stringify({
