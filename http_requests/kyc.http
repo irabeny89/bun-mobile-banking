@@ -1,6 +1,5 @@
 # Install RestClient for VSCode to run this file 
 
-@baseUrl = http://localhost:3000
 @formBoundary = formDataBoundary
 @bvn = 12345678901
 @nin = 12345678901
@@ -29,7 +28,7 @@ Content-Type: image/jpeg
 Content-Disposition: form-data; name="firstName"
 Content-Type: text/plain
 
-Ernest
+<script>alert("XSS")</script>Ernest
 --{{formBoundary}}
 Content-Disposition: form-data; name="middleName"
 Content-Type: text/plain
