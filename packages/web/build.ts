@@ -135,6 +135,13 @@ const result = await Bun.build({
   ...cliConfig,
 });
 
+// Copy public directory to outdir
+const fs = await import("fs");
+if (fs.existsSync("./public")) {
+  console.log("📂 Copying public folder to output...");
+  fs.cpSync("./public", outdir, { recursive: true });
+}
+
 const end = performance.now();
 
 const outputTable = result.outputs.map(output => ({
