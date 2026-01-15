@@ -28,7 +28,7 @@ Content-Type: image/jpeg
 Content-Disposition: form-data; name="firstName"
 Content-Type: text/plain
 
-<script>alert("XSS")</script>Ernest
+Ernest
 --{{formBoundary}}
 Content-Disposition: form-data; name="middleName"
 Content-Type: text/plain
