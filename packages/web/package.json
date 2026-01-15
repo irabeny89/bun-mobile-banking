@@ -11,7 +11,7 @@
   "dependencies": {
     "@radix-ui/react-accordion": "catalog:frontend",
     "@radix-ui/react-collapsible": "catalog:frontend",
-    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dialog": "catalog:frontend",
     "@radix-ui/react-label": "catalog:frontend",
     "@radix-ui/react-select": "catalog:frontend",
     "@radix-ui/react-slot": "catalog:frontend",
