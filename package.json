@@ -1,61 +1,8 @@
 {
-  "name": "moba-mobile-banking",
-  "version": "1.0.1",
-  "description": "Mobile banking app for individuals and businesses.",
-  "author": "Ernest Irabor <irabeny89@gmail.com>",
-  "scripts": {
-    "githook:commit-msg": "echo '#!/bin/sh\nset -e\ncog verify --file $1' > .git/hooks/commit-msg",
-    "githook:pre-push": "echo '#!/bin/sh\nset -e\nbun run lint && bun test' > .git/hooks/pre-push",
-    "githooks": "bun run githook:commit-msg & bun run githook:pre-push",
-    "postgithooks": "chmod +x .git/hooks/commit-msg & chmod +x .git/hooks/pre-push",
-    "githooks:rm": "rm .git/hooks/commit-msg .git/hooks/pre-push",
-    "lint": "tsc --noEmit",
-    "lint:tests": "tsc --noEmit tests/**/*.ts",
-    "dev": "bun run --watch src/index.ts",
-    "email": "email dev --dir src/emails",
-    "tunnel": "export $(cat .env.development | xargs) && ssh -R 80:localhost:$PORT localhost.run",
-    "maildev": "podman run -p 1080:1080 -p 1025:1025 maildev/maildev",
-    "mono:connect": "bun run http_requests/mono/connect/index.html",
-    "pod:app": "./scripts/app-pod.sh",
-    "pod:app:dev": "./scripts/app-pod.sh .env.development",
-    "kube:play": "./scripts/kube-play.sh",
-    "kube:gen": "./scripts/pod-kube.sh",
-    "garage": "export $(cat .env.development | xargs) && podman exec $STORAGE_CONTAINER_NAME /garage",
-    "garage:node-id": "bun garage status | awk 'NR==3 {print $1}'",
-    "garage:status": "bun garage status",
-    "garage:layout:create": "bun garage layout assign -z dc1 -c 1G $(bun garage:node-id)",
-    "garage:layout:apply": "bun garage layout apply --version 1",
-    "garage:layout:setup": "bun garage:layout:create && bun garage:layout:apply",
-    "garage:bucket:create": "export $(cat .env.development | xargs) && bun garage bucket create ${STORAGE_BUCKET}",
-    "garage:key:create": "export $(cat .env.development | xargs) && bun garage key create ${STORAGE_KEY_NAME}",
-    "garage:bucket:allow": "export $(cat .env.development | xargs) && bun garage bucket allow --read --write --owner ${STORAGE_BUCKET} --key ${STORAGE_KEY_NAME}",
-    "garage:bucket:setup": "bun garage:bucket:create && bun garage:key:create && bun garage:bucket:allow",
-    "garage:bucket:info": "export $(cat .env.development | xargs) && bun garage bucket info ${STORAGE_BUCKET}",
-    "psql:dev": "export $(cat .env.development | xargs) && podman exec -ti ${DATABASE_CONTAINER_NAME} psql -U $POSTGRES_USER -d $POSTGRES_DB",
-    "redis-cli:dev": "export $(cat .env.development | xargs) && podman exec -ti ${CACHE_CONTAINER_NAME} redis-cli"
-  },
-  "dependencies": {
-    "@elysiajs/cors": "^1.4.1",
-    "@elysiajs/openapi": "^1.4.13",
-    "@elysiajs/server-timing": "^1.4.0",
-    "@react-email/components": "^1.0.4",
-    "bullmq": "^5.66.5",
-    "elysia": "latest",
-    "jsonwebtoken": "^9.0.3",
-    "logixlysia": "^5.3.0",
-    "nodemailer": "^7.0.12",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "ts-node": "^10.9.2",
-    "xss": "^1.0.15"
-  },
-  "devDependencies": {
-    "@react-email/preview-server": "5.0.7",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/nodemailer": "^7.0.5",
-    "@types/react": "^19.2.8",
-    "bun-types": "latest",
-    "react-email": "^5.2.3"
-  },
-  "module": "src/index.js"
+    "name": "bun-mobile-banking-monorepo",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ]
 }
