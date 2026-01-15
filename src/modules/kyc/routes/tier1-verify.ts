@@ -20,23 +20,23 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
         tier1VerifySuccess: KycModel.tier1SuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .state("audit", {
-        action: "tier1_kyc_submission",
-        userId: "unknown",
-        userType: "individual",
-        targetId: "unknown",
-        targetType: "kyc",
-        status: "success",
-        details: {},
-        ipAddress: "unknown",
-        userAgent: "unknown",
-    } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
-        store.audit.ipAddress = server?.requestIP(request)?.address || "unknown"
-        store.audit.userAgent = headers["user-agent"] || "unknown"
-        return { logger: pinoLogger(store) }
+        return {
+            logger: pinoLogger(store),
+            audit: {
+                action: "tier1_kyc_submission",
+                userId: "unknown",
+                userType: "individual",
+                targetId: "unknown",
+                targetType: "kyc",
+                status: "success",
+                details: {},
+                ipAddress: server?.requestIP(request)?.address || "unknown",
+                userAgent: headers["user-agent"] || "unknown",
+            } as AuditModel.CreateAuditT
+        }
     })
-    .post("/tier1", async ({ user, body, logger, store }) => {
+    .post("/tier1", async ({ user, body, logger, audit }) => {
         const { url, path } = getUploadLocation(
             STORAGE.passportPhotoPath,
             user!.userType,
@@ -53,7 +53,7 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
         })
         logger.info("tier1Verify:: User KYC db data insertion queued")
         await AuditService.queue.add("log", {
-            ...store.audit,
+            ...audit,
             userId: user!.id,
         });
         logger.info("tier1Verify:: audit log queued")
@@ -65,12 +65,12 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
             }
         }
     }, {
-        async beforeHandle({ user, logger, set, body, store }) {
+        async beforeHandle({ user, logger, set, body, audit }) {
             if (!user) {
                 logger.info("tier1Verify.beforeHandle:: User not found");
                 set.status = 401;
                 await AuditService.queue.add("log", {
-                    ...store.audit,
+                    ...audit,
                     status: "failure",
                     details: { reason: "User not found" }
                 });
@@ -84,7 +84,7 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
                     }
                 }
             }
-            store.audit.userId = user.id
+            audit.userId = user.id
             try {
                 await KycService.verifyTier1Nin(user!.id, body)
             } catch (error: any) {
@@ -92,7 +92,7 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
                     logger.error(error, "tier1Verify.beforeHandle:: Tier 1 NIN verification failed")
                     set.status = 400
                     await AuditService.queue.add("log", {
-                        ...store.audit,
+                        ...audit,
                         status: "failure",
                         details: { tier: 1, reason: error.message }
                     });
@@ -107,7 +107,7 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
                     }
                 }
                 await AuditService.queue.add("log", {
-                    ...store.audit,
+                    ...audit,
                     status: "failure",
                     details: { tier: 1, reason: error.message }
                 });
