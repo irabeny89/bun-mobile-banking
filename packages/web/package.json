@@ -1,0 +1,30 @@
+{
+  "name": "bun-react-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/index.ts",
+    "start": "NODE_ENV=production bun src/index.ts",
+    "build": "bun run build.ts"
+  },
+  "dependencies": {
+    "@radix-ui/react-label": "catalog:frontend",
+    "@radix-ui/react-select": "catalog:frontend",
+    "@radix-ui/react-slot": "catalog:frontend",
+    "bun-plugin-tailwind": "catalog:frontend",
+    "class-variance-authority": "catalog:frontend",
+    "clsx": "catalog:frontend",
+    "lucide-react": "catalog:frontend",
+    "react": "catalog:frontend",
+    "react-dom": "catalog:frontend",
+    "tailwind-merge": "catalog:frontend"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:dev",
+    "@types/react-dom": "catalog:dev",
+    "@types/bun": "catalog:dev",
+    "tailwindcss": "catalog:dev",
+    "tw-animate-css": "catalog:dev"
+  }
+}
