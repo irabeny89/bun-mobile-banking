@@ -1,4 +1,4 @@
-import { app } from "@/index";
+import { app } from "web/src/index";
 import { describe, expect, it } from "bun:test";
 import { PORT } from "@/config";
 import pkg from "../../package.json";
