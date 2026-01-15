@@ -3,7 +3,6 @@ import { CommonSchema } from "@/share/schema";
 import Elysia from "elysia";
 import { KycModel } from "../model";
 import pinoLogger from "@/utils/pino-logger";
-import { kycQueue } from "@/utils/kyc-queue";
 import { ERROR_RESPONSE_CODES } from "@/types";
 import { KycService } from "../service";
 import { STORAGE } from "@/config";
@@ -41,7 +40,7 @@ export const tier3Verify = new Elysia({ name: "tier3-verify" })
             user!.id,
             body.addressProof.type.split("/").pop() as string
         )
-        await kycQueue.add("tier_3_update", {
+        await KycService.queue.add("tier_3_update", {
             userId: user!.id,
             storagePath: path,
             ...body,

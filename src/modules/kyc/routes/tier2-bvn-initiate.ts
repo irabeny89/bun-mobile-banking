@@ -4,7 +4,6 @@ import { KycModel } from "../model";
 import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import { ERROR_RESPONSE_CODES } from "@/types";
-import { kycQueue } from "@/utils/kyc-queue";
 import { KycService } from "../service";
 import { AuditModel } from "@/modules/audit/model";
 import { AuditService } from "@/modules/audit/service";
@@ -46,7 +45,7 @@ export const tier2BvnInitiate = new Elysia({ name: "tier2-bvn-initiate" })
                 }
             }
         }
-        await kycQueue.add("bvn_lookup", { userId: user.id, bvn: body.bvn })
+        await KycService.queue.add("bvn_lookup", { userId: user.id, bvn: body.bvn })
 
         await AuditService.queue.add("log", {
             ...store.audit,

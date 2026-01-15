@@ -1,17 +1,88 @@
 import dbSingleton from "@/utils/db";
 import { KycModel } from "./model";
-import { DOJAH, IS_PROD_ENV, MONO, MONO_BVN_SESSION_ID_CACHE_KEY, STORAGE } from "@/config";
+import { DOJAH, IS_PROD_ENV, MONO, MONO_BVN_SESSION_ID_CACHE_KEY, MONO_BVN_SESSION_ID_TTL, STORAGE, VALKEY_URL } from "@/config";
 import { DojahBvnValidateArgs, DojahLiveSelfieVerifyArgs, DojahLiveSelfieVerifyResponse, DojahNinLookupArgs, DojahUtilityBillVerifyArgs, DojahUtilityBillVerifyResponse, DojahVinLookupArgs, DojahVinLookupResponse, PrettyReplace } from "@/types";
-import { MonoBvnDetailsArgs, MonoBvnDetailsResponseData, MonoInitiateLookupBvnArgs, MonoLookupDriverLicenseArgs, MonoLookupNinArgs, MonoLookupNinResponseData, MonoLookupPassportArgs, MonoResponse, MonoVerifyBvnOtpArgs } from "@/types/mono.type"
+import { MonoBvnDetailsArgs, MonoBvnDetailsResponseData, MonoInitiateLookupBvnArgs, MonoInitiateLookupBvnResponseData, MonoLookupDriverLicenseArgs, MonoLookupNinArgs, MonoLookupNinResponseData, MonoLookupPassportArgs, MonoResponse, MonoVerifyBvnOtpArgs } from "@/types/mono.type"
 import { decrypt, encrypt } from "@/utils/encryption";
 import { fileStore, getUploadLocation } from "@/utils/storage";
 import { CommonSchema } from "@/share/schema";
 import cacheSingleton, { getCacheKey } from "@/utils/cache";
 import { sanitize } from "@/utils/sanitize";
+import { Queue, Worker } from "bullmq";
 
+type KycJobT = "bvn_lookup" | "tier_1_insert" | "tier_2_update" | "tier_3_update";
+type BvnLookupDataT = Record<"userId", string> & MonoInitiateLookupBvnArgs
+type Tier1DataT = {
+    userId: string;
+} & Omit<KycModel.PostTier1BodyT, "passportPhoto"> & Record<"passportPhoto", string>
+type Tier2DataT = Record<"userId", string> & KycModel.Tier2DataT
+type Tier3DataT = Record<"userId" | "storagePath", string> & KycModel.PostTier3BodyT
+type KycJobDataT = Tier1DataT | Tier2DataT | Tier3DataT | BvnLookupDataT
+
+const KYC_QUEUE_NAME = "kyc-insertion" as const;
 const sql = dbSingleton();
 const cache = cacheSingleton();
+
+const worker = new Worker<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME, async (job) => {
+    if (job.name === "tier_1_insert") {
+        console.info("kycQueue.worker.tier_1_insert:: job started")
+        const { userId, ...rest } = job.data as Tier1DataT
+        await KycService.createKyc(userId, rest)
+    }
+    if (job.name === "tier_2_update") {
+        console.info("kycQueue.worker.tier_2_update:: job started")
+        const { userId, ...rest } = job.data as Tier2DataT
+        await KycService.updateTier2(userId, rest)
+    }
+    if (job.name === "tier_3_update") {
+        console.info("kycQueue.worker.tier_3_update:: job started")
+        // delete the unencrypted file after verification
+        const { storagePath, userId, ...rest } = job.data as Tier3DataT
+        await Promise.all([
+            fileStore.file(storagePath).delete(),
+            KycService.updateTier3(userId, rest)
+        ])
+    }
+    if (job.name === "bvn_lookup") {
+        console.info("kycQueue.worker.bvn_lookup:: job started")
+        const tier1DataErrMsg = "Failed to get tier 1 data"
+        const { userId, ...rest } = job.data as BvnLookupDataT
+        const initBvnLookupRes = await KycService.monoInitiateBvnLookup(rest)
+        if (!initBvnLookupRes.ok) {
+            const errData = await initBvnLookupRes.json()
+            throw new Error(errData.message)
+        }
+        const tier1Data = await KycService.getTier1Data(userId)
+        if (!tier1Data) throw new Error(tier1DataErrMsg)
+        const { data: { session_id } } = await initBvnLookupRes.json() as MonoResponse<
+            MonoInitiateLookupBvnResponseData
+        >
+        const verifyBvnOtpResponse = await KycService.monoVerifyBvnOtp(session_id, {
+            method: "phone",
+            phone_number: tier1Data.phone
+        })
+        if (!verifyBvnOtpResponse.ok) {
+            const errData = await verifyBvnOtpResponse.json()
+            throw new Error(errData.message)
+        }
+        const cacheKey = getCacheKey(MONO_BVN_SESSION_ID_CACHE_KEY, userId)
+        await cache.set(cacheKey, session_id)
+        await cache.expire(cacheKey, +MONO_BVN_SESSION_ID_TTL)
+        //* at this point OTP has been sent to the user's phone
+        //* this OTP will be used to fetch BVN details
+    }
+}, { connection: { url: VALKEY_URL } })
+
+worker.on("completed", () => {
+    console.info("kycQueue.worker:: job completed")
+})
+
+worker.on("failed", (_, error) => {
+    console.error(error, "kycQueue.worker.tier_1-verify:: job failed")
+})
+
 export class KycService {
+    static queue = new Queue<KycJobDataT, unknown, KycJobT>(KYC_QUEUE_NAME)
     /**
      * Lookup NIN
      * 

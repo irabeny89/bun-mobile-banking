@@ -5,7 +5,6 @@ import { CommonSchema } from "@/share/schema";
 import pinoLogger from "@/utils/pino-logger";
 import { ERROR_RESPONSE_CODES } from "@/types";
 import { KycService } from "../service";
-import { kycQueue } from "@/utils/kyc-queue";
 import { fileStore, getUploadLocation } from "@/utils/storage";
 import { STORAGE } from "@/config";
 import { encrypt } from "@/utils/encryption";
@@ -46,7 +45,7 @@ export const tier1Verify = new Elysia({ name: "tier1-verify" })
         await fileStore
             .file(path)
             .write(encrypt(Buffer.from(await body.passportPhoto.arrayBuffer())))
-        await kycQueue.add("tier_1_insert", {
+        await KycService.queue.add("tier_1_insert", {
             userId: user!.id,
             ...body,
             passportPhoto: url
