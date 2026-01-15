@@ -55,7 +55,8 @@
     "@types/jsonwebtoken": "catalog:dev",
     "@types/nodemailer": "catalog:dev",
     "@types/react": "catalog:dev",
-    "react-email": "catalog:dev"
+    "react-email": "catalog:dev",
+    "bun-types": "catalog:dev"
   },
   "module": "src/index.js"
 }
