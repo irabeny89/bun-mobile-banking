@@ -1,5 +1,10 @@
 import xss from "xss";
 
+/**
+ * Sanitizes data by removing XSS attacks in strings, arrays and objects.
+ * @param data data to sanitize eg string, array or objects
+ * @returns cleaned data
+ */
 export function sanitize<T>(data: T): T {
     if (typeof data === "string") {
         return xss(data) as unknown as T;
