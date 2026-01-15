@@ -7,6 +7,7 @@ import { Queue, Worker } from "bullmq";
 import { getCacheKey } from "@/utils/cache";
 import { encrypt } from "@/utils/encryption";
 import cacheSingleton from "@/utils/cache";
+import { sanitize } from "@/utils/sanitize";
 
 type JobName = "update-mfa" | "cache-accounts" | "cache-transactions" | "update-statement";
 type UpdateMfaJobData = {
@@ -32,6 +33,7 @@ const queueName = "account-update" as const
 const db = dbSingleton()
 const cache = cacheSingleton()
 const worker = new Worker<JobData, unknown, JobName>(queueName, async (job) => {
+	job.data = sanitize(job.data)
 	console.info("accountQueue.worker:: job started")
 	if (job.name === "update-mfa") {
 		console.info("accountQueue.worker:: updating mfa")
