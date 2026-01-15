@@ -1,7 +1,8 @@
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./components/ui/accordion";
-import { ArrowRight, ShieldCheck, Zap, Globe, Code2, LineChart, Wallet, CreditCard, Banknote, Landmark, Smartphone, Lock } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./components/ui/dialog";
+import { ArrowRight, ShieldCheck, Zap, Code2, LineChart, Wallet, CreditCard, Banknote, Landmark, Smartphone, Lock } from "lucide-react";
 import "./index.css";
 import { APP_NAME } from "./config";
 
@@ -43,7 +44,6 @@ export function App() {
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
             A complete mobile banking solution featuring KYC/KYB, account management, payments, and robust security.
-            Built on a modern stack including Bun, Elysia, and React.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" className="h-12 px-8 text-base">
@@ -184,8 +184,61 @@ export function App() {
             © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
           </div>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Privacy</a>
-            <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Terms</a>
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="text-muted-foreground hover:text-foreground transition-colors">Privacy</button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Privacy Policy</DialogTitle>
+                  <DialogDescription>
+                    Last updated: {new Date().toLocaleDateString()}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 text-sm text-muted-foreground max-h-[60vh] overflow-y-auto">
+                  <p>
+                    <strong>1. Information Collection</strong><br />
+                    We collect information you provide directly to us, such as when you create or modify your account, request on-demand services, contact customer support, or otherwise communicate with us.
+                  </p>
+                  <p>
+                    <strong>2. Use of Information</strong><br />
+                    We use the information we collect to provide, maintain, and improve our services, such as to process transactions, prevent fraud, and provide customer support.
+                  </p>
+                  <p>
+                    <strong>3. Sharing of Information</strong><br />
+                    We may share the information we collect with third parties for legal reasons or in connection with a merger or sale.
+                  </p>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="text-muted-foreground hover:text-foreground transition-colors">Terms</button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Terms of Service</DialogTitle>
+                  <DialogDescription>
+                    Please read these terms carefully before using our service.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 text-sm text-muted-foreground max-h-[60vh] overflow-y-auto">
+                  <p>
+                    <strong>1. Acceptance of Terms</strong><br />
+                    By accessing or using our services, you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the service.
+                  </p>
+                  <p>
+                    <strong>2. Accounts</strong><br />
+                    When you create an account with us, you must provide us information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms.
+                  </p>
+                  <p>
+                    <strong>3. Termination</strong><br />
+                    We may terminate or suspend access to our service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.
+                  </p>
+                </div>
+              </DialogContent>
+            </Dialog>
             <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Twitter</a>
           </div>
         </div>
