@@ -15,7 +15,6 @@ import { kyc } from "./modules/kyc";
 import { PORT } from "./config";
 import { webhook } from "./modules/webhook";
 import { account } from "./modules/account";
-import xss from "xss"
 
 export const app = new Elysia({
   name: pkg.name,
@@ -29,24 +28,6 @@ export const app = new Elysia({
   .use(cors())
   .use(apiDocs)
   .use(serverTiming())
-  // .onParse(async({ contentType, body, request }) => {
-  //   if (contentType.includes("multipart/form-data")) {
-  //     const formdata = await request.formData()
-  //     console.log(formdata)
-  //     console.log(body)
-  //     for (const [key, value] of formdata.entries()) {
-  //       if (typeof value === "string") {
-  //         formdata.set(key, xss(value))
-  //       }
-  //     }
-  //     body = formdata;
-  //   }
-  //   if (contentType.includes("application/json")) {
-  //     body = JSON.parse(xss(JSON.stringify(body)))
-  //   }
-  //   console.log(typeof body)
-  //   return body;
-  // })
   .use(logger)
   .use(cacheReq)
   .use(rateLimitPlugin)
