@@ -2,7 +2,6 @@
     "name": "bun-mobile-banking-monorepo",
     "private": true,
     "workspaces": [
-        "apps/*",
         "packages/*"
     ]
 }
