@@ -24,7 +24,7 @@ echo "Creating pod $POD"
 # database variables
 DB_CONTAINER_NAME=${DATABASE_CONTAINER_NAME:-"moba-db"}
 # bind mount volume in host working directory
-DB_VOLUME="./postgres-data"
+DB_VOLUME="$(pwd)/postgres-data"
 DB_IMAGE="postgres:18.1-alpine3.23"
 DB_USER=${POSTGRES_USER:-"postgres"}
 DB_PASSWORD=${POSTGRES_PASSWORD:-"postgres"}
@@ -43,22 +43,22 @@ STORAGE_PORT0=${STORAGE_PORT:-"3900"}
 STORAGE_PORT1=${STORAGE_PORT:-"3901"}
 STORAGE_PORT2=${STORAGE_PORT:-"3902"}
 STORAGE_PORT3=${STORAGE_PORT:-"3903"}
-STORAGE_CONFIG_VOLUME="./storage/garage.toml"
-STORAGE_DATA_VOLUME="./storage/data"
-STORAGE_META_VOLUME="./storage/meta"
+STORAGE_CONFIG_VOLUME="$(pwd)/storage/garage.toml"
+STORAGE_DATA_VOLUME="$(pwd)/storage/data"
+STORAGE_META_VOLUME="$(pwd)/storage/meta"
 
 # create pod
 podman pod exists $POD && podman pod rm -f $POD
 podman pod create --name $POD -p $DB_PORT:5432 -p $CACHE_PORT:6379 -p $STORAGE_PORT0:3900 -p $STORAGE_PORT1:3901 -p $STORAGE_PORT2:3902 -p $STORAGE_PORT3:3903
 
 # run db in pod
-podman run -d --name $DB_CONTAINER_NAME --pod $POD -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PASSWORD -e POSTGRES_DB=$DB_NAME -v $DB_VOLUME:/var/lib/postgresql/18/data $DB_IMAGE
+podman run -d --name $DB_CONTAINER_NAME --pod $POD -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PASSWORD -e POSTGRES_DB=$DB_NAME --mount type=bind,source=$DB_VOLUME,target=/var/lib/postgresql/18/data $DB_IMAGE
 
 # run cache in pod
 podman run -d --name $CACHE_CONTAINER_NAME --pod $POD $CACHE_IMAGE
 
 # run file storage in pod
-podman run -d --name $STORAGE_CONTAINER_NAME --pod $POD -v $STORAGE_CONFIG_VOLUME:/etc/garage.toml:Z -v $STORAGE_DATA_VOLUME:/var/lib/garage/data:Z -v $STORAGE_META_VOLUME:/var/lib/garage/meta:Z $STORAGE_IMAGE
+podman run -d --name $STORAGE_CONTAINER_NAME --pod $POD --mount type=bind,source=$STORAGE_CONFIG_VOLUME,target=/etc/garage.toml --mount type=bind,source=$STORAGE_DATA_VOLUME,target=/var/lib/garage/data --mount type=bind,source=$STORAGE_META_VOLUME,target=/var/lib/garage/meta $STORAGE_IMAGE
 
 # inspect pod
 podman ps

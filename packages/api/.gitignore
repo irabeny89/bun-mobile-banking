@@ -41,14 +41,15 @@ package-lock.json
 
 codebook.toml
 
-/pgdata
-
 .vscode
 # rough notes
 rough-notes.md
 
 # garage
 storage/
+
+# postgres
+postgres-data/
 
 # files to ignore
 files
