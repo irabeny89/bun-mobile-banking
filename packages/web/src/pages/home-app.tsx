@@ -1,12 +1,12 @@
-import { Button } from "./components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./components/ui/accordion";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./components/ui/dialog";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
 import { ArrowRight, ShieldCheck, Zap, Code2, LineChart, Wallet, CreditCard, Banknote, Landmark, Smartphone, Lock } from "lucide-react";
-import "./index.css";
-import { APP_NAME } from "./config";
+import "../index.css";
+import { APP_NAME } from "../config";
 
-export function App() {
+export default function HomeApp() {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
       {/* Navigation */}
@@ -264,5 +264,3 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
     </Card>
   );
 }
-
-export default App;

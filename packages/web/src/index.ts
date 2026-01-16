@@ -3,33 +3,22 @@ import index from "./index.html";
 
 const server = serve({
   routes: {
-    "/manifest.json": Bun.file("../public/site.webmanifest"),
-    "/sw.js": Bun.file("../public/sw.js"),
+    "/site.webmanifest": Bun.file("./site.webmanifest"),
+    "/sw.js": async req => {
+      return new Response(Bun.file("./sw.js"), {
+        headers: {
+          "Content-Type": "application/javascript",
+        },
+      });
+    },
     "/icons/*": async req => {
       const name = new URL(req.url).pathname.split("/").pop();
-      return new Response(Bun.file(`../public/icons/${name}`));
+      return new Response(Bun.file(`./icons/${name}`));
     },
-    "/logo.svg": Bun.file("./src/logo.svg"),
-
-    // API Routes
-    "/api/hello": {
-      async GET(req) {
-        return Response.json({ message: "Hello, world!", method: "GET" });
-      },
-      async PUT(req) {
-        return Response.json({ message: "Hello, world!", method: "PUT" });
-      },
-    },
-
-    "/api/hello/:name": async req => {
-      const name = req.params.name;
-      return Response.json({ message: `Hello, ${name}!` });
-    },
-
     // Serve index.html for all other unmatched routes.
     "/*": index,
   },
-
+  port: process.env.PORT || 3000,
   development: process.env.NODE_ENV !== "production" && {
     // Enable browser hot reloading in development
     hmr: true,

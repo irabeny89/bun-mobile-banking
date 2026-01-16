@@ -2,8 +2,7 @@ const CACHE_NAME = "moba-v1";
 const ASSETS_TO_CACHE = [
     "/",
     "/index.html",
-    "/manifest.json",
-    "/logo.svg"
+    "/icons/favicon.ico"
 ];
 
 self.addEventListener("install", (event) => {
