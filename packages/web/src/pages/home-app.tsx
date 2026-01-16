@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ArrowRight, ShieldCheck, Zap, Code2, LineChart, Wallet, CreditCard, Banknote, Landmark, Smartphone, Lock } from "lucide-react";
 import "../index.css";
 import { APP_NAME } from "../config";
+import { InstallPWA } from "../components/share/pwa";
 
 export default function HomeApp() {
   return (
@@ -33,6 +34,7 @@ export default function HomeApp() {
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+          <InstallPWA />
         <div className="container mx-auto px-4 text-center relative z-10">
           <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium text-muted-foreground mb-8 bg-muted/50 backdrop-blur-sm">
             <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
@@ -111,24 +113,6 @@ export default function HomeApp() {
         </div>
       </section>
 
-      {/* Reference Section */}
-      <section id="reference" className="py-20 bg-background">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold tracking-tight mb-8">Powered By</h2>
-          <div className="flex flex-wrap justify-center gap-8 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
-            <a href="https://elysia.dev" target="_blank" className="flex items-center gap-2 font-bold text-xl hover:text-primary transition-colors">
-              <Zap className="size-6" /> Elysia
-            </a>
-            <a href="https://mono.co/" target="_blank" className="flex items-center gap-2 font-bold text-xl hover:text-primary transition-colors">
-              <Landmark className="size-6" /> Mono
-            </a>
-            <a href="https://garagehq.deuxfleurs.fr/" target="_blank" className="flex items-center gap-2 font-bold text-xl hover:text-primary transition-colors">
-              <Code2 className="size-6" /> Garage
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <section id="faq" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 max-w-3xl">
@@ -170,6 +154,24 @@ export default function HomeApp() {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+        </div>
+      </section>
+
+      {/* Reference Section */}
+      <section id="reference" className="py-20 bg-background">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-2xl font-bold tracking-tight mb-8">Powered By</h2>
+          <div className="flex flex-wrap justify-center gap-8 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+            <a href="https://elysia.dev" target="_blank" className="flex items-center gap-2 font-bold text-xl hover:text-primary transition-colors">
+              <Zap className="size-6" /> Elysia
+            </a>
+            <a href="https://mono.co/" target="_blank" className="flex items-center gap-2 font-bold text-xl hover:text-primary transition-colors">
+              <Landmark className="size-6" /> Mono
+            </a>
+            <a href="https://garagehq.deuxfleurs.fr/" target="_blank" className="flex items-center gap-2 font-bold text-xl hover:text-primary transition-colors">
+              <Code2 className="size-6" /> Garage
+            </a>
+          </div>
         </div>
       </section>
 

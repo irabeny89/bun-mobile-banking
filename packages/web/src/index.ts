@@ -3,18 +3,6 @@ import index from "./index.html";
 
 const server = serve({
   routes: {
-    "/site.webmanifest": Bun.file("./site.webmanifest"),
-    "/sw.js": async req => {
-      return new Response(Bun.file("./sw.js"), {
-        headers: {
-          "Content-Type": "application/javascript",
-        },
-      });
-    },
-    "/icons/*": async req => {
-      const name = new URL(req.url).pathname.split("/").pop();
-      return new Response(Bun.file(`./icons/${name}`));
-    },
     // Serve index.html for all other unmatched routes.
     "/*": index,
   },
