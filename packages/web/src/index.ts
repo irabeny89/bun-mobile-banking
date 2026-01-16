@@ -3,11 +3,11 @@ import index from "./index.html";
 
 const server = serve({
   routes: {
-    "/manifest.json": Bun.file("./public/manifest.json"),
-    "/sw.js": Bun.file("./public/sw.js"),
+    "/manifest.json": Bun.file("../public/site.webmanifest"),
+    "/sw.js": Bun.file("../public/sw.js"),
     "/icons/*": async req => {
       const name = new URL(req.url).pathname.split("/").pop();
-      return new Response(Bun.file(`./public/icons/${name}`));
+      return new Response(Bun.file(`../public/icons/${name}`));
     },
     "/logo.svg": Bun.file("./src/logo.svg"),
 
