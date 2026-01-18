@@ -69,5 +69,8 @@
     },
     "devDependencies": {
         "typescript": "latest"
+    },
+    "dependencies": {
+        "@tailwindcss/postcss": "^4.1.18"
     }
 }
