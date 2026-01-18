@@ -1,15 +1,14 @@
-import { Button } from "../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ArrowRight, ShieldCheck, Zap, Code2, LineChart, Wallet, CreditCard, Banknote, Landmark, Smartphone, Lock } from "lucide-react";
-import "../index.css";
-import { APP_NAME } from "../config";
-import { InstallPWA } from "../components/share/pwa";
+import { APP_NAME } from "@/config";
+import { InstallPWA } from "@/components/share/pwa";
 
-export default function HomeApp() {
+export default function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
+    <div className="min-h-screen text-foreground selection:bg-primary/20">
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -158,7 +157,7 @@ export default function HomeApp() {
       </section>
 
       {/* Reference Section */}
-      <section id="reference" className="py-20 bg-background">
+      <section id="reference" className="py-20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold tracking-tight mb-8">Powered By</h2>
           <div className="flex flex-wrap justify-center gap-8 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
