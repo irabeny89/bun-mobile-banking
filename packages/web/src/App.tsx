@@ -1,4 +1,4 @@
-import Navigation from "@/components/home/navigation";
+import Navigation from "@/components/share/header";
 import HeroSection from "@/components/home/hero-section";
 import Features from "@/components/home/features";
 import FAQ from "@/components/home/faq";
