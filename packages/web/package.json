@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "catalog:dev",
+    "@tanstack/router-plugin": "^1.151.6",
     "@types/node": "catalog:dev",
     "@types/react": "catalog:dev",
     "@types/react-dom": "catalog:dev",
