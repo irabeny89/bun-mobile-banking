@@ -30,6 +30,7 @@
   "devDependencies": {
     "@eslint/js": "catalog:dev",
     "@tanstack/eslint-plugin-query": "catalog:dev",
+    "@tanstack/react-router-devtools": "catalog:dev",
     "@tanstack/router-plugin": "catalog:dev",
     "@types/node": "catalog:dev",
     "@types/react": "catalog:dev",

@@ -25,6 +25,7 @@
                 "react-dom": "^19.2.3",
                 "tailwind-merge": "^3.4.0",
                 "tailwindcss-animate": "^1.0.7",
+                "@tailwindcss/postcss": "^4.1.18",
                 "@radix-ui/react-select": "^2.2.6",
                 "@radix-ui/react-slot": "^1.2.4",
                 "@radix-ui/react-accordion": "^1.2.12",
@@ -42,6 +43,7 @@
                 "@tanstack/react-router": "^1.151.6"
             },
             "dev": {
+                "@tanstack/react-router-devtools": "^1.151.6",
                 "@tanstack/eslint-plugin-query": "^5.91.3",
                 "@tanstack/router-plugin": "^1.151.6",
                 "@eslint/js": "^9.39.1",
@@ -77,7 +79,5 @@
     "devDependencies": {
         "typescript": "latest"
     },
-    "dependencies": {
-        "@tailwindcss/postcss": "^4.1.18"
-    }
+    "dependencies": {}
 }
