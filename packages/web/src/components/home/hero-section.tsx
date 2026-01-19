@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { InstallPWA } from "@/components/share/pwa";
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 
 export default function HeroSection() {
     return (
@@ -19,10 +20,12 @@ export default function HeroSection() {
                     A complete mobile banking solution featuring KYC/KYB, account management, payments, loans, investments, and robust security.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <Button size="lg" className="h-12 px-8 text-base">
-                        Start Banking
-                        <ArrowRight className="ml-2 size-4" />
-                    </Button>
+                    <Link to="/auth">
+                        <Button size="lg" className="h-12 px-8 text-base">
+                            Start Banking
+                            <ArrowRight className="ml-2 size-4" />
+                        </Button>
+                    </Link>
                     <Button size="lg" variant="outline" className="h-12 px-8 text-base" onClick={() => document.getElementById("faq")?.scrollIntoView({ behavior: "smooth" })}>
                         FAQs
                     </Button>

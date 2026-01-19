@@ -3,7 +3,6 @@ import Features from "@/components/home/features";
 import FAQ from "@/components/home/faq";
 import Reference from "@/components/home/reference";
 import { createFileRoute } from '@tanstack/react-router'
-import "../index.css"
 
 export default function HomePage() {
     return (
