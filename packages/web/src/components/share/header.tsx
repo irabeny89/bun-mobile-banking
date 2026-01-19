@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 export default function Header() {
 	const location = useLocation()
 	const isHome = location.pathname === '/'
+	const isAuth = location.pathname === '/auth'
 
 	const NavLinks = () => (
 		<>
@@ -43,16 +44,18 @@ export default function Header() {
 				)}
 
 				<div className="flex items-center gap-2 sm:gap-4">
-					<Link to="/auth">
-						<Button variant="ghost" size="sm" className="hidden sm:flex">
-							Log in
-						</Button>
-					</Link>
-					<Link to="/auth">
-						<Button size="sm">
-							Get Started
-						</Button>
-					</Link>
+					{!isAuth && <>
+						<Link to="/auth">
+							<Button variant="ghost" size="sm" className="hidden sm:flex">
+								Log in
+							</Button>
+						</Link>
+						<Link to="/auth">
+							<Button size="sm">
+								Get Started
+							</Button>
+						</Link>
+					</>}
 
 					{isHome && (
 						<div className="md:hidden ml-1">
