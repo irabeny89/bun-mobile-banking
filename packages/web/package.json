@@ -13,6 +13,7 @@
     "@radix-ui/react-accordion": "catalog:frontend",
     "@radix-ui/react-dialog": "catalog:frontend",
     "@radix-ui/react-slot": "catalog:frontend",
+    "@tanstack/react-query": "^5.90.19",
     "@tanstack/react-router": "^1.151.6",
     "class-variance-authority": "catalog:frontend",
     "clsx": "catalog:frontend",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@eslint/js": "catalog:dev",
+    "@tanstack/eslint-plugin-query": "^5.91.3",
     "@tanstack/router-plugin": "^1.151.6",
     "@types/node": "catalog:dev",
     "@types/react": "catalog:dev",
