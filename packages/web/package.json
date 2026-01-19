@@ -10,12 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@elysiajs/eden": "catalog:frontend",
     "@radix-ui/react-accordion": "catalog:frontend",
     "@radix-ui/react-dialog": "catalog:frontend",
     "@radix-ui/react-label": "catalog:frontend",
     "@radix-ui/react-separator": "catalog:frontend",
-    "@radix-ui/react-switch": "catalog:frontend",
     "@radix-ui/react-slot": "catalog:frontend",
+    "@radix-ui/react-switch": "catalog:frontend",
     "@radix-ui/react-tabs": "catalog:frontend",
     "@tanstack/react-query": "catalog:frontend",
     "@tanstack/react-router": "catalog:frontend",

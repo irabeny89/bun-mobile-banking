@@ -40,6 +40,7 @@
       "name": "bun-moba-web",
       "version": "0.0.0",
       "dependencies": {
+        "@elysiajs/eden": "^1.4.6",
         "@radix-ui/react-accordion": "catalog:frontend",
         "@radix-ui/react-dialog": "catalog:frontend",
         "@radix-ui/react-label": "catalog:frontend",
@@ -60,7 +61,7 @@
       "devDependencies": {
         "@eslint/js": "catalog:dev",
         "@tanstack/eslint-plugin-query": "catalog:dev",
-        "@tanstack/react-router-devtools": "^1.151.6",
+        "@tanstack/react-router-devtools": "catalog:dev",
         "@tanstack/router-plugin": "catalog:dev",
         "@types/node": "catalog:dev",
         "@types/react": "catalog:dev",
@@ -102,6 +103,7 @@
       "@react-email/preview-server": "5.0.7",
       "@react-email/render": "^2.0.2",
       "@tanstack/eslint-plugin-query": "^5.91.3",
+      "@tanstack/react-router-devtools": "^1.151.6",
       "@tanstack/router-plugin": "^1.151.6",
       "@types/bun": "latest",
       "@types/jsonwebtoken": "^9.0.10",
@@ -410,6 +412,8 @@
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
 
     "@elysiajs/cors": ["@elysiajs/cors@1.4.1", "", { "peerDependencies": { "elysia": ">= 1.4.0" } }, "sha512-lQfad+F3r4mNwsxRKbXyJB8Jg43oAOXjRwn7sKUL6bcOW3KjUqUimTS+woNpO97efpzjtDE0tEjGk9DTw8lqTQ=="],
+
+    "@elysiajs/eden": ["@elysiajs/eden@1.4.6", "", { "peerDependencies": { "elysia": ">=1.4.19" } }, "sha512-Tsa4NwXEWg/u73vWiYZQ3L5/ecgZSxqiEjYwpS+4qBKXeTZqZKl2hcgHJSVBL+InEDMi35Xugct7qyAXE5oM4Q=="],
 
     "@elysiajs/openapi": ["@elysiajs/openapi@1.4.13", "", { "peerDependencies": { "elysia": ">= 1.4.0" } }, "sha512-5BNI7yuFo8zjacTWA8a/wYE0tNZ4ecD7PAkeUDEU7lj6Iep0t2i5Rml6q4/+roM5oZFdtvvzoX4DH8zGKFEo0w=="],
 

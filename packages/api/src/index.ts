@@ -46,5 +46,3 @@ export const app = new Elysia({
     .use(webhook)
   )
   .listen(PORT);
-  
-export type App = typeof app

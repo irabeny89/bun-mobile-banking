@@ -58,5 +58,8 @@
     "react-email": "catalog:dev",
     "bun-types": "catalog:dev"
   },
-  "module": "src/index.js"
+  "module": "src/index.js",
+  "exports": {
+    ".": "./src/types/index.ts"
+  }
 }
