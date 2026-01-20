@@ -44,12 +44,12 @@ export class AuditService {
                     ${data.userId},
                     ${data.userType},
                     ${data.action},
-                    ${data.targetType ?? null},
-                    ${data.targetId ?? null},
+                    ${data.targetType},
+                    ${data.targetId},
                     ${data.details ?? {}},
                     ${data.ipAddress ?? null},
                     ${data.userAgent ?? null},
-                    ${data.status ?? 'SUCCESS'}
+                    ${data.status}
                 )
             `;
     }

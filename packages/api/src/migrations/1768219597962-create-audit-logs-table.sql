@@ -1,14 +1,14 @@
 CREATE TABLE audit_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL,
+    user_id UUID DEFAULT NULL,
     user_type VARCHAR(50) NOT NULL,
     action VARCHAR(50) NOT NULL,
-    target_type VARCHAR(150) DEFAULT NULL,
+    target_type VARCHAR(150) NOT NULL,
     target_id VARCHAR(150) DEFAULT NULL,
     details JSONB DEFAULT '{}'::jsonb,
     ip_address VARCHAR(100) DEFAULT NULL,
     user_agent TEXT DEFAULT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'success',
+    status VARCHAR(50) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

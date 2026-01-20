@@ -30,48 +30,51 @@ export namespace AuditModel {
     ]);
     export type AuditActionT = typeof auditActionSchema.static;
 
+    export const auditTargetTypeSchema = t.UnionEnum([
+        "auth",
+        "account",
+        "audit",
+        "individual_user",
+        "kyc",
+        "webhook"
+    ], {
+        minLength: 1,
+        description: "Target/module type e.g. account, auth, etc."
+    })
+    export type AuditTargetTypeT = typeof auditTargetTypeSchema.static
+
     export const createAuditSchema = t.Object({
-        userId: t.String(),
+        userId: t.Nullable(t.String()),
         userType: CommonSchema.userTypeSchema,
         action: auditActionSchema,
-        targetType: t.Optional(t.UnionEnum([
-            "auth",
-            "account",
-            "audit",
-            "individual_user",
-            "kyc",
-            "webhook"
-        ], {
-            minLength: 1,
-            description: "Target/module type e.g. account, auth, etc."
-        })),
-        targetId: t.Optional(t.String({
+        targetType: auditTargetTypeSchema,
+        targetId: t.Nullable(t.String({
             minLength: 1,
             description: "Target/resource id e.g. email, account id, user id, etc."
         })),
-        details: t.Optional(t.Any({
+        details: t.Any({
             description: "Details in JSON object"
-        })),
-        ipAddress: t.Optional(t.String({
+        }),
+        ipAddress: t.String({
             description: "IP address"
-        })),
-        userAgent: t.Optional(t.String({
+        }),
+        userAgent: t.String({
             description: "User agent"
-        })),
-        status: t.Optional(auditStatusSchema),
+        }),
+        status: auditStatusSchema,
     });
     export type CreateAuditT = typeof createAuditSchema.static;
 
     export const auditSchema = t.Object({
         id: CommonSchema.idSchema,
-        userId: CommonSchema.idSchema,
+        userId: t.Nullable(CommonSchema.idSchema),
         userType: CommonSchema.userTypeSchema,
         action: auditActionSchema,
         targetType: t.Optional(t.String()),
-        targetId: t.Optional(t.String()),
+        targetId: t.Nullable(CommonSchema.idSchema),
         details: t.Any(),
-        ipAddress: t.Optional(t.String()),
-        userAgent: t.Optional(t.String()),
+        ipAddress: t.Nullable(t.String()),
+        userAgent: t.Nullable(t.String()),
         status: auditStatusSchema,
         createdAt: t.Date(),
         updatedAt: t.Date(),

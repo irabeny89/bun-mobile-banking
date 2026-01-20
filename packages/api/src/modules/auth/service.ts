@@ -4,12 +4,12 @@ import { AuthModel } from "./model";
 import cacheSingleton, { getCacheKey } from "@/utils/cache";
 import { OTP_TTL, REGISTER_CACHE_KEY, REFRESH_TOKEN_TTL, REFRESH_TOKEN_CACHE_KEY, MFA_OTP_CACHE_KEY, SECRET_1, ACCESS_TOKEN_TTL, SECRET_2 } from "@/config";
 import { emailQueue } from "@/utils/email-queue";
-import pino from "pino";
+import { Logger } from "logixlysia"
 import { CommonSchema } from "@/share/schema";
 import { sign, verify } from "jsonwebtoken";
 import dbSingleton from "@/utils/db";
 
-type SendMfaOtpParamsT = Record<"logger", pino.Logger> & CommonSchema.TokenPayloadT
+type SendMfaOtpParamsT = Record<"logger", Logger["pino"]> & CommonSchema.TokenPayloadT
 const cache = cacheSingleton();
 const db = dbSingleton();
 export abstract class AuthService {
@@ -60,7 +60,7 @@ export abstract class AuthService {
      * @param userType individual or business
      * @returns token payload or false if token is invalid
      */
-    static async verifyToken(token: string, tokenType: "access" | "refresh", userType: CommonSchema.UserType, logger?: pino.Logger) {
+    static async verifyToken(token: string, tokenType: "access" | "refresh", userType: CommonSchema.UserType, logger?: Logger["pino"]) {
         try {
             const payload = verify(token, tokenType === "access" ? SECRET_1 : SECRET_2) as CommonSchema.TokenPayloadT
             logger?.info("AuthService:: token verified successfully")
@@ -107,21 +107,6 @@ export abstract class AuthService {
     static async getRefreshToken(userId: string) {
         const token = await cache.get(getCacheKey(REFRESH_TOKEN_CACHE_KEY, userId))
         return token
-    }
-    static async register(body: AuthModel.RegisterBodyT, logger: pino.Logger) {
-        const otp = await genOTP()
-        logger.debug({ otp }, "AuthService:: OTP generated")
-        const cacheKey = getCacheKey(REGISTER_CACHE_KEY, otp);
-        await cache.set(cacheKey, JSON.stringify(body))
-        await cache.expire(cacheKey, OTP_TTL)
-        logger.info("AuthService:: user registration data cached")
-        await emailQueue.add("email-verify", {
-            otp,
-            email: body.email,
-            name: "Anonymous User",
-            subject: "Email Verification"
-        })
-        logger.info("AuthService:: email queued")
     }
     /**
      * Get user registration data (from initial registration step) from cache

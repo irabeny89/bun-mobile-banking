@@ -1,13 +1,15 @@
-import { OTP_TTL } from "@/config";
+import { OTP_TTL, REGISTER_CACHE_KEY } from "@/config";
 import { IndividualUserService } from "@/modules/Individual_user/service";
 import pinoLogger from "@/utils/pino-logger";
 import Elysia from "elysia";
 import { AuthModel } from "../model";
-import { AuthService } from "../service";
 import { CommonSchema } from "@/share/schema";
 import { ERROR_RESPONSE_CODES } from "@/types";
 import { AuditService } from "@/modules/audit/service";
 import { AuditModel } from "@/modules/audit/model";
+import cacheSingleton, { getCacheKey } from "@/utils/cache";
+import { emailQueue } from "@/utils/email-queue";
+import { genOTP } from "@/utils/otp";
 
 
 export const registerIndividual = new Elysia({ name: "registerIndividual" })
@@ -16,45 +18,47 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
         registerSuccess: AuthModel.registerSuccessSchema,
         error: CommonSchema.errorSchema,
     })
-    .state("audit", {
-        action: "register",
-        userId: "unknown",
-        userType: "individual",
-        targetId: "unknown",
-        targetType: "auth",
-        status: "success",
-        details: {},
-        ipAddress: "unknown",
-        userAgent: "unknown",
-    } as AuditModel.CreateAuditT)
     .resolve(({ store, server, request, headers }) => {
         const logger = pinoLogger(store)
         return {
             logger,
             audit: {
                 action: "register",
-                userId: "unknown",
+                userId: null,
                 userType: "individual",
-                targetId: "unknown",
+                targetId: null,
                 targetType: "auth",
                 status: "success",
                 details: {},
-                ipAddress: server?.requestIP(request)?.address || "unknown",
-                userAgent: headers["user-agent"] || "unknown",
+                ipAddress: server?.requestIP(request)?.address,
+                userAgent: headers["user-agent"],
             } as AuditModel.CreateAuditT
         }
     })
     .post("/register/individual", async ({ body, logger, audit }) => {
-        logger.info("auth:: registering individual user")
-        await AuthService.register(body, logger)
-        await AuditService.queue.add("log", {
-            ...audit,
-            status: "success",
-            details: { email: body.email }
-        })
-        logger.info("auth:: audit log queued")
+        const otp = await genOTP()
+        logger.info({ otp }, "auth:: OTP generated")
+        const cache = cacheSingleton();
+        const cacheKey = getCacheKey(REGISTER_CACHE_KEY, otp);
+        await cache.set(cacheKey, JSON.stringify(body))
+        await cache.expire(cacheKey, OTP_TTL)
+        logger.info("auth:: user registration data cached")
+        await Promise.all([
+            emailQueue.add("email-verify", {
+                otp,
+                email: body.email,
+                name: "Anonymous User",
+                subject: "Email Verification"
+            }),
+            AuditService.queue.add("log", {
+                ...audit,
+                status: "success",
+                details: { email: body.email }
+            })
+        ])
+        logger.info("auth:: email and audit log queued")
         return {
-            type: "success",
+            type: "success" as const,
             data: {
                 nextStep: "verify email",
                 message: `Check your email to complete your registration within ${OTP_TTL / 60} minutes.`
@@ -88,7 +92,7 @@ export const registerIndividual = new Elysia({ name: "registerIndividual" })
                 }
             }
             body.password = await Bun.password.hash(body.password)
-            logger.debug("auth:: hashed plain password")
+            logger.info("auth:: hashed plain password")
         },
         response: {
             200: "registerSuccess",

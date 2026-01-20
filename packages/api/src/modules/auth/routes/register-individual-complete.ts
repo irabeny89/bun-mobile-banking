@@ -20,14 +20,14 @@ export const registerIndividualComplete = new Elysia({
         .resolve(async ({ body, store, status, request, headers, server }) => {
             const audit = {
                 action: "register_complete",
-                userId: "unknown",
+                userId: null,
                 userType: "individual",
-                targetId: "unknown",
+                targetId: null,
                 targetType: "auth",
                 status: "success",
                 details: {},
-                ipAddress: server?.requestIP(request)?.address || "unknown",
-                userAgent: headers["user-agent"] || "unknown",
+                ipAddress: server?.requestIP(request)?.address,
+                userAgent: headers["user-agent"],
             } as AuditModel.CreateAuditT
             const logger = pinoLogger(store)
             const registerData = await AuthService.getUserRegisterData(body.otp)
