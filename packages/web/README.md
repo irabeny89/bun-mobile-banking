@@ -1,6 +1,6 @@
 # MoBa Web Client
 
-The frontend web application for MoBa (Modern Banking), a premium mobile banking solution built with Bun, React, and Vite.
+The frontend web application (Progressive Web App) for MoBa (Modern Banking), a premium mobile banking solution built with Bun, React, and Vite.
 
 ## Tech Stack
 
@@ -12,6 +12,38 @@ The frontend web application for MoBa (Modern Banking), a premium mobile banking
 - **UI Components**: [Radix UI](https://www.radix-ui.com/) + [Shadcn/UI](https://ui.shadcn.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Forms**: [React Hook Form](https://react-hook-form.com/) with [Zod](https://zod.dev/) validation
+
+## Development & Building
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) installed on your machine.
+
+### Installation
+
+1. Install dependencies from the root of the project:
+
+   ```bash
+   bun install
+   ```
+
+2. Run the development server:
+
+   ```bash
+   bun run dev
+   ```
+
+3. The application will be available at `http://localhost:5173`.
+
+### Building for Production
+
+1. Build the application for production:
+
+   ```bash
+   bun run build
+   ```
+
+2. The production build will be available in the `dist` directory.
 
 ## Features
 
