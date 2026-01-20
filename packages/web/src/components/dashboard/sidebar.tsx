@@ -6,17 +6,23 @@ import {
     Settings,
     Wallet,
     User,
-    LogOut
+    LogOut,
+    Banknote,
+    TrendingUp,
+    LifeBuoy
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-    { icon: Home, label: "Overview", to: "/dashboard" },
-    { icon: BarChart3, label: "Statistics", to: "/dashboard" },
-    { icon: Wallet, label: "Accounts", to: "/dashboard" },
-    { icon: CreditCard, label: "My Cards", to: "/dashboard" },
+    { icon: Home, label: "Dashboard", to: "/dashboard" },
+    { icon: BarChart3, label: "Transactions", to: "/dashboard" },
+    { icon: Wallet, label: "Payments", to: "/dashboard" },
+    { icon: CreditCard, label: "Card Management", to: "/dashboard" },
+    { icon: Banknote, label: "Loans", to: "/dashboard" },
+    { icon: TrendingUp, label: "Investments", to: "/dashboard" },
     { icon: Settings, label: "Settings", to: "/dashboard" },
+    { icon: LifeBuoy, label: "Support", to: "/dashboard" },
 ];
 
 export function Sidebar({ className }: { className?: string }) {

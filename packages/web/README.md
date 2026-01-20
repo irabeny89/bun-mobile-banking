@@ -1,73 +1,113 @@
-# React + TypeScript + Vite
+# MoBa Web Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The frontend web application for MoBa (Modern Banking), a premium mobile banking solution built with Bun, React, and Vite.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework**: [React](https://react.dev/) with [Vite](https://vitejs.dev/)
+- **Routing**: [TanStack Router](https://tanstack.com/router)
+- **State Management & Data Fetching**: [TanStack Query (React Query)](https://tanstack.com/query)
+- **API Client**: [Elysia Eden Treaty](https://elysiajs.com/eden/treaty) (Type-safe API communication)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with [Tailwind CSS Animate](https://github.com/jamiebuilds/tailwindcss-animate)
+- **UI Components**: [Radix UI](https://www.radix-ui.com/) + [Shadcn/UI](https://ui.shadcn.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Forms**: [React Hook Form](https://react-hook-form.com/) with [Zod](https://zod.dev/) validation
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. User Onboarding
 
-## Expanding the ESLint configuration
+User Type: Individual - KYC
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [x] User registration (NIN/Bank verification)
+- [x] KYC compliance (photo ID, address verification, etc.)
+- [x] OTP and email/mobile verification
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+User Type: Business - KYB
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- [ ] Documents upload
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### 2. Account Management
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- [x] Dashboard overview
+- [x] View account balances
+- [x] View transaction history
+- [x] Statement generation (PDF/email)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 3. Transactions
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- [ ] Intra-bank transfers
+- [ ] Inter-bank transfers (via NIBSS/NIP)
+- [ ] Wallet-to-wallet transfer (if applicable)
+- [ ] Scheduled/recurring payments
+- [ ] Saved beneficiaries
+- [ ] FX Swap
+
+### 4. Payments & Top-ups
+
+- [ ] Airtime & data recharge
+- [ ] DSTV, PHCN, and other utility bill payments
+- [ ] Payment with USSD
+
+### 5. Card Management
+
+- [ ] Request for ATM/virtual cards
+- [ ] Card activation & deactivation
+- [ ] PIN change & card freeze
+
+### 6. Loan Management
+
+- [ ] Request loan
+- [ ] Loan repayment tracker
+
+### 7. Investment
+
+- [ ] Fixed deposit investment management
+
+### 8. Security
+
+- [ ] Biometric authentication (Face ID, Fingerprint)
+- [x] 2FA (Two-Factor Authentication)
+- [x] Session management (auto logout)
+- [ ] Transaction PIN and OTP confirmation
+- [ ] Secret Question
+- [x] Change password
+
+### 9. Support
+
+- [ ] In-app live chat
+- [ ] Customer service contact options
+
+### 10. Audit Logs
+
+- [x] Audit logs
+
+## Getting Started
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) installed on your machine.
+
+### Installation
+
+1. Install dependencies from the root of the project:
+
+   ```bash
+   bun install
+   ```
+
+2. Run the development server:
+
+   ```bash
+   bun run dev
+   ```
+
+3. The application will be available at `http://localhost:5173`.
+
+## Project Structure
+
+- `src/components`: Reusable UI components (shadcn/ui and custom blocks)
+- `src/hooks`: Custom React hooks (including authentication and API mutations)
+- `src/lib`: Utility functions and API client setup (Eden Treaty)
+- `src/routes`: File-based routing powered by TanStack Router
+- `src/types.ts`: Shared TypeScript interfaces and types

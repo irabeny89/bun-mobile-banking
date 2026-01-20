@@ -22,7 +22,7 @@ User type includes individual and business.
   - [Mono External API](#mono-external-api)
   - [File Storage](#file-storage)
     - [Create Cluster Layout](#create-cluster-layout)
-    - [Create a Bucket and Keys](#create-a-bucket-and-keys)
+    - [Create a Bucket and Keys](#create-bucket-and-keys)
   - [Database Migrations](#database-migrations)
 - [Reference](#reference)
 

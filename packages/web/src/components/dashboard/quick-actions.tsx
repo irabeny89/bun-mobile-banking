@@ -5,10 +5,10 @@ import { Send, Plus, CreditCard, Banknote } from "lucide-react";
 
 export function QuickActions() {
     const actions = [
-        { icon: Send, label: "Send Money", color: "bg-blue-500 hover:bg-blue-600" },
-        { icon: Plus, label: "Add Funds", color: "bg-emerald-500 hover:bg-emerald-600" },
-        { icon: Banknote, label: "Pay Bills", color: "bg-orange-500 hover:bg-orange-600" },
-        { icon: CreditCard, label: "My Cards", color: "bg-purple-500 hover:bg-purple-600" },
+        { icon: Send, label: "Transfer", color: "bg-blue-600 hover:bg-blue-700" },
+        { icon: Banknote, label: "Pay Bills", color: "bg-emerald-600 hover:bg-emerald-700" },
+        { icon: CreditCard, label: "Cards", color: "bg-purple-600 hover:bg-purple-700" },
+        { icon: Plus, label: "More", color: "bg-gray-600 hover:bg-gray-700" },
     ];
 
     return (

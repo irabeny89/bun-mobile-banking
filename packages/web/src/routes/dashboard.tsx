@@ -3,10 +3,17 @@ import { StatCard } from '@/components/dashboard/stat-card';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { QuickActions } from '@/components/dashboard/quick-actions';
 import { Sidebar } from '@/components/dashboard/sidebar';
-import { Wallet, TrendingUp, TrendingDown, CreditCard, Bell, Search } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, CreditCard, Bell, Search, ShieldCheck, FileText, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/auth.hook';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet";
 
 export const Route = createFileRoute('/dashboard')({
     component: Dashboard,
@@ -21,7 +28,20 @@ function Dashboard() {
 
             <main className="flex-1 overflow-auto">
                 {/* Top Bar */}
-                <header className="h-16 border-b bg-background/50 backdrop-blur-md sticky top-0 z-10 px-8 flex items-center justify-between">
+                <header className="h-16 border-b bg-background/50 backdrop-blur-md sticky top-0 z-10 px-4 sm:px-8 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 lg:hidden">
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button variant="ghost" size="icon" className="size-9">
+                                    <Menu className="size-5" />
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side="left" className="p-0 w-72">
+                                <Sidebar className="flex lg:flex" />
+                            </SheetContent>
+                        </Sheet>
+                    </div>
+
                     <div className="flex items-center gap-4 flex-1 max-w-md">
                         <div className="relative w-full">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
@@ -52,9 +72,23 @@ function Dashboard() {
 
                 <div className="p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     {/* Greeting Section */}
-                    <div className="flex flex-col gap-1">
-                        <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
-                        <p className="text-muted-foreground">Welcome back, {user?.email}. Here's what's happening with your account today.</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex flex-col gap-1">
+                            <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+                            <p className="text-muted-foreground flex items-center gap-2">
+                                Welcome back, {user?.email}.
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                    <ShieldCheck className="size-3" />
+                                    KYC Verified
+                                </span>
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Button variant="outline" size="sm" className="hidden sm:flex border-primary/20 hover:bg-primary/5">
+                                <FileText className="mr-2 h-4 w-4" />
+                                Get Statement
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Main Stats Grid */}
