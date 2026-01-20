@@ -39,7 +39,10 @@ export namespace AuthModel {
     })
     export type RegisterCompleteT = typeof registerCompleteSchema.static;
 
-    export const registerCompleteSuccessSchema = successSchemaFactory(tokenSchema)
+    export const registerCompleteSuccessSchema = successSchemaFactory(t.Intersect([
+        tokenSchema,
+        t.Object({ message: t.Literal("OTP verified successfully") })
+    ]))
     export type RegisterCompleteSuccessT = typeof registerCompleteSuccessSchema.static;
 
     export const loginSchema = t.Pick(IndividualUserModel.userSchema, ["email", "password"])

@@ -35,15 +35,15 @@
     "redis-cli:dev": "export $(cat .env.development | xargs) && podman exec -ti ${CACHE_CONTAINER_NAME} redis-cli"
   },
   "dependencies": {
-    "jsonwebtoken": "catalog:",
-    "xss": "catalog:",
     "@elysiajs/cors": "catalog:backend",
     "@elysiajs/openapi": "catalog:backend",
     "@elysiajs/server-timing": "catalog:backend",
     "bullmq": "catalog:backend",
     "elysia": "catalog:backend",
+    "jsonwebtoken": "catalog:",
     "logixlysia": "catalog:backend",
-    "nodemailer": "catalog:backend"
+    "nodemailer": "catalog:backend",
+    "xss": "catalog:"
   },
   "devDependencies": {
     "react": "catalog:frontend",

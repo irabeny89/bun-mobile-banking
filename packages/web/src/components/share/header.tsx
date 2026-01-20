@@ -15,6 +15,9 @@ export default function Header() {
 	const location = useLocation()
 	const isHome = location.pathname === '/'
 	const isAuth = location.pathname === '/auth'
+	const isDashboard = location.pathname.startsWith('/dashboard')
+
+	if (isDashboard) return null;
 
 	const NavLinks = () => (
 		<>

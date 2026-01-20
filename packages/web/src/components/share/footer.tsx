@@ -3,7 +3,14 @@ import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } 
 import { Wallet } from "lucide-react";
 import { DialogHeader } from "@/components/ui/dialog";
 
+import { useLocation } from "@tanstack/react-router";
+
 export default function Footer() {
+    const location = useLocation()
+    const isDashboard = location.pathname.startsWith('/dashboard')
+
+    if (isDashboard) return null;
+
     return (
         <footer className="py-12 border-t bg-background">
             <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">

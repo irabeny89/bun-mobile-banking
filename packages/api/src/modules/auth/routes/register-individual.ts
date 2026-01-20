@@ -11,7 +11,6 @@ import cacheSingleton, { getCacheKey } from "@/utils/cache";
 import { emailQueue } from "@/utils/email-queue";
 import { genOTP } from "@/utils/otp";
 
-
 export const registerIndividual = new Elysia({ name: "registerIndividual" })
     .model({
         register: AuthModel.registerBodySchema,

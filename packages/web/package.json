@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@elysiajs/eden": "catalog:frontend",
+    "@hookform/resolvers": "catalog:frontend",
     "@radix-ui/react-accordion": "catalog:frontend",
     "@radix-ui/react-dialog": "catalog:frontend",
     "@radix-ui/react-label": "catalog:frontend",
@@ -22,11 +23,15 @@
     "@tanstack/react-router": "catalog:frontend",
     "class-variance-authority": "catalog:frontend",
     "clsx": "catalog:frontend",
+    "jsonwebtoken": "catalog:",
     "lucide-react": "catalog:frontend",
     "react": "catalog:frontend",
     "react-dom": "catalog:frontend",
+    "react-hook-form": "catalog:frontend",
+    "sonner": "catalog:frontend",
     "tailwind-merge": "catalog:frontend",
-    "tailwindcss-animate": "catalog:frontend"
+    "tailwindcss-animate": "catalog:frontend",
+    "zod": "catalog:frontend"
   },
   "devDependencies": {
     "@eslint/js": "catalog:dev",
@@ -48,7 +53,8 @@
     "typescript-eslint": "catalog:dev",
     "vite": "catalog:dev",
     "vite-plugin-pwa": "catalog:dev",
-    "workbox-window": "catalog:dev"
+    "workbox-window": "catalog:dev",
+    "@types/jsonwebtoken": "catalog:dev"
   },
   "overrides": {
     "vite": "catalog:dev"
