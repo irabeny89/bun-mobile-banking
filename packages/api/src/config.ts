@@ -1,4 +1,4 @@
-import { transactions } from "./modules/account/routes/transactions";
+
 
 export const PORT = process.env.PORT ?? "3000";
 export const DEFAULT_CURRENCY = process.env.DEFAULT_CURRENCY ?? "NGN";

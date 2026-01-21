@@ -6,7 +6,7 @@ export const AuthTabs = {
 
 export type AuthTabsT = (typeof AuthTabs)[keyof typeof AuthTabs];
 
-export type ApiSuccessT<T = null> = {
+export type ApiSuccessT<T = any> = {
     type: "success";
     data: T
 }

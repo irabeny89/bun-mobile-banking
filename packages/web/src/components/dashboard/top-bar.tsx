@@ -1,13 +1,13 @@
 import { Bell, Search, Menu } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Button } from '~/components/ui/button';
 import {
 	Sheet,
 	SheetContent,
 	SheetTrigger,
-} from "@/components/ui/sheet";
-import { Sidebar } from '@/components/dashboard/sidebar';
-import type { TokenPayloadT } from '@/types';
+} from "~/components/ui/sheet";
+import { Sidebar } from '~/components/dashboard/sidebar';
+import type { TokenPayloadT } from '~/types';
 
 type Props = {
 	user: TokenPayloadT | null

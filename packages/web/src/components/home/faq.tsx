@@ -1,5 +1,5 @@
-import { APP_NAME } from "@/config";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { APP_NAME } from "~/config";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "~/components/ui/accordion";
 
 export default function FAQ() {
     return (

@@ -1,4 +1,4 @@
-export type MonoResponse<D = null, M = null> = {
+export type MonoResponse<D = null> = {
     status: "successful" | "failed";
     message: string;
     timestamp: string;

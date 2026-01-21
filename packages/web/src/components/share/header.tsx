@@ -1,6 +1,6 @@
-import { APP_NAME } from "@/config";
+import { APP_NAME } from "~/config";
 import { Wallet, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "~/components/ui/button";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
 	Sheet,
@@ -8,8 +8,8 @@ import {
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
-} from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
+} from "~/components/ui/sheet";
+import { Separator } from "~/components/ui/separator";
 
 export default function Header() {
 	const location = useLocation()

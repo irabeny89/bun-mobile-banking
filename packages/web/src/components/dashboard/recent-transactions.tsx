@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { ArrowDownLeft, ShoppingCart, Coffee, Car, Home } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "~/lib/utils";
 
 
 const transactions = [

@@ -5,11 +5,11 @@ import {
 	TabsContent,
 	TabsList,
 	TabsTrigger,
-} from "@/components/ui/tabs"
+} from "~/components/ui/tabs"
 import { LogIn, UserPlus, LifeBuoy } from "lucide-react"
-import Login from '@/components/auth/login'
-import Register from '@/components/auth/register'
-import Recovery from '@/components/auth/recovery'
+import Login from '~/components/auth/login'
+import Register from '~/components/auth/register'
+import Recovery from '~/components/auth/recovery'
 
 export const Route = createFileRoute('/auth')({
 	component: AuthPage,

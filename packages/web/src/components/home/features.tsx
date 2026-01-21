@@ -1,5 +1,5 @@
 import { ShieldCheck, LineChart, Zap, Smartphone, CreditCard, Banknote, Lock } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "~/components/ui/card";
 
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {

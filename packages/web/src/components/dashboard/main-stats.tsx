@@ -1,4 +1,4 @@
-import { StatCard } from "@/components/dashboard/stat-card";
+import { StatCard } from "~/components/dashboard/stat-card";
 import { Wallet, TrendingUp, TrendingDown, CreditCard } from "lucide-react";
 
 export default function MainStats() {

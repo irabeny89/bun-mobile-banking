@@ -5,12 +5,12 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "~/components/ui/card"
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 import type { Dispatch, SetStateAction } from "react"
-import { AuthTabs } from "@/types"
+import { AuthTabs } from "~/types"
 
 export default function Login({ setActiveTab }: { setActiveTab: Dispatch<SetStateAction<string>> }) {
 	return (

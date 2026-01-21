@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "~/components/ui/button";
 import { ShieldCheck, FileText } from "lucide-react";
-import type { TokenPayloadT } from "@/types";
+import type { TokenPayloadT } from "~/types";
 
 type Props = {
 	user: TokenPayloadT | null

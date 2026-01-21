@@ -1,7 +1,7 @@
-import { ACCESS_TOKEN_KEY } from "@/config";
-import { eden } from "@/lib/api";
-import { decodeJwt } from "@/lib/utils";
-import type { ApiErrorT, ApiSuccessT, TokenPayloadT } from "@/types";
+import { ACCESS_TOKEN_KEY } from "~/config";
+import { eden } from "~/lib/api";
+import { decodeJwt } from "~/lib/utils";
+import type { ApiErrorT, ApiSuccessT, TokenPayloadT } from "~/types";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -50,11 +50,11 @@ export function useRegister() {
 				const res = await eden.api.v1.auth.register.individual.post(body);
 				const { type } = res.data as ApiSuccessT | ApiErrorT
 				if (type === "error") {
-					const { error } = res.data as ApiErrorT
+					const { error } = res.data as unknown as ApiErrorT
 					throw new Error(error.message)
 				}
 				return res.data as ApiSuccessT<RegisterResponseData>
-			} catch (error) {
+			} catch (err) {
 				throw new Error("Something went wrong")
 			}
 		}
@@ -70,11 +70,11 @@ export function useRegisterComplete() {
 				const res = await eden.api.v1.auth.register.individual.complete.post(body);
 				const { type } = res.data as ApiSuccessT | ApiErrorT
 				if (type === "error") {
-					const { error } = res.data as ApiErrorT
+					const { error } = res.data as unknown as ApiErrorT
 					throw new Error(error.message)
 				}
 				return res.data as ApiSuccessT<RegisterCompleteResponseData>
-			} catch (error) {
+			} catch (err) {
 				throw new Error("Something went wrong")
 			}
 		}

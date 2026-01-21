@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
-import { InstallPWA } from "@/components/share/pwa";
-import { Button } from "@/components/ui/button";
+import { InstallPWA } from "~/components/share/pwa";
+import { Button } from "~/components/ui/button";
 import { Link } from "@tanstack/react-router";
 
 export default function HeroSection() {

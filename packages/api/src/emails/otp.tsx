@@ -1,6 +1,5 @@
 import { OTP_TTL } from "@/config";
 import { Section, Tailwind, Text } from "@react-email/components";
-import * as React from "react";
 import { render } from "@react-email/render";
 
 type Props = {

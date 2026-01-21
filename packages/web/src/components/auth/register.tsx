@@ -5,14 +5,14 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
+} from "~/components/ui/card"
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
+import { Switch } from "~/components/ui/switch"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRegister, registerBodySchema, type RegisterBodyT, useRegisterComplete } from "@/hooks/auth.hook"
+import { useRegister, registerBodySchema, type RegisterBodyT, useRegisterComplete } from "~/hooks/auth.hook"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
@@ -21,9 +21,9 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-} from "@/components/ui/dialog"
+} from "~/components/ui/dialog"
 import { useNavigate } from "@tanstack/react-router"
-import { ACCESS_TOKEN_KEY } from "@/config"
+import { ACCESS_TOKEN_KEY } from "~/config"
 
 export default function Register() {
 	const navigate = useNavigate()

@@ -11,8 +11,8 @@ import {
     TrendingUp,
     LifeBuoy
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
 
 const navItems = [
     { icon: Home, label: "Dashboard", to: "/dashboard" },

@@ -1,7 +1,7 @@
-import { APP_NAME } from "@/config";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { APP_NAME } from "~/config";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "~/components/ui/dialog";
 import { Wallet } from "lucide-react";
-import { DialogHeader } from "@/components/ui/dialog";
+import { DialogHeader } from "~/components/ui/dialog";
 
 import { useLocation } from "@tanstack/react-router";
 

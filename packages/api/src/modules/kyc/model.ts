@@ -2,7 +2,7 @@ import { IMAGE_UPLOAD } from "@/config";
 import { CommonSchema } from "@/share/schema";
 import { successSchemaFactory } from "@/utils/response";
 import { t } from "elysia";
-import { FileUnit } from "elysia/dist/type-system/types";
+
 
 export namespace KycModel {
     export const currentTierSchema = t.UnionEnum(["tier_1", "tier_2", "tier_3"])
@@ -174,7 +174,7 @@ export namespace KycModel {
         t.Object({
             passportPhoto: t.File({
                 description: "Passport photo must be a valid image file e.g jpeg, png, jpg",
-                maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+                maxSize: IMAGE_UPLOAD.maxSize as any,
                 type: IMAGE_UPLOAD.mimeType
             })
         }),
@@ -200,7 +200,7 @@ export namespace KycModel {
             }),
             imageFile: t.File({
                 description: "Image file must be a valid image file e.g jpeg, png, jpg",
-                maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+                maxSize: IMAGE_UPLOAD.maxSize as any,
                 type: IMAGE_UPLOAD.mimeType
             })
         })
@@ -213,12 +213,12 @@ export namespace KycModel {
             t.Object({
                 addressProof: t.File({
                     description: "Address proof must be a valid image file e.g jpeg, png, jpg",
-                    maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+                    maxSize: IMAGE_UPLOAD.maxSize as any,
                     type: IMAGE_UPLOAD.mimeType
                 }),
                 liveSelfie: t.File({
                     description: "Live selfie must be a valid image file e.g jpeg, png, jpg",
-                    maxSize: IMAGE_UPLOAD.maxSize as FileUnit,
+                    maxSize: IMAGE_UPLOAD.maxSize as any,
                     type: IMAGE_UPLOAD.mimeType
                 }),
                 meterNumber: t.String({

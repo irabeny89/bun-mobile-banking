@@ -1,16 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { StatCard } from '@/components/dashboard/stat-card';
-import { RecentTransactions } from '@/components/dashboard/recent-transactions';
-import { QuickActions } from '@/components/dashboard/quick-actions';
-import { Sidebar } from '@/components/dashboard/sidebar';
-import { Wallet, TrendingUp, TrendingDown, CreditCard, ShieldCheck, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/hooks/auth.hook';
-import TopBar from '@/components/dashboard/top-bar';
-import Greeting from '@/components/dashboard/greeting';
-import MainStats from '@/components/dashboard/main-stats';
-import AtmCard from '@/components/dashboard/atm-card';
-import SavingsGoal from '@/components/dashboard/savings-goal';
+import { RecentTransactions } from '~/components/dashboard/recent-transactions';
+import { QuickActions } from '~/components/dashboard/quick-actions';
+import { Sidebar } from '~/components/dashboard/sidebar';
+import { useAuth } from '~/hooks/auth.hook';
+import TopBar from '~/components/dashboard/top-bar';
+import Greeting from '~/components/dashboard/greeting';
+import MainStats from '~/components/dashboard/main-stats';
+import AtmCard from '~/components/dashboard/atm-card';
+import SavingsGoal from '~/components/dashboard/savings-goal';
 
 export const Route = createFileRoute('/dashboard')({
 	component: Dashboard,

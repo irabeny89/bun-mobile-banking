@@ -1,7 +1,7 @@
-import HeroSection from "@/components/home/hero-section";
-import Features from "@/components/home/features";
-import FAQ from "@/components/home/faq";
-import Reference from "@/components/home/reference";
+import HeroSection from "~/components/home/hero-section";
+import Features from "~/components/home/features";
+import FAQ from "~/components/home/faq";
+import Reference from "~/components/home/reference";
 import { createFileRoute } from '@tanstack/react-router'
 
 export default function HomePage() {
